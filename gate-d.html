@@ -4,6 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gate D · 한 화면 한 업무</title>
+<!-- est-workbook-hook:start -->
+<script>
+/* 상세 견적서 라우트(#EstCivil, #est/civil 등)를 엑셀형 견적 워크북 화면으로 연결 */
+(function(){
+  var GATE = 'gate-d';
+  var RX = /^#(?:Est(Civil|Tank)|est[-\/](civil|tank))(?:$|[\/?&])/;
+  function url(hash, back){
+    var tank = /tank/i.test(hash);
+    return 'estimate-workbook.html?view=' + (tank ? 'tank' : 'civil') + '&from=' + GATE + '&back=' + encodeURIComponent(back);
+  }
+  function page(u){ var m = /([\w\-]+\.html)(#[^\s]*)?$/.exec(u || ''); return m ? m[1] + (m[2] || '') : ''; }
+  if (RX.test(location.hash)) {
+    var ref = page(document.referrer);
+    location.replace(url(location.hash, ref && ref.indexOf(GATE + '.html') !== 0 ? ref : GATE + '.html'));
+  }
+  window.addEventListener('hashchange', function(e){
+    if (!RX.test(location.hash)) return;
+    e.stopImmediatePropagation();
+    var old = (e.oldURL || '').split('#')[1] || '';
+    var dest = url(location.hash, GATE + '.html' + (old ? '#' + old : ''));
+    history.replaceState(null, '', old ? '#' + old : location.pathname + location.search);
+    location.href = dest;
+  });
+})();
+</script>
+<!-- est-workbook-hook:end -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{--bg:#FFFFFF;--soft:#F5F5F7;--line:#E8E8EC;--ink:#16161A;--sub:#6B6B76;--faint:#A0A0AA;--acc:#3346D3;--acc-w:#EEF0FD;--ok:#12805C;--ok-w:#E5F4EE;--warn:#C2410C;--warn-w:#FDEDE4;--ai:#7034D6;--ai-w:#F3EDFD}
