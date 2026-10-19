@@ -1,0 +1,1913 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gate A · 영업·견적 통합관리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+html,body{margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#gate{position:fixed;right:14px;bottom:14px;z-index:50;background:#101828;color:#fff;font:600 12px/1 'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;padding:9px 12px;border-radius:999px;box-shadow:0 4px 14px rgba(16,24,40,.25);letter-spacing:.02em}
+#gate b{color:#9DB4E8;margin-right:6px}
+#gate:hover{background:#000}
+</style>
+</head>
+<body>
+<div id="host"></div>
+<a id="gate" href="index.html" title="인트로로 돌아가기"><b>GATE A</b>v1 · 업무 흐름형</a>
+<template id="t-Main"><style>
+/*body*/:host{display:block;margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#101828;font-size:14px;line-height:1.5}
+a{color:#2457C5;text-decoration:none}a:hover{color:#1A3F94}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+.main{flex:999 1 560px;min-width:0;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font-size:20px;font-weight:700}
+.sub{color:#667085;font-size:13px}
+.panel{background:#fff;border:1px solid #E4E7EC;border-radius:10px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #EAECF0}
+.ph h2{margin:0;font-size:14px;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;color:#344054;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#F9FAFB;color:#101828}
+.btn.pri{background:#2457C5;border-color:#2457C5;color:#fff}
+.btn.pri:hover{background:#1A3F94;color:#fff}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;background:#F2F4F7;color:#475467;white-space:nowrap}
+.p-rv{background:#EEF3FD;color:#2457C5}.p-qp{background:#FEF0E6;color:#B54708}.p-wo{background:#E7F6EC;color:#067647}.p-warn{background:#FEF0E6;color:#B54708}
+.muted{color:#667085}
+.ai{font-size:11px;font-weight:700;color:#6941C6}
+.seg{display:inline-flex;background:#F2F4F7;border-radius:8px;padding:3px;gap:2px}
+.seg a,.seg button{border:0;background:none;font:inherit;font-size:13px;color:#475467;padding:0 12px;min-height:34px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center}
+.seg .on{background:#fff;color:#101828;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.row{display:block;padding:12px 16px;border-bottom:1px solid #EAECF0;color:#101828}
+.row:hover{background:#F9FAFB;color:#101828}
+.row.on{background:#EEF3FD}
+.sec{padding:16px 20px;border-top:1px solid #EAECF0}
+.sec h3{margin:0 0 10px;font-size:13px;font-weight:600;color:#475467}
+.dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 20px;margin:0}
+.dl dt{font-size:12px;color:#667085}
+.dl dd{margin:2px 0 0;font-weight:600}
+.f label{display:block;font-size:12px;font-weight:600;color:#475467;margin-bottom:4px}
+.f select{width:100%;min-height:40px;border:1px solid #D0D5DD;border-radius:6px;padding:0 10px;font:inherit;font-size:13px;background:#fff}
+
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴">
+<div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a>
+<div class="grp">오늘 할 일</div>
+<a class="nav on" href="#Main">메일 분류함 <span class="badge">3</span></a>
+<a class="nav" href="#Briefing">영업 브리핑</a>
+<a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a>
+<div class="grp">영업 프로젝트</div>
+<a class="nav" href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a>
+<a class="nav" href="#Results">결과·분석</a>
+<div class="grp">문서</div>
+<a class="nav" href="#DocHub">문서함</a>
+<a class="nav" href="#DocChat">문서 채팅</a>
+<div class="grp">기준 정보</div>
+<a class="nav" href="#AVL">고객사 AVL</a>
+<span class="nav dim">단가 마스터</span>
+<span class="nav dim">외주업체</span>
+</nav>
+<main class="main">
+<div class="top">
+<div><h1>메일 분류함</h1><div class="sub">대표메일 · 오늘 23건 중 영업 관련 14건 · 확정 9건</div></div>
+<a class="btn pri" href="#Briefing">브리핑 보내기 (9건)</a>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<section class="panel" style="flex: 1 1 340px; min-width: 0; overflow: hidden" aria-label="메일 목록">
+<div class="ph"><div class="seg"><button class="on" type="button">미확정 5</button><button type="button">확인 필요 3</button><button type="button">확정 9</button></div></div>
+<a class="row on" href="#Main">
+<div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">울산공장 저장탱크 4기 신설 견적 요청</b><span class="muted" style="font-size: 12px">09:12</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 4px"><span class="muted" style="font-size: 13px">한빛케미칼(주)</span><span class="pill p-rv">견적요청</span></div>
+</a>
+<a class="row" href="#Main">
+<div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">평택 물류센터 기계설비 현장설명회</b><span class="muted" style="font-size: 12px">08:47</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 4px"><span class="muted" style="font-size: 13px">대성건설(주)</span><span class="pill p-rv">현장설명회</span></div>
+</a>
+<a class="row" href="#Main">
+<div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">당진 LNG 인입배관 정정공고(2차)</b><span class="muted" style="font-size: 12px">08:30</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 4px"><span class="muted" style="font-size: 13px">서해에너지 · QP-2026-0049에 연결</span><span class="pill">정정공고</span></div>
+</a>
+<a class="row" href="#Main">
+<div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">광양 수처리설비 질의 회신</b><span class="muted" style="font-size: 12px">08:05</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 4px"><span class="muted" style="font-size: 13px">한결엔지니어링 · QP-2026-0051에 연결</span><span class="pill">질의회신</span></div>
+</a>
+<a class="row" href="#Main">
+<div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">오송 신공장 유틸리티 배관 문의</b><span class="muted" style="font-size: 12px">07:58</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 4px"><span class="muted" style="font-size: 13px">미래바이오 시설팀</span><span class="pill p-warn">확인 필요</span></div>
+</a>
+<div class="muted" style="padding: 12px 16px; font-size: 12px">영업 아님으로 제외된 9건 보기</div>
+</section>
+<section class="panel" style="flex: 1.7 1 520px; min-width: 0; overflow: hidden" aria-label="선택한 메일">
+<div style="padding: 18px 20px">
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start">
+<div><span class="pill p-rv">견적요청</span><h2 style="margin: 8px 0 2px; font-size: 18px">울산공장 저장탱크 4기 신설 견적 요청</h2><div class="sub">한빛케미칼(주) 구매팀 · 10/15 09:12</div></div>
+<span class="ai">AI 분류 96%</span>
+</div>
+<p style="margin: 14px 0 0; font-size: 13px; color: #344054"><span class="ai">AI 요약</span>&nbsp; 저장탱크 4기 신설 견적 요청. 10/20 현장설명회 참석 후 10/30까지 제출. 입찰자료 5종 첨부.</p>
+</div>
+<div class="sec">
+<h3>핵심 정보</h3>
+<dl class="dl">
+<div><dt>발주처</dt><dd>한빛케미칼(주)</dd></div>
+<div><dt>견적 구분</dt><dd>탱크</dd></div>
+<div><dt>지역</dt><dd>울산 남구</dd></div>
+<div><dt>현장설명회</dt><dd>10/20 10:00</dd></div>
+<div><dt>견적 마감</dt><dd>10/30 17:00 <span style="color: #B54708">D-15</span></dd></div>
+<div><dt>적용 AVL</dt><dd>한빛케미칼 v3</dd></div>
+</dl>
+</div>
+<div class="sec">
+<h3>첨부 5</h3>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 20px; font-size: 13px">
+<div>입찰안내서.pdf <span class="muted">· 안내서</span></div>
+<div>탱크_시방서.pdf <span class="muted">· 시방서</span></div>
+<div>BM_List.xlsx <span class="muted">· 물량</span></div>
+<div>GA_도면.zip <span class="muted">· 도면</span></div>
+<div>계약일반조건.pdf <span class="muted">· 계약조건</span></div>
+</div>
+</div>
+<div class="sec">
+<h3>등록</h3>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px" class="f">
+<div><label for="match">프로젝트</label><select id="match"><option>새 검토 ID · RV-2026-0142</option><option>기존 프로젝트에 연결</option></select></div>
+<div><label for="owner">담당자</label><select id="owner"><option>[탱크 담당자] (추천)</option><option>[공사 담당자]</option></select></div>
+</div>
+<div class="muted" style="font-size: 12px; margin-top: 8px">저장 위치 · 20_영업프로젝트 / 2026 / RV-2026-0142_한빛케미칼_울산저장탱크 / 10_검토</div>
+</div>
+<div style="display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; padding: 14px 20px; border-top: 1px solid #EAECF0; background: #F9FAFB">
+<button class="btn" type="button">영업 아님</button>
+<button class="btn" type="button">분류 수정</button>
+<a class="btn pri" href="#DocHub">확정하고 등록</a>
+</div>
+</section>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>메일 분류함</b>대표메일로 들어온 요청을 AI가 유형별로 나누고 핵심 정보를 뽑아 둔 결과를 영업지원이 확인·수정하는 화면입니다. 확정하면 검토 ID(RV)가 만들어지고 담당자가 배정되며, 첨부는 표준 폴더에 원본 그대로 저장됩니다.</div></footer></main>
+</div>
+</template><template id="t-Briefing"><style>
+/*body*/:host{display:block;margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#101828;font-size:14px;line-height:1.5}
+a{color:#2457C5;text-decoration:none}a:hover{color:#1A3F94}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+.main{flex:999 1 560px;min-width:0;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font-size:20px;font-weight:700}
+.sub{color:#667085;font-size:13px}
+.panel{background:#fff;border:1px solid #E4E7EC;border-radius:10px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #EAECF0}
+.ph h2{margin:0;font-size:14px;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;color:#344054;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#F9FAFB;color:#101828}
+.btn.pri{background:#2457C5;border-color:#2457C5;color:#fff}
+.btn.pri:hover{background:#1A3F94;color:#fff}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;background:#F2F4F7;color:#475467;white-space:nowrap}
+.p-rv{background:#EEF3FD;color:#2457C5}.p-qp{background:#FEF0E6;color:#B54708}.p-wo{background:#E7F6EC;color:#067647}.p-warn{background:#FEF0E6;color:#B54708}
+.muted{color:#667085}
+.ai{font-size:11px;font-weight:700;color:#6941C6}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;font-size:12px;color:#667085;padding:10px 16px;border-bottom:1px solid #EAECF0;white-space:nowrap;background:#F9FAFB}
+td{padding:12px 16px;border-bottom:1px solid #EAECF0;vertical-align:top}
+tr:last-child td{border-bottom:0}
+.id{font-size:12px;font-weight:600;color:#475467;white-space:nowrap}
+.li{display:flex;gap:12px;padding:11px 16px;border-bottom:1px solid #EAECF0;font-size:13px;color:#101828}
+.li:last-child{border-bottom:0}
+.li .d{flex:none;width:64px;font-weight:600}
+
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴">
+<div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a>
+<div class="grp">오늘 할 일</div>
+<a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a>
+<a class="nav on" href="#Briefing">영업 브리핑</a>
+<a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a>
+<div class="grp">영업 프로젝트</div>
+<a class="nav" href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a>
+<a class="nav" href="#Results">결과·분석</a>
+<div class="grp">문서</div>
+<a class="nav" href="#DocHub">문서함</a>
+<a class="nav" href="#DocChat">문서 채팅</a>
+<div class="grp">기준 정보</div>
+<a class="nav" href="#AVL">고객사 AVL</a>
+<span class="nav dim">단가 마스터</span>
+<span class="nav dim">외주업체</span>
+</nav>
+<main class="main">
+<div class="top">
+<div><h1>영업 브리핑 · 10월 15일</h1><div class="sub">받는 사람: 영업그룹 12명 (대표이사·임원 포함) · 메신저 + 메일</div></div>
+<div style="display: flex; gap: 8px"><button class="btn" type="button">편집</button><button class="btn pri" type="button">보내기</button></div>
+</div>
+<div class="panel" style="padding: 14px 18px; font-size: 14px"><span class="ai">AI 요약</span>&nbsp; 신규 5건(견적요청 3, 현장설명회 2). 이번 주 마감 1건, 현장설명회 2건, 임원 승인 대기 2건.</div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<section class="panel" style="flex: 2 1 560px; min-width: 0; overflow: hidden">
+<div class="ph"><h2>신규 접수 5</h2><a href="#Pipeline" style="font-size: 13px">파이프라인에서 보기</a></div>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>검토 ID</th><th>프로젝트</th><th>구분</th><th>현장설명회</th><th>마감</th><th>담당</th></tr></thead>
+<tbody>
+<tr><td class="id">RV-2026-0142</td><td><a href="#DocHub">울산공장 저장탱크 4기</a><div class="muted" style="font-size: 12px">한빛케미칼 · 견적요청</div></td><td>탱크</td><td>10/20</td><td>10/30</td><td>[탱크 담당자]</td></tr>
+<tr><td class="id">RV-2026-0143</td><td>평택 물류센터 기계설비<div class="muted" style="font-size: 12px">대성건설 · 현장설명회</div></td><td>공사</td><td>10/17</td><td>11/06</td><td>[공사 담당자]</td></tr>
+<tr><td class="id">RV-2026-0144</td><td>여수 원료탱크 보수<div class="muted" style="font-size: 12px">동해정밀화학 · 견적요청</div></td><td>공사</td><td>—</td><td>10/27</td><td>[공사 담당자]</td></tr>
+<tr><td class="id">RV-2026-0145</td><td>하동 저장조 교체<div class="muted" style="font-size: 12px">남부발전 협력사 · 현장설명회</div></td><td>탱크</td><td>10/22</td><td>미정</td><td><span class="pill p-warn">배정 필요</span></td></tr>
+<tr><td class="id">RV-2026-0146</td><td>오송 신공장 유틸리티 배관<div class="muted" style="font-size: 12px">미래바이오 · 견적요청</div></td><td>공사</td><td>—</td><td>10/29</td><td>[공사 담당자]</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<section class="panel">
+<div class="ph"><h2>이번 주 일정</h2></div>
+<div class="li"><span class="d">10/16</span><span>마감 · 당진 LNG 배관 <span class="muted">QP-2026-0049</span></span></div>
+<div class="li"><span class="d">10/17</span><span>현설 · 평택 물류센터 14:00</span></div>
+<div class="li"><span class="d">10/17</span><span>TCM · 광양 수처리 2차</span></div>
+<div class="li"><span class="d">10/20</span><span>현설 · 울산 저장탱크 10:00</span></div>
+</section>
+<section class="panel">
+<div class="ph"><h2>임원 승인 대기 2</h2><a href="#Approvals" style="font-size: 13px">승인함</a></div>
+<a class="li" href="#Approvals"><span class="pill p-qp">견적</span><span>당진 LNG 배관 R2 · <span style="color: #B54708">D-1</span></span></a>
+<a class="li" href="#GoNoGo"><span class="pill p-rv">참여</span><span>울산 저장탱크 4기</span></a>
+</section>
+</div>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>영업 브리핑</b>그날 확정된 신규 요청, 이번 주 현장설명회·마감, 임원 승인 대기 건을 한 장으로 묶어 대표이사·임원을 포함한 영업그룹에 보내는 화면입니다.</div></footer></main>
+</div>
+</template><template id="t-Pipeline"><style>
+/*body*/:host{display:block;margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#101828;font-size:14px;line-height:1.5}
+a{color:#2457C5;text-decoration:none}a:hover{color:#1A3F94}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+.main{flex:999 1 560px;min-width:0;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font-size:20px;font-weight:700}
+.sub{color:#667085;font-size:13px}
+.panel{background:#fff;border:1px solid #E4E7EC;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;color:#344054;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;background:#F2F4F7;color:#475467;white-space:nowrap}
+.p-rv{background:#EEF3FD;color:#2457C5}.p-qp{background:#FEF0E6;color:#B54708}.p-wo{background:#E7F6EC;color:#067647}
+.muted{color:#667085}
+.seg{display:inline-flex;background:#F2F4F7;border-radius:8px;padding:3px;gap:2px}
+.seg button{border:0;background:none;font:inherit;font-size:13px;color:#475467;padding:0 12px;min-height:34px;border-radius:6px;cursor:pointer}
+.seg .on{background:#fff;color:#101828;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.stg{padding:14px 18px;border-right:1px solid #EAECF0}
+.stg:last-child{border-right:0}
+.stg .n{font-size:22px;font-weight:700}
+.stg .b{font-size:12px;color:#667085;margin-top:2px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;font-size:12px;color:#667085;padding:10px 16px;border-bottom:1px solid #EAECF0;white-space:nowrap;background:#F9FAFB}
+td{padding:12px 16px;border-bottom:1px solid #EAECF0;vertical-align:top}
+.gh td{background:#F5F6F8;font-size:12px;font-weight:700;color:#475467;padding:8px 16px}
+.id{font-size:12px;font-weight:600;color:#475467;white-space:nowrap}
+.par{font-size:11px;color:#98A2B3;white-space:nowrap}
+
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴">
+<div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a>
+<div class="grp">오늘 할 일</div>
+<a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a>
+<a class="nav" href="#Briefing">영업 브리핑</a>
+<a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a>
+<div class="grp">영업 프로젝트</div>
+<a class="nav on" href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a>
+<a class="nav" href="#Results">결과·분석</a>
+<div class="grp">문서</div>
+<a class="nav" href="#DocHub">문서함</a>
+<a class="nav" href="#DocChat">문서 채팅</a>
+<div class="grp">기준 정보</div>
+<a class="nav" href="#AVL">고객사 AVL</a>
+<span class="nav dim">단가 마스터</span>
+<span class="nav dim">외주업체</span>
+</nav>
+<main class="main">
+<div class="top">
+<div><h1>파이프라인</h1><div class="sub">검토(RV) → 견적(QP) → WorkOrder(WO)</div></div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<div class="seg"><button class="on" type="button">전체</button><button type="button">공사</button><button type="button">탱크</button></div>
+<div class="seg"><button class="on" type="button">전체 담당</button><button type="button">내 담당</button></div>
+</div>
+</div>
+<section class="panel stages" aria-label="단계별 현황">
+<div class="stg"><div style="display: flex; justify-content: space-between; align-items: center"><span class="pill p-rv">검토 RV</span><span class="n">12</span></div><div class="b">접수 3 · 검토중 7 · 참여 상신 2</div></div>
+<div class="stg"><div style="display: flex; justify-content: space-between; align-items: center"><span class="pill p-qp">견적 QP</span><span class="n">10</span></div><div class="b">작성 4 · 승인요청 1 · 제출 2 · 협상 3</div></div>
+<div class="stg"><div style="display: flex; justify-content: space-between; align-items: center"><span class="pill p-wo">WorkOrder WO</span><span class="n">6</span></div><div class="b">실행예산 2 · 코드 발번 4 (올해 수주)</div></div>
+</section>
+<section class="panel" style="overflow: hidden">
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>프로젝트</th><th>ID</th><th>상태</th><th>다음 할 일</th><th>마감</th><th>담당</th></tr></thead>
+<tbody>
+<tr class="gh"><td colspan="6">검토 · 3</td></tr>
+<tr><td><a href="#GoNoGo">울산공장 저장탱크 4기</a><div class="muted" style="font-size: 12px">한빛케미칼 · 탱크</div></td><td class="id">RV-2026-0142</td><td><span class="pill p-rv">참여 상신</span></td><td>임원 참여 결정</td><td>10/30 <span style="color: #B54708">D-15</span></td><td>[탱크 담당자]</td></tr>
+<tr><td>평택 물류센터 기계설비<div class="muted" style="font-size: 12px">대성건설 · 공사</div></td><td class="id">RV-2026-0143</td><td><span class="pill p-rv">검토중</span></td><td>현설 참석 10/17</td><td>11/06</td><td>[공사 담당자]</td></tr>
+<tr><td>오송 신공장 유틸리티 배관<div class="muted" style="font-size: 12px">미래바이오 · 공사</div></td><td class="id">RV-2026-0146</td><td><span class="pill p-rv">접수</span></td><td>자료 검토</td><td>10/29</td><td>[공사 담당자]</td></tr>
+<tr class="gh"><td colspan="6">견적 · 3</td></tr>
+<tr><td><a href="#QuoteCivil">여수 원료탱크 보수</a><div class="muted" style="font-size: 12px">동해정밀화학 · 공사</div></td><td><div class="id">QP-2026-0059 · R0</div><div class="par">RV-2026-0144</div></td><td><span class="pill p-qp">견적 작성</span></td><td>노임·장비비 산정</td><td>10/27</td><td>[공사 담당자]</td></tr>
+<tr><td><a href="#Approvals">당진 LNG 인입배관</a><div class="muted" style="font-size: 12px">서해에너지 · 공사</div></td><td><div class="id">QP-2026-0049 · R2</div><div class="par">RV-2026-0128</div></td><td><span class="pill p-qp">승인요청</span></td><td>임원 견적 승인</td><td>10/16 <span style="color: #B54708">D-1</span></td><td>[공사 담당자]</td></tr>
+<tr><td><a href="#TCM">광양 수처리설비</a><div class="muted" style="font-size: 12px">한결엔지니어링 · 탱크</div></td><td><div class="id">QP-2026-0051 · R3</div><div class="par">RV-2026-0119</div></td><td><span class="pill p-qp">협상중</span></td><td>2차 기술협의 10/17</td><td>—</td><td>[탱크 담당자]</td></tr>
+<tr class="gh"><td colspan="6">수주 · 종결 · 3</td></tr>
+<tr><td><a href="#Results">아산 소방수 저장조</a><div class="muted" style="font-size: 12px">세진화학 · 탱크</div></td><td><div class="id">WO-2026-0031</div><div class="par">QP-2026-0040</div></td><td><span class="pill p-wo">실행예산 작성</span></td><td>업체 확정가 반영</td><td>—</td><td>[탱크 담당자]</td></tr>
+<tr><td><a href="#Results">시흥 물류창고 배관</a><div class="muted" style="font-size: 12px">삼일건설 · 공사</div></td><td><div class="id">QP-2026-0043</div><div class="par">RV-2026-0102</div></td><td><span class="pill">실주</span></td><td>실패요인 분석</td><td>—</td><td>[공사 담당자]</td></tr>
+<tr><td>군산 저장탱크 도장 보수<div class="muted" style="font-size: 12px">새만금그린 · 탱크</div></td><td class="id">RV-2026-0131</td><td><span class="pill">불참 종결</span></td><td>—</td><td>—</td><td>[탱크 담당자]</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>파이프라인</b>진행 중인 모든 건을 검토(RV)·견적(QP)·수주(WO) 단계로 묶어 상태, 다음 할 일, 마감, 담당자를 보는 화면입니다. 행을 누르면 해당 프로젝트 화면으로 들어갑니다.</div></footer></main>
+</div>
+</template><template id="t-Analysis"><style>
+/*body*/:host{display:block;margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#101828;font-size:14px;line-height:1.5}
+a{color:#2457C5;text-decoration:none}a:hover{color:#1A3F94}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+.main{flex:999 1 560px;min-width:0;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-size:20px;font-weight:700}
+.sub{color:#667085;font-size:13px}
+.panel{background:#fff;border:1px solid #E4E7EC;border-radius:10px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #EAECF0}
+.ph h2{margin:0;font-size:14px;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;color:#344054;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#F9FAFB;color:#101828}
+.btn.pri{background:#2457C5;border-color:#2457C5;color:#fff}
+.btn.pri:hover{background:#1A3F94;color:#fff}
+.muted{color:#667085}
+.ai{font-size:11px;font-weight:700;color:#6941C6}
+.phd{padding:18px 20px 0;display:flex;flex-direction:column;gap:14px}
+.chain{display:flex;flex-wrap:wrap;border:1px solid #E4E7EC;border-radius:8px;overflow:hidden}
+.lnk{flex:1 1 140px;padding:8px 14px;border-right:1px solid #E4E7EC;display:flex;flex-direction:column}
+.lnk:last-child{border-right:0}
+.lnk b{font-size:13px;font-weight:600}
+.lnk span{font-size:12px;color:#667085}
+.lnk.done{background:#F9FAFB}
+.lnk.now{background:#EEF3FD}.lnk.now span{color:#2457C5;font-weight:600}
+.lnk.off b{color:#98A2B3;font-weight:500}
+.tabs{display:flex;gap:4px;overflow-x:auto;align-items:center}
+.tab{padding:0 12px;min-height:44px;display:inline-flex;align-items:center;color:#475467;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:#101828}
+.tab.on{color:#101828;border-bottom-color:#2457C5;font-weight:600}
+.seg{display:inline-flex;background:#E9ECF1;border-radius:8px;padding:3px;gap:2px}
+.seg a{font-size:13px;color:#475467;padding:0 14px;min-height:34px;border-radius:6px;display:inline-flex;align-items:center}
+.seg a.on{background:#fff;color:#101828;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.gh{padding:10px 16px;font-size:12px;font-weight:700;color:#475467;background:#F9FAFB;border-bottom:1px solid #EAECF0;display:flex;justify-content:space-between}
+.it{display:block;padding:12px 16px;border-bottom:1px solid #EAECF0;color:#101828}
+.it:hover{background:#F9FAFB;color:#101828}
+.it.on{background:#EEF3FD}
+mark{background:#FEF0E6;color:inherit;padding:1px 2px;border-radius:3px}
+mark.c{background:#FEF7C3}
+.f select{min-height:36px;border:1px solid #D0D5DD;border-radius:6px;padding:0 10px;font:inherit;font-size:13px;background:#fff}
+
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴">
+<div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a>
+<div class="grp">오늘 할 일</div>
+<a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a>
+<a class="nav" href="#Briefing">영업 브리핑</a>
+<a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a>
+<div class="grp">영업 프로젝트</div>
+<a class="nav on" href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a>
+<a class="nav" href="#Results">결과·분석</a>
+<div class="grp">문서</div>
+<a class="nav" href="#DocHub">문서함</a>
+<a class="nav" href="#DocChat">문서 채팅</a>
+<div class="grp">기준 정보</div>
+<a class="nav" href="#AVL">고객사 AVL</a>
+<span class="nav dim">단가 마스터</span>
+<span class="nav dim">외주업체</span>
+</nav>
+<main class="main">
+<section class="panel">
+<div class="phd">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: flex-start">
+<div><div class="sub"><a href="#Pipeline">파이프라인</a> › 한빛케미칼 · 탱크 · 울산</div><h1 style="margin-top: 2px">울산공장 저장탱크 4기 신설</h1><div class="sub">현설 10/20 · 마감 10/30 <span style="color: #B54708; font-weight: 600">D-15</span></div></div>
+<div class="chain" style="flex: 0 1 480px">
+<div class="lnk now"><b>RV-2026-0142</b><span>검토중</span></div>
+<div class="lnk off"><b>QP</b><span>참여 승인 시 생성</span></div>
+<div class="lnk off"><b>WO</b><span>수주 시 생성</span></div>
+</div>
+</div>
+<nav class="tabs" aria-label="프로젝트 단계">
+<a class="tab" href="#DocHub">문서·이력</a>
+<a class="tab on" href="#Analysis">검토</a>
+<a class="tab" href="#QuoteTank">견적</a>
+<a class="tab" href="#TCM">협상</a>
+<a class="tab" href="#Results">결과</a>
+<span style="flex: 1"></span>
+<a class="btn" href="#DocChat" style="min-height: 34px">문서에 질문하기</a>
+</nav>
+</div>
+</section>
+<div class="seg" style="align-self: flex-start"><a class="on" href="#Analysis">① 문서 분석</a><a href="#Similar">② 유사견적</a><a href="#GoNoGo">③ 참여보고서</a></div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<section class="panel" style="flex: 1.5 1 480px; min-width: 0; overflow: hidden" aria-label="원문">
+<div class="ph">
+<div class="f"><label for="doc" style="position: absolute; left: -9999px">문서</label><select id="doc"><option>계약일반조건.pdf (항목 7)</option><option>입찰안내서.pdf (항목 3)</option><option>탱크_시방서.pdf (항목 6)</option></select></div>
+<span class="muted" style="font-size: 12px">12 / 28쪽</span>
+</div>
+<div style="padding: 20px 24px; font-size: 13px; line-height: 1.9; color: #344054">
+<p style="margin: 0 0 12px"><b>제23조 (지체상금)</b> 지체일수 1일당 계약금액의 [0.N]%를 지체상금으로 납부하며, <mark>지체상금의 상한은 두지 아니한다.</mark></p>
+<p style="margin: 0 0 12px"><b>제27조 (하자담보)</b> 하자담보책임기간은 준공일로부터 <mark>5년</mark>으로 하며, 보증금은 계약금액의 5%로 한다.</p>
+<p style="margin: 0 0 12px"><b>제31조 (설계변경)</b> <mark>발주자 제공 물량의 오류·누락으로 인한 증가분은 계약금액 조정 대상에서 제외한다.</mark></p>
+<p style="margin: 0 0 12px"><b>제34조 (현장 조건)</b> 기존 시설 운전 중 작업에 필요한 <mark class="c">가설·안전 시설 일체는 계약상대자 부담</mark>으로 한다.</p>
+<p style="margin: 0"><b>제36조 (시험 및 검사)</b> <mark class="c">수압시험, RT 100% 및 제3자 검사 비용</mark>은 계약상대자가 부담한다.</p>
+</div>
+</section>
+<section class="panel" style="flex: 1 1 340px; min-width: 0; overflow: hidden" aria-label="AI 추출 항목">
+<div class="ph"><h2>추출 항목 16 <span class="ai">AI</span></h2><span class="muted" style="font-size: 12px">확인 9/16</span></div>
+<div class="gh"><span>독소조항</span><span>5</span></div>
+<a class="it on" href="#Analysis"><div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">지체상금 상한 없음</b><span class="muted" style="font-size: 12px">제23조</span></div><div class="muted" style="font-size: 13px">상한 10% 질의 권장</div></a>
+<a class="it" href="#Analysis"><div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">물량 오류 증가분 조정 불가</b><span class="muted" style="font-size: 12px">제31조</span></div><div class="muted" style="font-size: 13px">BM 물량 검증 필수</div></a>
+<div class="gh"><span>비용발생</span><span>7</span></div>
+<a class="it" href="#Analysis"><div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">RT 100%·제3자 검사 비용</b><span class="muted" style="font-size: 12px">제36조</span></div><div class="muted" style="font-size: 13px">시험·검사비 별도 반영</div></a>
+<div class="gh"><span>위험요인</span><span>4</span></div>
+<a class="it" href="#Analysis"><div style="display: flex; justify-content: space-between; gap: 8px"><b style="font-weight: 600">운전 중 공장 내 작업</b><span class="muted" style="font-size: 12px">제34조</span></div><div class="muted" style="font-size: 13px">작업허가로 공기 지연 가능</div></a>
+<div style="padding: 14px 16px"><a class="btn pri" href="#Similar" style="width: 100%; box-sizing: border-box">체크리스트 만들고 다음 단계로</a></div>
+</section>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>검토 ① 문서 분석</b>입찰 문서 원문 옆에 AI가 찾은 위험요인·독소조항·비용발생 항목을 조항 위치와 함께 보여주는 화면입니다. 담당자가 항목을 확인하면 견적 체크리스트로 넘어갑니다.</div></footer></main>
+</div>
+</template><template id="t-Similar"><style>
+/*body*/:host{display:block;margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#101828;font-size:14px;line-height:1.5}
+a{color:#2457C5;text-decoration:none}a:hover{color:#1A3F94}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+.main{flex:999 1 560px;min-width:0;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-size:20px;font-weight:700}
+.sub{color:#667085;font-size:13px}
+.panel{background:#fff;border:1px solid #E4E7EC;border-radius:10px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #EAECF0}
+.ph h2{margin:0;font-size:14px;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;color:#344054;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#F9FAFB;color:#101828}
+.btn.pri{background:#2457C5;border-color:#2457C5;color:#fff}
+.btn.pri:hover{background:#1A3F94;color:#fff}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;background:#F2F4F7;color:#475467;white-space:nowrap}
+.p-wo{background:#E7F6EC;color:#067647}
+.muted{color:#667085}
+.ai{font-size:11px;font-weight:700;color:#6941C6}
+.phd{padding:18px 20px 0;display:flex;flex-direction:column;gap:14px}
+.chain{display:flex;flex-wrap:wrap;border:1px solid #E4E7EC;border-radius:8px;overflow:hidden}
+.lnk{flex:1 1 140px;padding:8px 14px;border-right:1px solid #E4E7EC;display:flex;flex-direction:column}
+.lnk:last-child{border-right:0}
+.lnk b{font-size:13px;font-weight:600}
+.lnk span{font-size:12px;color:#667085}
+.lnk.now{background:#EEF3FD}.lnk.now span{color:#2457C5;font-weight:600}
+.lnk.off b{color:#98A2B3;font-weight:500}
+.tabs{display:flex;gap:4px;overflow-x:auto;align-items:center}
+.tab{padding:0 12px;min-height:44px;display:inline-flex;align-items:center;color:#475467;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:#101828}
+.tab.on{color:#101828;border-bottom-color:#2457C5;font-weight:600}
+.seg{display:inline-flex;background:#E9ECF1;border-radius:8px;padding:3px;gap:2px}
+.seg a{font-size:13px;color:#475467;padding:0 14px;min-height:34px;border-radius:6px;display:inline-flex;align-items:center}
+.seg a.on{background:#fff;color:#101828;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.it{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid #EAECF0;color:#101828}
+.it:hover{background:#F9FAFB;color:#101828}
+.it.on{background:#EEF3FD}
+.sc{flex:none;width:36px;font-size:16px;font-weight:700;color:#2457C5}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;font-size:12px;color:#667085;padding:10px 16px;border-bottom:1px solid #EAECF0;background:#F9FAFB}
+td{padding:11px 16px;border-bottom:1px solid #EAECF0}
+tr.d td{background:#FFFAF5}
+tr.d td:first-child{box-shadow:inset 3px 0 0 #F79009}
+
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴">
+<div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a>
+<div class="grp">오늘 할 일</div>
+<a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a>
+<a class="nav" href="#Briefing">영업 브리핑</a>
+<a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a>
+<div class="grp">영업 프로젝트</div>
+<a class="nav on" href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a>
+<a class="nav" href="#Results">결과·분석</a>
+<div class="grp">문서</div>
+<a class="nav" href="#DocHub">문서함</a>
+<a class="nav" href="#DocChat">문서 채팅</a>
+<div class="grp">기준 정보</div>
+<a class="nav" href="#AVL">고객사 AVL</a>
+<span class="nav dim">단가 마스터</span>
+<span class="nav dim">외주업체</span>
+</nav>
+<main class="main">
+<section class="panel">
+<div class="phd">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: flex-start">
+<div><div class="sub"><a href="#Pipeline">파이프라인</a> › 한빛케미칼 · 탱크 · 울산</div><h1 style="margin-top: 2px">울산공장 저장탱크 4기 신설</h1><div class="sub">현설 10/20 · 마감 10/30 <span style="color: #B54708; font-weight: 600">D-15</span></div></div>
+<div class="chain" style="flex: 0 1 480px">
+<div class="lnk now"><b>RV-2026-0142</b><span>검토중</span></div>
+<div class="lnk off"><b>QP</b><span>참여 승인 시 생성</span></div>
+<div class="lnk off"><b>WO</b><span>수주 시 생성</span></div>
+</div>
+</div>
+<nav class="tabs" aria-label="프로젝트 단계">
+<a class="tab" href="#DocHub">문서·이력</a>
+<a class="tab on" href="#Analysis">검토</a>
+<a class="tab" href="#QuoteTank">견적</a>
+<a class="tab" href="#TCM">협상</a>
+<a class="tab" href="#Results">결과</a>
+<span style="flex: 1"></span>
+<a class="btn" href="#DocChat" style="min-height: 34px">문서에 질문하기</a>
+</nav>
+</div>
+</section>
+<div class="seg" style="align-self: flex-start"><a href="#Analysis">① 문서 분석</a><a class="on" href="#Similar">② 유사견적</a><a href="#GoNoGo">③ 참여보고서</a></div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<section class="panel" style="flex: 1 1 340px; min-width: 0; overflow: hidden" aria-label="유사 견적">
+<div class="ph"><h2>유사 견적 5</h2><span class="muted" style="font-size: 12px">유사도 순 · 최근 5년</span></div>
+<a class="it on" href="#Similar"><span class="sc">91</span><span style="flex: 1; min-width: 0"><b style="font-weight: 600">울산 원료탱크 증설</b><span class="muted" style="font-size: 12px; display: block">QP-2025-0033 · 한빛케미칼 · CS 2,000㎥×3</span></span><span class="pill p-wo">수주</span></a>
+<a class="it" href="#Similar"><span class="sc">86</span><span style="flex: 1; min-width: 0"><b style="font-weight: 600">아산 소방수 저장조</b><span class="muted" style="font-size: 12px; display: block">QP-2026-0040 · 세진화학 · CS 1,500㎥×2</span></span><span class="pill p-wo">수주</span></a>
+<a class="it" href="#Similar"><span class="sc">78</span><span style="flex: 1; min-width: 0"><b style="font-weight: 600">여수 제품탱크</b><span class="muted" style="font-size: 12px; display: block">QP-2024-0071 · 동해정밀화학 · SUS 800㎥×4</span></span><span class="pill">실주</span></a>
+<a class="it" href="#Similar"><span class="sc">72</span><span style="flex: 1; min-width: 0"><b style="font-weight: 600">울산 폐수 저장조</b><span class="muted" style="font-size: 12px; display: block">QP-2024-0052 · 한빛케미칼 · CS 1,200㎥×2</span></span><span class="pill p-wo">수주</span></a>
+<a class="it" href="#Similar" style="border-bottom: 0"><span class="sc">65</span><span style="flex: 1; min-width: 0"><b style="font-weight: 600">하동 저장조</b><span class="muted" style="font-size: 12px; display: block">QP-2023-0018 · 남부에너지 · CS 3,000㎥×1</span></span><span class="pill">실주</span></a>
+</section>
+<section class="panel" style="flex: 1.4 1 480px; min-width: 0; overflow: hidden" aria-label="비교">
+<div class="ph"><h2>이번 건 vs QP-2025-0033</h2><span class="muted" style="font-size: 12px">차이 항목 강조</span></div>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>항목</th><th>이번 건</th><th>QP-2025-0033</th></tr></thead>
+<tbody>
+<tr><td class="muted">사양</td><td>CS 2,500㎥ × 4기</td><td>CS 2,000㎥ × 3기</td></tr>
+<tr class="d"><td class="muted">검사</td><td>RT 100%, 제3자 검사</td><td>RT 10%</td></tr>
+<tr class="d"><td class="muted">지체상금</td><td>상한 없음</td><td>상한 10%</td></tr>
+<tr class="d"><td class="muted">적용 AVL</td><td>v3</td><td>v2</td></tr>
+<tr><td class="muted">공기</td><td>8개월</td><td>7개월</td></tr>
+<tr><td class="muted">견적가 · 마진율</td><td>—</td><td>[금액] · [  ]%</td></tr>
+</tbody>
+</table>
+</div>
+<div style="padding: 14px 16px; border-top: 1px solid #EAECF0; font-size: 13px; line-height: 1.8">
+<span class="ai">AI 시사점</span>
+<ul style="margin: 4px 0 0; padding-left: 18px">
+<li>검사 조건 강화로 시험·검사비 별도 반영</li>
+<li>AVL v3에서 펌프·도장 업체 변경 → 가격 재요청</li>
+<li>지체상금 상한 없음 → 리스크율 상향 검토</li>
+</ul>
+</div>
+<div style="display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid #EAECF0; background: #F9FAFB"><a class="btn" href="#AVL">AVL 변경 보기</a><a class="btn pri" href="#GoNoGo">보고서에 반영</a></div>
+</section>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>검토 ② 유사견적</b>과거 견적 중 유사도가 높은 건을 찾아 이번 건과 사양·검사 조건·지체상금·AVL·결과를 나란히 비교하는 화면입니다. 차이 나는 항목은 강조되고 AI가 시사점을 정리합니다.</div></footer></main>
+</div>
+</template><template id="t-GoNoGo"><style>
+/*body*/:host{display:block;margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#101828;font-size:14px;line-height:1.5}
+a{color:#2457C5;text-decoration:none}a:hover{color:#1A3F94}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+.main{flex:999 1 560px;min-width:0;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-size:20px;font-weight:700}
+.sub{color:#667085;font-size:13px}
+.panel{background:#fff;border:1px solid #E4E7EC;border-radius:10px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #EAECF0}
+.ph h2{margin:0;font-size:14px;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;color:#344054;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#F9FAFB;color:#101828}
+.btn.pri{background:#2457C5;border-color:#2457C5;color:#fff}
+.btn.pri:hover{background:#1A3F94;color:#fff}
+.muted{color:#667085}
+.ai{font-size:11px;font-weight:700;color:#6941C6}
+.phd{padding:18px 20px 0;display:flex;flex-direction:column;gap:14px}
+.chain{display:flex;flex-wrap:wrap;border:1px solid #E4E7EC;border-radius:8px;overflow:hidden}
+.lnk{flex:1 1 140px;padding:8px 14px;border-right:1px solid #E4E7EC;display:flex;flex-direction:column}
+.lnk:last-child{border-right:0}
+.lnk b{font-size:13px;font-weight:600}
+.lnk span{font-size:12px;color:#667085}
+.lnk.now{background:#EEF3FD}.lnk.now span{color:#2457C5;font-weight:600}
+.lnk.off b{color:#98A2B3;font-weight:500}
+.tabs{display:flex;gap:4px;overflow-x:auto;align-items:center}
+.tab{padding:0 12px;min-height:44px;display:inline-flex;align-items:center;color:#475467;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:#101828}
+.tab.on{color:#101828;border-bottom-color:#2457C5;font-weight:600}
+.seg{display:inline-flex;background:#E9ECF1;border-radius:8px;padding:3px;gap:2px}
+.seg a{font-size:13px;color:#475467;padding:0 14px;min-height:34px;border-radius:6px;display:inline-flex;align-items:center}
+.seg a.on{background:#fff;color:#101828;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.sec{padding:16px 24px;border-top:1px solid #EAECF0}
+.sec h3{margin:0 0 6px;font-size:14px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.sec h3 span{font-size:11px;font-weight:500;color:#6941C6}
+.sec p{margin:0;font-size:13px;line-height:1.8;color:#344054}
+.blk{padding:16px 18px;border-top:1px solid #EAECF0}
+.blk:first-child{border-top:0}
+
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴">
+<div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a>
+<div class="grp">오늘 할 일</div>
+<a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a>
+<a class="nav" href="#Briefing">영업 브리핑</a>
+<a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a>
+<div class="grp">영업 프로젝트</div>
+<a class="nav on" href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a>
+<a class="nav" href="#Results">결과·분석</a>
+<div class="grp">문서</div>
+<a class="nav" href="#DocHub">문서함</a>
+<a class="nav" href="#DocChat">문서 채팅</a>
+<div class="grp">기준 정보</div>
+<a class="nav" href="#AVL">고객사 AVL</a>
+<span class="nav dim">단가 마스터</span>
+<span class="nav dim">외주업체</span>
+</nav>
+<main class="main">
+<section class="panel">
+<div class="phd">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: flex-start">
+<div><div class="sub"><a href="#Pipeline">파이프라인</a> › 한빛케미칼 · 탱크 · 울산</div><h1 style="margin-top: 2px">울산공장 저장탱크 4기 신설</h1><div class="sub">현설 10/20 · 마감 10/30 <span style="color: #B54708; font-weight: 600">D-15</span></div></div>
+<div class="chain" style="flex: 0 1 480px">
+<div class="lnk now"><b>RV-2026-0142</b><span>검토중</span></div>
+<div class="lnk off"><b>QP</b><span>참여 승인 시 생성</span></div>
+<div class="lnk off"><b>WO</b><span>수주 시 생성</span></div>
+</div>
+</div>
+<nav class="tabs" aria-label="프로젝트 단계">
+<a class="tab" href="#DocHub">문서·이력</a>
+<a class="tab on" href="#Analysis">검토</a>
+<a class="tab" href="#QuoteTank">견적</a>
+<a class="tab" href="#TCM">협상</a>
+<a class="tab" href="#Results">결과</a>
+<span style="flex: 1"></span>
+<a class="btn" href="#DocChat" style="min-height: 34px">문서에 질문하기</a>
+</nav>
+</div>
+</section>
+<div class="seg" style="align-self: flex-start"><a href="#Analysis">① 문서 분석</a><a href="#Similar">② 유사견적</a><a class="on" href="#GoNoGo">③ 참여보고서</a></div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<section class="panel" style="flex: 1.8 1 520px; min-width: 0; overflow: hidden" aria-label="보고서">
+<div class="ph"><h2>견적 참여여부 검토 보고 <span class="muted" style="font-weight: 400">· v2 편집 중</span></h2><button class="btn" type="button" style="min-height: 34px">AI로 다시 쓰기</button></div>
+<div class="sec" style="border-top: 0"><h3>1. 개요 <span>입찰안내서 p.1~3</span></h3><p>CS 2,500㎥ 저장탱크 4기 설계·제작·설치 일괄. 공기 8개월, 마감 10/30.</p></div>
+<div class="sec"><h3>2. 참여 요건 <span>입찰안내서 p.4</span></h3><p>동종 실적 2건 이상, 압력용기 인증, AVL v3 업체 사용. 당사 충족 (QP-2025-0033, QP-2026-0040).</p></div>
+<div class="sec"><h3>3. 수익성 <span>유사견적 5건</span></h3><p>최유사 QP-2025-0033 기준 예상 마진율 [  ]%. 같은 고객사 최근 2건 모두 수주.</p></div>
+<div class="sec"><h3>4. 리스크 <span>문서 분석 16항목</span></h3><p>지체상금 상한 없음, 물량 오류 조정 불가, RT 100% 검사비, 운전 중 작업.</p></div>
+<div class="sec"><h3>5. 의견</h3><p><b>참여 권고.</b> 지체상금 상한이 해소되지 않으면 리스크율 [  ]%p 상향.</p></div>
+</section>
+<aside class="panel" style="flex: 1 1 300px; min-width: 0; overflow: hidden" aria-label="상신">
+<div class="blk"><span class="ai">AI 추천</span><div style="font-size: 20px; font-weight: 700; margin-top: 2px">참여</div><div class="muted" style="font-size: 13px">실적 충족 · 고객사 수주율 높음 · 계약 리스크 2건 조건부</div></div>
+<div class="blk">
+<div style="font-size: 13px; font-weight: 600; margin-bottom: 6px">결재 경로</div>
+<div style="font-size: 13px; color: #344054">[탱크 담당자] → [영업팀장] → <b>[임원]</b></div>
+<label for="op" style="display: block; font-size: 12px; font-weight: 600; color: #475467; margin: 12px 0 4px">상신 의견</label>
+<textarea id="op" rows="2" style="width: 100%; box-sizing: border-box; border: 1px solid #D0D5DD; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 13px">현장설명회 전 결정 요청드립니다.</textarea>
+</div>
+<div class="blk" style="background: #F9FAFB">
+<div style="font-size: 12px; font-weight: 600; color: #475467">승인 시 자동 처리</div>
+<div class="muted" style="font-size: 13px; margin-top: 4px; line-height: 1.8">QP-2026-0058 생성 · AVL v3 고정<br>견적 폴더 생성 · RV 상태 → 참여 승인</div>
+</div>
+<div class="blk"><a class="btn pri" href="#Approvals" style="width: 100%; box-sizing: border-box">참여 결정 상신</a></div>
+</aside>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>검토 ③ 참여보고서</b>AI가 문서 분석과 유사견적을 바탕으로 만든 참여여부 보고서 초안을 담당자가 다듬어 임원에게 참여 결정을 올리는 화면입니다. 승인되면 견적프로젝트 ID(QP)가 생깁니다.</div></footer></main>
+</div>
+</template><template id="t-QuoteCivil"><style>
+/*body*/:host{display:block;margin:0;background:#F4F5F7;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1A1D23;font-size:14px}
+a{color:#1F5FAD}a:hover{color:#174A87}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 200px;max-width:232px;background:#14213D;color:#D9DEE8;padding:20px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;color:#fff;font-size:16px;padding:4px 12px 20px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;color:#C9D0DD;text-decoration:none;min-height:24px}
+.nav:hover{background:#1F2F52;color:#fff}
+.nav.on{background:#2B4A85;color:#fff;font-weight:600}
+.nav.dim{color:#8D97AB}
+.cnt{background:#E8590C;color:#fff;border-radius:10px;font-size:12px;padding:1px 8px;font-weight:600}
+.navsec{font-size:12px;color:#8D97AB;padding:20px 12px 6px}
+.main{flex:999 1 560px;min-width:0;padding:24px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border:1px solid #E1E4EA;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #C9CED8;background:#fff;color:#1A1D23;font:inherit;font-weight:500;text-decoration:none;cursor:pointer}
+.btn.pri{background:#1F5FAD;border-color:#1F5FAD;color:#fff}
+.btn.pri:hover{background:#174A87;color:#fff}
+.muted{color:#5F6776}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.rv{background:#E3EDFA;color:#174A87}.qp{background:#FDEBDD;color:#9A3412}.wo{background:#DCF2E3;color:#166534}.end{background:#ECEEF2;color:#4B5363}
+.idbox{display:inline-flex;gap:8px;align-items:center;border:1px solid #E1E4EA;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600}
+.idbox.off{color:#A3AAB6;border-style:dashed;font-weight:400}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #E1E4EA;overflow-x:auto}
+.tab{padding:10px 14px;text-decoration:none;color:#5F6776;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:#1A1D23}
+.tab.on{color:#1A1D23;border-bottom-color:#1F5FAD;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;color:#5F6776;background:#F7F8FA;padding:9px 10px;border-bottom:1px solid #E1E4EA;white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid #EEF0F3;white-space:nowrap}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.srcb{font-size:11px;padding:1px 6px;border-radius:4px;background:#ECEEF2;color:#4B5363}
+.tree a{display:block;padding:7px 10px;border-radius:6px;text-decoration:none;color:#1A1D23;font-size:13px}
+.tree a.on{background:#EEF4FC;font-weight:600}
+.row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
+
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box;display:block;color:#344054}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px;color:#101828}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054;text-decoration:none}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+:host{background:#F5F6F8}
+.btn.pri{background:#2457C5;border-color:#2457C5}
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴"><div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a><div class="grp">오늘 할 일</div><a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a><a class="nav" href="#Briefing">영업 브리핑 </a><a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a><div class="grp">영업 프로젝트</div><a class="nav on" href="#Pipeline">파이프라인 </a><a class="nav" href="#Results">결과·분석 </a><div class="grp">문서</div><a class="nav" href="#DocHub">문서함 </a><a class="nav" href="#DocChat">문서 채팅 </a><div class="grp">기준 정보</div><a class="nav" href="#AVL">고객사 AVL </a><span class="nav dim">단가 마스터</span><span class="nav dim">외주업체</span></nav>
+<main class="main">
+<section class="card" style="padding: 20px 24px 0; display: flex; flex-direction: column; gap: 14px">
+<div class="muted" style="font-size: 13px"><a href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a> › 동해정밀화학</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
+<h1 style="margin: 0; font-size: 22px">여수 원료탱크 보수공사</h1>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 13px"><span class="st end">공사</span><span class="st end">전남 여수</span><span class="st end">공기 3개월</span><span class="st qp">마감 10/27 · D-12</span></div>
+</div>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+<span class="idbox">RV-2026-0144 <span class="st end">참여 승인</span></span><span class="muted">›</span>
+<span class="idbox">QP-2026-0059 · R0 <span class="st qp">견적 작성</span></span><span class="muted">›</span>
+<span class="idbox off">WO · 수주 시 생성</span>
+</div>
+<nav class="tabs" aria-label="프로젝트 메뉴">
+<a class="tab" href="#DocHub">문서함·이력</a>
+<a class="tab" href="#Analysis">문서 분석</a>
+<a class="tab" href="#Similar">유사견적</a>
+<a class="tab" href="#GoNoGo">참여보고서</a>
+<a class="tab on" href="#QuoteCivil">견적</a>
+<a class="tab" href="#TCM">TCM·협상</a>
+<a class="tab" href="#Results">결과</a>
+<a class="tab" href="#DocChat">문서 채팅</a>
+</nav>
+</section>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section class="card tree" style="flex: 0 1 200px; min-width: 0; padding: 14px" aria-label="공종">
+<div style="font-size: 12px; font-weight: 600; color: #5F6776; padding: 0 10px 8px">공종 (BM List 214품목)</div>
+<a class="on" href="#QuoteCivil">전체</a>
+<a href="#QuoteCivil">1. 가설공사</a>
+<a href="#QuoteCivil">2. 표면처리·도장</a>
+<a href="#QuoteCivil">3. 판재 교체</a>
+<a href="#QuoteCivil">4. 용접·검사</a>
+<a href="#QuoteCivil">5. 장비</a>
+<a href="#QuoteCivil">6. 기타 경비</a>
+<div style="border-top: 1px solid #E1E4EA; margin: 10px 0; padding-top: 10px; font-size: 12px" class="muted">단가 기준일 2026-10-01<br>노임: 단가 마스터 2026 하반기<br>지역 할증: 전남 적용</div>
+</section>
+<section class="card" style="flex: 1.8 1 560px; min-width: 0; overflow: hidden" aria-label="내역">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding: 14px 16px; border-bottom: 1px solid #E1E4EA">
+<div style="display: flex; gap: 8px; align-items: center"><h2 style="margin: 0; font-size: 15px">내역 · R0</h2><span class="srcb">예시 데이터</span></div>
+<div style="display: flex; gap: 6px; flex-wrap: wrap"><button class="btn" type="button" style="min-height: 34px; font-size: 13px">BM List 다시 불러오기</button><button class="btn" type="button" style="min-height: 34px; font-size: 13px">행 추가</button></div>
+</div>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>공종</th><th>품목 · 규격</th><th>단위</th><th class="num">물량</th><th class="num">단가(원)</th><th class="num">금액(원)</th><th>단가 출처</th></tr></thead>
+<tbody>
+<tr><td>2</td><td>표면처리 블라스팅 Sa2½</td><td>㎡</td><td class="num">1,850</td><td class="num">18,000</td><td class="num">33,300,000</td><td><span class="srcb">단가 마스터</span></td></tr>
+<tr><td>2</td><td>에폭시 도장 3coat</td><td>㎡</td><td class="num">1,850</td><td class="num">24,000</td><td class="num">44,400,000</td><td><span class="srcb">유사견적 QP-2024-0071</span></td></tr>
+<tr><td>3</td><td>저판 교체 SS275 9t (할증 5%)</td><td>ton</td><td class="num">12.6</td><td class="num">1,420,000</td><td class="num">17,892,000</td><td><span class="srcb">자재 시세 10/01</span></td></tr>
+<tr><td>4</td><td>용접공 (지역 할증 포함)</td><td>인</td><td class="num">210</td><td class="num">280,000</td><td class="num">58,800,000</td><td><span class="srcb">노임단가</span></td></tr>
+<tr style="background: #FFF7F0"><td>1</td><td>비계 설치·해체</td><td>㎡</td><td class="num">960</td><td class="num">21,000</td><td class="num">20,160,000</td><td><span class="srcb">단가 마스터</span></td></tr>
+<tr><td>5</td><td>크레인 50ton</td><td>일</td><td class="num">12</td><td class="num">1,350,000</td><td class="num">16,200,000</td><td><span class="srcb">장비 손료</span></td></tr>
+<tr style="font-weight: 700; background: #F7F8FA"><td colspan="5">직접비 합계</td><td class="num">190,752,000</td><td></td></tr>
+</tbody>
+</table>
+</div>
+<div style="padding: 14px 16px; border-top: 1px solid #E1E4EA; background: #FBF8FF">
+<div style="font-size: 12px; font-weight: 600; color: #5B2DA0; margin-bottom: 6px">AI 검토 의견 2</div>
+<ul style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8">
+<li>비계 물량이 유사견적(QP-2024-0071) 대비 적습니다. 탱크 둘레 기준으로 다시 확인하세요.</li>
+<li>체크리스트의 "밀폐공간 환기·가스측정" 항목이 내역에 없습니다.</li>
+</ul>
+</div>
+</section>
+<aside class="card" style="flex: 1 1 280px; min-width: 0; padding: 20px" aria-label="견적 요약">
+<h2 style="margin: 0 0 10px; font-size: 15px">견적 요약</h2>
+<div class="row"><span class="muted">가설</span><span class="num">20,160,000</span></div>
+<div class="row"><span class="muted">표면처리·도장</span><span class="num">77,700,000</span></div>
+<div class="row"><span class="muted">판재 교체</span><span class="num">17,892,000</span></div>
+<div class="row"><span class="muted">노무 (용접·검사)</span><span class="num">58,800,000</span></div>
+<div class="row"><span class="muted">장비</span><span class="num">16,200,000</span></div>
+<div class="row" style="border-top: 1px solid #E1E4EA; margin-top: 4px; padding-top: 10px; font-weight: 700"><span>직접비</span><span class="num">190,752,000</span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px">
+<div><label for="ovh" style="font-size: 12px; font-weight: 600">간접비 %</label><input id="ovh" type="text" value="" placeholder="[  ]" style="width: 100%; box-sizing: border-box; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 8px; font: inherit; margin-top: 4px"></div>
+<div><label for="risk" style="font-size: 12px; font-weight: 600">리스크율 %</label><input id="risk" type="text" value="" placeholder="[  ]" style="width: 100%; box-sizing: border-box; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 8px; font: inherit; margin-top: 4px"></div>
+<div><label for="margin" style="font-size: 12px; font-weight: 600">마진율 %</label><input id="margin" type="text" value="" placeholder="[  ]" style="width: 100%; box-sizing: border-box; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 8px; font: inherit; margin-top: 4px"></div>
+</div>
+<div class="muted" style="font-size: 12px; margin-top: 6px">참고: 유사견적 평균 리스크율 [  ]%, 마진율 [  ]%</div>
+<div style="background: #14213D; color: #fff; border-radius: 8px; padding: 14px 16px; margin-top: 14px"><div style="font-size: 12px; color: #B9C3D6">견적가 (계산 엔진)</div><div style="font-size: 22px; font-weight: 700; margin-top: 2px">[견적가]</div></div>
+<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px">
+<a class="btn" href="#EstCivil">상세 견적서 보기</a>
+<a class="btn pri" href="#Approvals">견적 승인요청</a>
+</div>
+</aside>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>공사 견적 작성</b>공사형 견적의 공종별 물량·단가·금액을 작성하고 단가 출처를 남기는 화면입니다. AI가 유사견적 대비 이상한 물량이나 누락 공종을 알려주고, 리스크·마진율을 넣으면 계산 엔진이 견적가를 냅니다.</div></footer></main>
+</div>
+</template><template id="t-QuoteTank"><style>
+/*body*/:host{display:block;margin:0;background:#F4F5F7;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1A1D23;font-size:14px}
+a{color:#1F5FAD}a:hover{color:#174A87}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 200px;max-width:232px;background:#14213D;color:#D9DEE8;padding:20px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;color:#fff;font-size:16px;padding:4px 12px 20px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;color:#C9D0DD;text-decoration:none;min-height:24px}
+.nav:hover{background:#1F2F52;color:#fff}
+.nav.on{background:#2B4A85;color:#fff;font-weight:600}
+.nav.dim{color:#8D97AB}
+.cnt{background:#E8590C;color:#fff;border-radius:10px;font-size:12px;padding:1px 8px;font-weight:600}
+.navsec{font-size:12px;color:#8D97AB;padding:20px 12px 6px}
+.main{flex:999 1 560px;min-width:0;padding:24px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border:1px solid #E1E4EA;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #C9CED8;background:#fff;color:#1A1D23;font:inherit;font-weight:500;text-decoration:none;cursor:pointer}
+.btn.pri{background:#1F5FAD;border-color:#1F5FAD;color:#fff}
+.btn.pri:hover{background:#174A87;color:#fff}
+.muted{color:#5F6776}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.rv{background:#E3EDFA;color:#174A87}.qp{background:#FDEBDD;color:#9A3412}.wo{background:#DCF2E3;color:#166534}.end{background:#ECEEF2;color:#4B5363}
+.idbox{display:inline-flex;gap:8px;align-items:center;border:1px solid #E1E4EA;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600}
+.idbox.off{color:#A3AAB6;border-style:dashed;font-weight:400}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #E1E4EA;overflow-x:auto}
+.tab{padding:10px 14px;text-decoration:none;color:#5F6776;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:#1A1D23}
+.tab.on{color:#1A1D23;border-bottom-color:#1F5FAD;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;color:#5F6776;background:#F7F8FA;padding:9px 12px;border-bottom:1px solid #E1E4EA;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #EEF0F3;white-space:nowrap}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.best{background:#DCF2E3;color:#14532D;font-weight:700}
+.out{color:#A3AAB6}
+.pk{display:block;padding:10px 12px;border-radius:8px;border:1px solid #E1E4EA;text-decoration:none;color:#1A1D23}
+.pk.on{border-color:#1F5FAD;background:#EEF4FC}
+
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box;display:block;color:#344054}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px;color:#101828}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054;text-decoration:none}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+:host{background:#F5F6F8}
+.btn.pri{background:#2457C5;border-color:#2457C5}
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴"><div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a><div class="grp">오늘 할 일</div><a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a><a class="nav" href="#Briefing">영업 브리핑 </a><a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a><div class="grp">영업 프로젝트</div><a class="nav on" href="#Pipeline">파이프라인 </a><a class="nav" href="#Results">결과·분석 </a><div class="grp">문서</div><a class="nav" href="#DocHub">문서함 </a><a class="nav" href="#DocChat">문서 채팅 </a><div class="grp">기준 정보</div><a class="nav" href="#AVL">고객사 AVL </a><span class="nav dim">단가 마스터</span><span class="nav dim">외주업체</span></nav>
+<main class="main">
+<section class="card" style="padding: 20px 24px 0; display: flex; flex-direction: column; gap: 14px">
+<div class="muted" style="font-size: 13px"><a href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a> › 한빛케미칼(주)</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
+<h1 style="margin: 0; font-size: 22px">울산공장 저장탱크 4기 신설</h1>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 13px"><span class="st end">탱크</span><span class="st end">적용 AVL v3</span><span class="st qp">마감 10/30 · D-15</span></div>
+</div>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+<span class="idbox">RV-2026-0142 <span class="st end">참여 승인</span></span><span class="muted">›</span>
+<span class="idbox">QP-2026-0058 · R0 <span class="st qp">견적 작성</span></span><span class="muted">›</span>
+<span class="idbox off">WO · 수주 시 생성</span>
+</div>
+<nav class="tabs" aria-label="프로젝트 메뉴">
+<a class="tab" href="#DocHub">문서함·이력</a>
+<a class="tab" href="#Analysis">문서 분석</a>
+<a class="tab" href="#Similar">유사견적</a>
+<a class="tab" href="#GoNoGo">참여보고서</a>
+<a class="tab on" href="#QuoteTank">견적</a>
+<a class="tab" href="#TCM">TCM·협상</a>
+<a class="tab" href="#Results">결과</a>
+<a class="tab" href="#DocChat">문서 채팅</a>
+</nav>
+</section>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section class="card" style="flex: 0 1 250px; min-width: 0; padding: 16px; display: flex; flex-direction: column; gap: 8px" aria-label="외주 패키지">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 14px">외주 패키지 5</h2><span class="muted" style="font-size: 12px">AVL v3 기준</span></div>
+<a class="pk on" href="#QuoteTank"><div style="font-weight: 600; font-size: 13px">탱크 본체 제작·설치</div><div class="muted" style="font-size: 12px">AVL 3곳 · 회신 3/3</div></a>
+<a class="pk" href="#QuoteTank"><div style="font-weight: 600; font-size: 13px">펌프</div><div style="font-size: 12px; color: #C2410C">AVL 2곳 · 회신 1/2 · 기한 10/22</div></a>
+<a class="pk" href="#QuoteTank"><div style="font-weight: 600; font-size: 13px">밸브</div><div style="font-size: 12px; color: #C2410C">AVL 3곳 · 회신 0/3 · 기한 10/23</div></a>
+<a class="pk" href="#QuoteTank"><div style="font-weight: 600; font-size: 13px">계장</div><div class="muted" style="font-size: 12px">AVL 2곳 · 회신 2/2</div></a>
+<a class="pk" href="#QuoteTank"><div style="font-weight: 600; font-size: 13px">도장</div><div class="muted" style="font-size: 12px">AVL 2곳 · 회신 2/2 · v3에서 1곳 변경</div></a>
+<a class="btn" href="#AVL" style="margin-top: 6px">AVL 업체에 가격 요청</a>
+</section>
+<section class="card" style="flex: 1.8 1 560px; min-width: 0; overflow: hidden" aria-label="업체 견적 비교">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding: 14px 16px; border-bottom: 1px solid #E1E4EA">
+<div><h2 style="margin: 0; font-size: 15px">탱크 본체 제작·설치 · 업체 견적 비교</h2><div class="muted" style="font-size: 12px; margin-top: 2px">단위: 백만원 · 업체 회신 견적서에서 AI 추출 후 담당자 확인 · 예시 데이터</div></div>
+<button class="btn" type="button" style="min-height: 34px; font-size: 13px">원본 견적서 보기</button>
+</div>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>항목</th><th class="num">A중공업<br><span style="font-weight: 400">AVL</span></th><th class="num">B플랜트<br><span style="font-weight: 400">AVL</span></th><th class="num">C엔지니어링<br><span style="font-weight: 400">AVL</span></th><th class="num out">D산업<br><span style="font-weight: 400; color: #C2410C">AVL 외</span></th><th class="num">선택가</th><th>분할 발주</th></tr></thead>
+<tbody>
+<tr><td>판재 제작</td><td class="num">412</td><td class="num best">398</td><td class="num">425</td><td class="num out">380</td><td class="num" style="font-weight: 700">398</td><td>가능</td></tr>
+<tr><td>용접·조립</td><td class="num">186</td><td class="num">201</td><td class="num best">179</td><td class="num out">170</td><td class="num" style="font-weight: 700">179</td><td style="color: #C2410C">확인 필요</td></tr>
+<tr><td>수압시험</td><td class="num">24</td><td class="num best">21</td><td class="num">26</td><td class="num out">20</td><td class="num" style="font-weight: 700">21</td><td>가능</td></tr>
+<tr><td>운반·설치</td><td class="num">58</td><td class="num">64</td><td class="num best">55</td><td class="num out">50</td><td class="num" style="font-weight: 700">55</td><td>가능</td></tr>
+<tr style="font-weight: 700; background: #F7F8FA"><td>합계</td><td class="num">680</td><td class="num">684</td><td class="num">685</td><td class="num out">620</td><td class="num">653</td><td></td></tr>
+<tr><td class="muted">견적 유효기간</td><td class="num">90일</td><td class="num">60일</td><td class="num">90일</td><td class="num out">30일</td><td></td><td></td></tr>
+</tbody>
+</table>
+</div>
+<div style="padding: 14px 16px; border-top: 1px solid #E1E4EA; background: #FBF8FF; font-size: 13px; line-height: 1.8">
+<div style="font-size: 12px; font-weight: 600; color: #5B2DA0">AI 의견</div>
+항목별 최적가 조합은 653으로, 단일 업체 최저(A중공업 680)보다 27 낮습니다. 용접·조립을 판재 제작과 다른 업체에 나눠 줄 수 있는지 확인이 필요합니다. D산업은 AVL v3에 없어 비교에서만 표시했습니다.
+</div>
+</section>
+<aside class="card" style="flex: 1 1 260px; min-width: 0; padding: 20px" aria-label="재구성 요약">
+<h2 style="margin: 0 0 12px; font-size: 15px">재구성 원가 (백만원)</h2>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px"><span class="muted">탱크 본체</span><span>653</span></div>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px"><span class="muted">펌프</span><span style="color: #C2410C">회신 대기</span></div>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px"><span class="muted">밸브</span><span style="color: #C2410C">회신 대기</span></div>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px"><span class="muted">계장</span><span>[  ]</span></div>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px"><span class="muted">도장</span><span>[  ]</span></div>
+<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px"><span class="muted">시험·검사 (RT 100%)</span><span>[  ]</span></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px">
+<div><label for="t-risk" style="font-size: 12px; font-weight: 600">리스크율 %</label><input id="t-risk" type="text" placeholder="[  ]" style="width: 100%; box-sizing: border-box; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 8px; font: inherit; margin-top: 4px"></div>
+<div><label for="t-margin" style="font-size: 12px; font-weight: 600">마진율 %</label><input id="t-margin" type="text" placeholder="[  ]" style="width: 100%; box-sizing: border-box; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 8px; font: inherit; margin-top: 4px"></div>
+</div>
+<div class="muted" style="font-size: 12px; margin-top: 6px">지체상금 상한 없음 → 리스크율 상향 검토 (체크리스트 #3)</div>
+<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px">
+<a class="btn" href="#EstTank">상세 견적서 보기</a>
+<a class="btn pri" href="#Approvals">견적 승인요청 (2개 패키지 대기 중)</a>
+</div>
+</aside>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>탱크 외주견적 비교</b>탱크형 견적에서 AVL 업체에 요청한 가격 회신을 항목 × 업체 표로 비교하고, 항목별 최적가로 재구성하는 화면입니다. AVL 밖 업체는 비교만 하고 선택하지 않습니다.</div></footer></main>
+</div>
+</template><template id="t-Approvals"><style>
+/*body*/:host{display:block;margin:0;background:#F4F5F7;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1A1D23;font-size:14px}
+a{color:#1F5FAD}a:hover{color:#174A87}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 200px;max-width:232px;background:#14213D;color:#D9DEE8;padding:20px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;color:#fff;font-size:16px;padding:4px 12px 20px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;color:#C9D0DD;text-decoration:none;min-height:24px}
+.nav:hover{background:#1F2F52;color:#fff}
+.nav.on{background:#2B4A85;color:#fff;font-weight:600}
+.nav.dim{color:#8D97AB}
+.cnt{background:#E8590C;color:#fff;border-radius:10px;font-size:12px;padding:1px 8px;font-weight:600}
+.navsec{font-size:12px;color:#8D97AB;padding:20px 12px 6px}
+.main{flex:999 1 560px;min-width:0;padding:24px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border:1px solid #E1E4EA;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:8px;border:1px solid #C9CED8;background:#fff;color:#1A1D23;font:inherit;font-weight:500;text-decoration:none;cursor:pointer}
+.btn.pri{background:#1F5FAD;border-color:#1F5FAD;color:#fff}
+.btn.pri:hover{background:#174A87;color:#fff}
+.btn.neg{color:#B42318;border-color:#E9B5B0}
+.muted{color:#5F6776}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.rv{background:#E3EDFA;color:#174A87}.qp{background:#FDEBDD;color:#9A3412}.wo{background:#DCF2E3;color:#166534}.end{background:#ECEEF2;color:#4B5363}
+.item{display:block;padding:14px 16px;border-bottom:1px solid #EEF0F3;text-decoration:none;color:#1A1D23}
+.item.on{background:#EEF4FC;border-left:3px solid #1F5FAD}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.kv div{border:1px solid #E1E4EA;border-radius:8px;padding:12px}
+.kv .l{font-size:12px;color:#5F6776}
+.kv .v{font-size:18px;font-weight:700;margin-top:2px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;color:#5F6776;background:#F7F8FA;padding:9px 12px;border-bottom:1px solid #E1E4EA;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #EEF0F3}
+
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box;display:block;color:#344054}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px;color:#101828}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054;text-decoration:none}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+:host{background:#F5F6F8}
+.btn.pri{background:#2457C5;border-color:#2457C5}
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴"><div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a><div class="grp">오늘 할 일</div><a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a><a class="nav" href="#Briefing">영업 브리핑 </a><a class="nav on" href="#Approvals">승인함 <span class="badge">2</span></a><div class="grp">영업 프로젝트</div><a class="nav" href="#Pipeline">파이프라인 </a><a class="nav" href="#EstCivil">상세 견적서</a><a class="nav" href="#Results">결과·분석 </a><div class="grp">문서</div><a class="nav" href="#DocHub">문서함 </a><a class="nav" href="#DocChat">문서 채팅 </a><div class="grp">기준 정보</div><a class="nav" href="#AVL">고객사 AVL </a><span class="nav dim">단가 마스터</span><span class="nav dim">외주업체</span></nav>
+<main class="main">
+<div>
+<div class="muted" style="font-size: 13px">[임원] 결재 대기 · 참여 결정, 견적 승인, 실행예산 승인</div>
+<h1 style="margin: 4px 0 0; font-size: 24px; font-weight: 700">승인함</h1>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section class="card" style="flex: 1 1 320px; min-width: 0; overflow: hidden" aria-label="결재 목록">
+<div style="padding: 12px 16px; border-bottom: 1px solid #E1E4EA; font-weight: 600">대기 2 · 오늘 처리 3</div>
+<a class="item on" href="#Approvals"><div style="display: flex; justify-content: space-between; gap: 8px"><span class="st qp">견적 승인</span><span style="font-size: 12px; color: #C2410C; font-weight: 600">마감 D-1</span></div><div style="font-weight: 600; margin-top: 6px">QP-2026-0049 · R2 당진 LNG 인입배관</div><div class="muted" style="font-size: 13px">[공사 담당자] · 10/15 08:50 상신</div></a>
+<a class="item" href="#GoNoGo"><div style="display: flex; justify-content: space-between; gap: 8px"><span class="st rv">참여 결정</span><span class="muted" style="font-size: 12px">현설 10/20</span></div><div style="font-weight: 600; margin-top: 6px">RV-2026-0142 울산 저장탱크 4기</div><div class="muted" style="font-size: 13px">[탱크 담당자] · AI 추천: 참여</div></a>
+<div style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #5F6776; background: #F7F8FA">오늘 처리</div>
+<a class="item" href="#Results"><div style="display: flex; justify-content: space-between; gap: 8px"><span class="st wo">실행예산</span><span class="muted" style="font-size: 12px">승인</span></div><div style="font-weight: 600; margin-top: 6px">WO-2026-0029 김해 저장조 교체</div></a>
+</section>
+<section class="card" style="flex: 2 1 560px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 20px" aria-label="결재 상세">
+<div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center"><span class="st qp">견적 승인요청</span><span class="muted" style="font-size: 13px">RV-2026-0128 › QP-2026-0049 · R2</span></div>
+<h2 style="margin: 8px 0 0; font-size: 20px">당진 LNG 인입배관공사 견적 승인</h2>
+<div class="muted" style="font-size: 13px; margin-top: 2px">서해에너지(주) · 공사 · 제출 마감 10/16 17:00</div>
+</div>
+<div class="kv">
+<div><div class="l">견적가</div><div class="v">[금액]</div></div>
+<div><div class="l">리스크율 / 마진율</div><div class="v">[ ]% / [ ]%</div></div>
+<div><div class="l">체크리스트</div><div class="v" style="color: #15803D">22 / 22 완료</div></div>
+</div>
+<div>
+<h3 style="margin: 0 0 8px; font-size: 14px">R1 대비 변경 (정정공고 2차 반영)</h3>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>항목</th><th>R1</th><th>R2</th><th>사유</th></tr></thead>
+<tbody>
+<tr><td>배관 연장</td><td>1.2 km</td><td>1.45 km</td><td>정정공고 2차 노선 변경</td></tr>
+<tr><td>비파괴검사</td><td>RT 20%</td><td>RT 100%</td><td>정정공고 2차 시방 변경</td></tr>
+<tr><td>공기</td><td>5개월</td><td>6개월</td><td>물량 증가</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<h3 style="margin: 0 0 8px; font-size: 14px">결재 문서 (버전 고정)</h3>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+<a href="#DocHub">QP-2026-0049_견적서_당진LNG배관_v5_20261015.xlsx</a>
+<a href="#DocHub">QP-2026-0049_리스크체크리스트_v3_20261014.pdf</a>
+</div>
+</div>
+<div>
+<label for="ap-op" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px">결재 의견</label>
+<textarea id="ap-op" rows="2" style="width: 100%; box-sizing: border-box; border: 1px solid #C9CED8; border-radius: 8px; padding: 10px; font: inherit; font-size: 13px" placeholder="의견을 입력하세요"></textarea>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: center; border-top: 1px solid #E1E4EA; padding-top: 16px">
+<span class="muted" style="font-size: 12px">승인 시: QP 상태 → 견적 승인 · 견적서 v5 잠금 · 제출본 폴더에 복사</span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<button class="btn neg" type="button">반려 (R3로 수정)</button>
+<button class="btn" type="button">조건부 승인</button>
+<a class="btn pri" href="#TCM">승인</a>
+</div>
+</div>
+</section>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>승인함</b>임원이 참여 결정, 견적 승인, 실행예산 결재를 이전 리비전 대비 변경 내역과 결재 문서 버전과 함께 보고 승인·조건부·반려하는 화면입니다.</div></footer></main>
+</div>
+</template><template id="t-TCM"><style>
+/*body*/:host{display:block;margin:0;background:#F4F5F7;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1A1D23;font-size:14px}
+a{color:#1F5FAD}a:hover{color:#174A87}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 200px;max-width:232px;background:#14213D;color:#D9DEE8;padding:20px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;color:#fff;font-size:16px;padding:4px 12px 20px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;color:#C9D0DD;text-decoration:none;min-height:24px}
+.nav:hover{background:#1F2F52;color:#fff}
+.nav.on{background:#2B4A85;color:#fff;font-weight:600}
+.nav.dim{color:#8D97AB}
+.cnt{background:#E8590C;color:#fff;border-radius:10px;font-size:12px;padding:1px 8px;font-weight:600}
+.navsec{font-size:12px;color:#8D97AB;padding:20px 12px 6px}
+.main{flex:999 1 560px;min-width:0;padding:24px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border:1px solid #E1E4EA;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #C9CED8;background:#fff;color:#1A1D23;font:inherit;font-weight:500;text-decoration:none;cursor:pointer}
+.btn.pri{background:#1F5FAD;border-color:#1F5FAD;color:#fff}
+.btn.pri:hover{background:#174A87;color:#fff}
+.muted{color:#5F6776}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.rv{background:#E3EDFA;color:#174A87}.qp{background:#FDEBDD;color:#9A3412}.wo{background:#DCF2E3;color:#166534}.end{background:#ECEEF2;color:#4B5363}
+.idbox{display:inline-flex;gap:8px;align-items:center;border:1px solid #E1E4EA;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600}
+.idbox.off{color:#A3AAB6;border-style:dashed;font-weight:400}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #E1E4EA;overflow-x:auto}
+.tab{padding:10px 14px;text-decoration:none;color:#5F6776;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:#1A1D23}
+.tab.on{color:#1A1D23;border-bottom-color:#1F5FAD;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;color:#5F6776;background:#F7F8FA;padding:9px 12px;border-bottom:1px solid #E1E4EA;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #EEF0F3;vertical-align:top}
+.mt{display:block;padding:12px 14px;border-radius:8px;border:1px solid #E1E4EA;text-decoration:none;color:#1A1D23}
+.mt.on{border-color:#1F5FAD;background:#EEF4FC}
+
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box;display:block;color:#344054}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px;color:#101828}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054;text-decoration:none}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+:host{background:#F5F6F8}
+.btn.pri{background:#2457C5;border-color:#2457C5}
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴"><div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a><div class="grp">오늘 할 일</div><a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a><a class="nav" href="#Briefing">영업 브리핑 </a><a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a><div class="grp">영업 프로젝트</div><a class="nav on" href="#Pipeline">파이프라인 </a><a class="nav" href="#Results">결과·분석 </a><div class="grp">문서</div><a class="nav" href="#DocHub">문서함 </a><a class="nav" href="#DocChat">문서 채팅 </a><div class="grp">기준 정보</div><a class="nav" href="#AVL">고객사 AVL </a><span class="nav dim">단가 마스터</span><span class="nav dim">외주업체</span></nav>
+<main class="main">
+<section class="card" style="padding: 20px 24px 0; display: flex; flex-direction: column; gap: 14px">
+<div class="muted" style="font-size: 13px"><a href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a> › 한결엔지니어링</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
+<h1 style="margin: 0; font-size: 22px">광양 수처리설비 설치</h1>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><a class="btn" href="#Results">실주 등록</a><a class="btn pri" href="#Results">수주 확정 → WO 생성</a></div>
+</div>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+<span class="idbox">RV-2026-0119 <span class="st end">참여 승인</span></span><span class="muted">›</span>
+<span class="idbox">QP-2026-0051 · R3 <span class="st qp">TCM·협상중</span></span><span class="muted">›</span>
+<span class="idbox off">WO · 수주 시 생성</span>
+</div>
+<nav class="tabs" aria-label="프로젝트 메뉴">
+<a class="tab" href="#DocHub">문서함·이력</a>
+<a class="tab" href="#Analysis">문서 분석</a>
+<a class="tab" href="#Similar">유사견적</a>
+<a class="tab" href="#GoNoGo">참여보고서</a>
+<a class="tab" href="#QuoteTank">견적</a>
+<a class="tab on" href="#TCM">TCM·협상</a>
+<a class="tab" href="#Results">결과</a>
+<a class="tab" href="#DocChat">문서 채팅</a>
+</nav>
+</section>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<aside style="flex: 0 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<section class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 8px" aria-label="회의 목록">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 14px">회의 3</h2><button class="btn" type="button" style="min-height: 32px; font-size: 12px">회의 추가</button></div>
+<a class="mt" href="#TCM"><div class="muted" style="font-size: 12px">10/17 예정</div><div style="font-weight: 600; font-size: 13px">2차 기술협의</div></a>
+<a class="mt on" href="#TCM"><div class="muted" style="font-size: 12px">10/08 · 1시간 40분</div><div style="font-weight: 600; font-size: 13px">가격 협상</div></a>
+<a class="mt" href="#TCM"><div class="muted" style="font-size: 12px">09/24 · 2시간</div><div style="font-weight: 600; font-size: 13px">1차 기술협의 (TCM)</div></a>
+</section>
+<section class="card" style="padding: 16px" aria-label="가격 변경 이력">
+<h2 style="margin: 0 0 10px; font-size: 14px">견적 리비전</h2>
+<div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+<div style="display: flex; justify-content: space-between"><span>R0 · 최초 제출 09/10</span><span>[금액]</span></div>
+<div style="display: flex; justify-content: space-between"><span>R1 · TCM 사양 변경</span><span>[금액]</span></div>
+<div style="display: flex; justify-content: space-between"><span>R2 · 1차 네고</span><span>[금액]</span></div>
+<div style="display: flex; justify-content: space-between; font-weight: 700"><span>R3 · 최종 제시 10/10</span><span>[금액]</span></div>
+</div>
+</section>
+</aside>
+<section class="card" style="flex: 1 1 560px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 20px" aria-label="회의록">
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+<div><h2 style="margin: 0; font-size: 18px">가격 협상 · 2026-10-08</h2><div class="muted" style="font-size: 13px; margin-top: 4px">고객사 구매팀 2명 · 당사 [탱크 담당자], [영업팀장] · 한결엔지니어링 회의실</div></div>
+<div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start"><button class="btn" type="button" style="min-height: 34px; font-size: 13px">녹음·메모 업로드</button><span class="st" style="background: #EEE6FA; color: #5B2DA0">AI 회의록 · 담당자 확인 완료</span></div>
+</div>
+<div>
+<h3 style="margin: 0 0 8px; font-size: 14px">요약</h3>
+<p style="margin: 0; font-size: 13px; line-height: 1.8; color: #3A4150">고객사는 R2 대비 추가 인하를 요청했고, 당사는 펌프 사양을 AVL 내 동급 모델로 바꾸는 조건으로 R3를 제시하기로 했다. 지체상금 상한(10%)은 고객사가 수용했다.</p>
+</div>
+<div>
+<h3 style="margin: 0 0 8px; font-size: 14px">질의·답변</h3>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>구분</th><th>내용</th><th>답변·결과</th></tr></thead>
+<tbody>
+<tr><td>고객 요청</td><td>R2 대비 추가 가격 인하</td><td>펌프 사양 변경 조건으로 R3 제시</td></tr>
+<tr><td>당사 질의</td><td>지체상금 상한 설정 가능 여부</td><td>계약금액 10% 상한 수용</td></tr>
+<tr><td>고객 요청</td><td>공기 1개월 단축 검토</td><td>외주 일정 확인 후 회신 (미결)</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<h3 style="margin: 0 0 8px; font-size: 14px">조건 변경 추적</h3>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>변경 사항</th><th>반영 리비전</th><th>상태</th></tr></thead>
+<tbody>
+<tr><td>펌프 사양 → AVL 동급 모델</td><td>R3</td><td><span class="st wo">반영</span></td></tr>
+<tr><td>지체상금 10% 상한</td><td>계약 조건</td><td><span class="st wo">반영</span></td></tr>
+<tr><td>공기 1개월 단축</td><td>—</td><td><span class="st qp">미반영</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<h3 style="margin: 0 0 8px; font-size: 14px">후속 조치</h3>
+<div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+<label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked> R3 견적서 제출 · [탱크 담당자] · 10/10</label>
+<label style="display: flex; gap: 8px; align-items: center"><input type="checkbox"> 외주 업체 공기 단축 가능 여부 확인 · [탱크 담당자] · 10/16</label>
+<label style="display: flex; gap: 8px; align-items: center"><input type="checkbox"> 2차 기술협의 자료 준비 · [영업팀장] · 10/17</label>
+</div>
+</div>
+<div class="muted" style="font-size: 12px; border-top: 1px solid #E1E4EA; padding-top: 12px">저장: 20_영업프로젝트/2026/RV-2026-0119_한결엔지니어링_광양수처리/20_견적_QP-2026-0051/26_TCM_협상</div>
+</section>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>TCM·협상 기록</b>견적 제출 후 고객사와의 TCM·협상 내용을 회의록, 질의·답변, 조건 변경(반영 여부), 후속 조치, 리비전별 가격으로 남기는 화면입니다. 수주·실주 확정도 여기서 시작합니다.</div></footer></main>
+</div>
+</template><template id="t-Results"><style>
+/*body*/:host{display:block;margin:0;background:#F4F5F7;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1A1D23;font-size:14px}
+a{color:#1F5FAD}a:hover{color:#174A87}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 200px;max-width:232px;background:#14213D;color:#D9DEE8;padding:20px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;color:#fff;font-size:16px;padding:4px 12px 20px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;color:#C9D0DD;text-decoration:none;min-height:24px}
+.nav:hover{background:#1F2F52;color:#fff}
+.nav.on{background:#2B4A85;color:#fff;font-weight:600}
+.nav.dim{color:#8D97AB}
+.cnt{background:#E8590C;color:#fff;border-radius:10px;font-size:12px;padding:1px 8px;font-weight:600}
+.navsec{font-size:12px;color:#8D97AB;padding:20px 12px 6px}
+.main{flex:999 1 560px;min-width:0;padding:24px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border:1px solid #E1E4EA;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #C9CED8;background:#fff;color:#1A1D23;font:inherit;font-weight:500;text-decoration:none;cursor:pointer}
+.btn.pri{background:#1F5FAD;border-color:#1F5FAD;color:#fff}
+.btn.pri:hover{background:#174A87;color:#fff}
+.muted{color:#5F6776}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.rv{background:#E3EDFA;color:#174A87}.qp{background:#FDEBDD;color:#9A3412}.wo{background:#DCF2E3;color:#166534}.end{background:#ECEEF2;color:#4B5363}
+.idbox{display:inline-flex;gap:8px;align-items:center;border:1px solid #E1E4EA;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;color:#5F6776;background:#F7F8FA;padding:9px 12px;border-bottom:1px solid #E1E4EA;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #EEF0F3}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.step{border-radius:8px;padding:10px 12px;font-size:13px;border:1px solid #E1E4EA}
+.step.done{background:#DCF2E3;border-color:#B7E1C4;color:#14532D}
+.step.now{background:#EEF4FC;border-color:#1F5FAD;font-weight:600}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#F7F8FA;border:1px solid #E1E4EA;border-radius:6px;padding:2px 6px}
+
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box;display:block;color:#344054}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px;color:#101828}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054;text-decoration:none}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+:host{background:#F5F6F8}
+.btn.pri{background:#2457C5;border-color:#2457C5}
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴"><div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a><div class="grp">오늘 할 일</div><a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a><a class="nav" href="#Briefing">영업 브리핑 </a><a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a><div class="grp">영업 프로젝트</div><a class="nav" href="#Pipeline">파이프라인 </a><a class="nav" href="#EstCivil">상세 견적서</a><a class="nav on" href="#Results">결과·분석 </a><div class="grp">문서</div><a class="nav" href="#DocHub">문서함 </a><a class="nav" href="#DocChat">문서 채팅 </a><div class="grp">기준 정보</div><a class="nav" href="#AVL">고객사 AVL </a><span class="nav dim">단가 마스터</span><span class="nav dim">외주업체</span></nav>
+<main class="main">
+<div>
+<div class="muted" style="font-size: 13px">수주 → WorkOrder · 실행예산 · 실행 코드 / 실주 → 실패요인 분석</div>
+<h1 style="margin: 4px 0 0; font-size: 24px; font-weight: 700">결과 관리</h1>
+</div>
+<section class="card" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px" aria-label="WorkOrder">
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center">
+<div><div style="display: flex; gap: 8px; align-items: center"><span class="st wo">수주</span><h2 style="margin: 0; font-size: 18px">아산 공장 소방수 저장조</h2></div><div class="muted" style="font-size: 13px; margin-top: 4px">세진화학 · 탱크 · 계약 10/02</div></div>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><span class="idbox">RV-2026-0097</span><span class="muted">›</span><span class="idbox">QP-2026-0040 · R2</span><span class="muted">›</span><span class="idbox" style="border-color: #15803D">WO-2026-0031 <span class="st wo">실행예산 작성</span></span></div>
+</div>
+<div class="steps">
+<div class="step done">① WO 생성 · 10/02</div>
+<div class="step now">② 실행예산 작성</div>
+<div class="step">③ 실행예산 승인</div>
+<div class="step">④ 실행 코드 발번</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<div style="flex: 1.6 1 520px; min-width: 0; overflow-x: auto">
+<table>
+<thead><tr><th>항목</th><th class="num">견적 (백만원)</th><th class="num">실행 (백만원)</th><th class="num">차이</th><th>확정 업체</th><th>원가 코드</th></tr></thead>
+<tbody>
+<tr><td>탱크 본체 제작</td><td class="num">520</td><td class="num">498</td><td class="num" style="color: #15803D">-22</td><td>B플랜트 (AVL)</td><td><span class="code">[JOB]-100</span></td></tr>
+<tr><td>펌프·밸브</td><td class="num">84</td><td class="num">86</td><td class="num" style="color: #B42318">+2</td><td>A펌프 (AVL)</td><td><span class="code">[JOB]-200</span></td></tr>
+<tr><td>도장</td><td class="num">46</td><td class="num">44</td><td class="num" style="color: #15803D">-2</td><td>E도장 (AVL)</td><td><span class="code">[JOB]-300</span></td></tr>
+<tr><td>시험·검사</td><td class="num">18</td><td class="num">18</td><td class="num">0</td><td>미정</td><td><span class="code">[JOB]-400</span></td></tr>
+<tr><td>현장 경비</td><td class="num">40</td><td class="num">40</td><td class="num">0</td><td>자체</td><td><span class="code">[JOB]-900</span></td></tr>
+<tr style="font-weight: 700; background: #F7F8FA"><td>합계</td><td class="num">708</td><td class="num">686</td><td class="num" style="color: #15803D">-22</td><td></td><td></td></tr>
+</tbody>
+</table>
+<div class="muted" style="font-size: 12px; margin-top: 6px">예시 데이터 · 원가 코드 형식은 회사 체계에 맞춰 확정</div>
+</div>
+<div style="flex: 1 1 260px; min-width: 0; border: 1px solid #E1E4EA; border-radius: 8px; padding: 16px">
+<div style="font-weight: 600">승인되면 생성</div>
+<ul class="muted" style="margin: 8px 0 14px; padding-left: 18px; font-size: 13px; line-height: 1.8">
+<li>실행 코드 <span class="code">[JOB]</span> 발번</li>
+<li>원가 코드 5개 생성, ERP로 전송</li>
+<li>폴더 30_수주_WO-2026-0031 / 32_실행예산 잠금</li>
+</ul>
+<a class="btn pri" href="#Approvals" style="width: 100%; box-sizing: border-box">실행예산 승인요청</a>
+</div>
+</div>
+</section>
+<section class="card" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px" aria-label="실주 분석">
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center">
+<div><div style="display: flex; gap: 8px; align-items: center"><span class="st end">실주</span><h2 style="margin: 0; font-size: 18px">시흥 물류창고 배관공사</h2></div><div class="muted" style="font-size: 13px; margin-top: 4px">삼일건설 · 공사 · RV-2026-0102 › QP-2026-0043 R1 · 결과 통보 10/06</div></div>
+<span class="st" style="background: #FDE2E2; color: #9F1D1D">대외비 · 임원·견적담당</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<div style="flex: 1 1 380px; min-width: 0">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<div style="border: 1px solid #E1E4EA; border-radius: 8px; padding: 12px"><div class="muted" style="font-size: 12px">당사 제출가</div><div style="font-weight: 700; margin-top: 2px">[금액]</div></div>
+<div style="border: 1px solid #E1E4EA; border-radius: 8px; padding: 12px"><div class="muted" style="font-size: 12px">낙찰가 (확인 시)</div><div style="font-weight: 700; margin-top: 2px">[금액]</div></div>
+<div style="border: 1px solid #E1E4EA; border-radius: 8px; padding: 12px"><div class="muted" style="font-size: 12px">낙찰사</div><div style="font-weight: 700; margin-top: 2px">[업체명]</div></div>
+</div>
+<label for="lose-why" style="display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px">실주 사유 (담당자)</label>
+<select id="lose-why" style="width: 100%; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 10px; font: inherit; background: #fff"><option>가격</option><option>기술·사양</option><option>공기</option><option>실적·자격</option><option>관계·기타</option></select>
+</div>
+<div style="flex: 1 1 340px; min-width: 0; background: #FBF8FF; border-radius: 8px; padding: 14px 16px">
+<div style="font-size: 12px; font-weight: 600; color: #5B2DA0">AI 실패요인 분석 초안</div>
+<ul style="margin: 8px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.8">
+<li>노무비 비중이 유사 수주 건 평균보다 높음 (지역 할증 중복 적용 의심)</li>
+<li>TCM에서 요청한 공기 단축에 회신하지 않음 (TCM 회의록 09/18)</li>
+<li>같은 발주처 최근 3건 중 2건 실주 · 모두 가격 사유</li>
+</ul>
+<div class="muted" style="font-size: 12px; margin-top: 8px">근거: QP-2026-0043 견적서 v3, TCM 회의록, 유사견적 DB</div>
+<button class="btn" type="button" style="margin-top: 12px">확정하고 유사견적 DB에 반영</button>
+</div>
+</div>
+</section>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>결과 관리</b>수주한 건을 WorkOrder로 만들어 견적 대비 실행예산을 확정하고 실행 코드를 발번하는 화면입니다. 실주한 건은 사유와 AI 실패요인 분석을 남겨 다음 견적에 쓰게 합니다.</div></footer></main>
+</div>
+</template><template id="t-AVL"><style>
+/*body*/:host{display:block;margin:0;background:#F4F5F7;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1A1D23;font-size:14px}
+a{color:#1F5FAD}a:hover{color:#174A87}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 200px;max-width:232px;background:#14213D;color:#D9DEE8;padding:20px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;color:#fff;font-size:16px;padding:4px 12px 20px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;color:#C9D0DD;text-decoration:none;min-height:24px}
+.nav:hover{background:#1F2F52;color:#fff}
+.nav.on{background:#2B4A85;color:#fff;font-weight:600}
+.nav.dim{color:#8D97AB}
+.cnt{background:#E8590C;color:#fff;border-radius:10px;font-size:12px;padding:1px 8px;font-weight:600}
+.navsec{font-size:12px;color:#8D97AB;padding:20px 12px 6px}
+.main{flex:999 1 560px;min-width:0;padding:24px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border:1px solid #E1E4EA;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #C9CED8;background:#fff;color:#1A1D23;font:inherit;font-weight:500;text-decoration:none;cursor:pointer}
+.btn.pri{background:#1F5FAD;border-color:#1F5FAD;color:#fff}
+.btn.pri:hover{background:#174A87;color:#fff}
+.muted{color:#5F6776}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.wo{background:#DCF2E3;color:#166534}.qp{background:#FDEBDD;color:#9A3412}.end{background:#ECEEF2;color:#4B5363}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;color:#5F6776;background:#F7F8FA;padding:9px 12px;border-bottom:1px solid #E1E4EA;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #EEF0F3;white-space:nowrap}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.cust{display:block;padding:10px 12px;border-radius:8px;text-decoration:none;color:#1A1D23;font-size:13px}
+.cust.on{background:#EEF4FC;font-weight:600}
+.ver{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border:1px solid #E1E4EA;border-radius:8px;min-width:150px;text-decoration:none;color:#1A1D23}
+.ver.on{border-color:#1F5FAD;background:#EEF4FC}
+.add{background:#DCF2E3;color:#14532D;font-weight:600;font-size:12px;padding:1px 6px;border-radius:4px}
+.del{background:#FDE2E2;color:#9F1D1D;font-weight:600;font-size:12px;padding:1px 6px;border-radius:4px}
+
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box;display:block;color:#344054}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px;color:#101828}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054;text-decoration:none}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+:host{background:#F5F6F8}
+.btn.pri{background:#2457C5;border-color:#2457C5}
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴"><div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a><div class="grp">오늘 할 일</div><a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a><a class="nav" href="#Briefing">영업 브리핑 </a><a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a><div class="grp">영업 프로젝트</div><a class="nav" href="#Pipeline">파이프라인 </a><a class="nav" href="#EstCivil">상세 견적서</a><a class="nav" href="#Results">결과·분석 </a><div class="grp">문서</div><a class="nav" href="#DocHub">문서함 </a><a class="nav" href="#DocChat">문서 채팅 </a><div class="grp">기준 정보</div><a class="nav on" href="#AVL">고객사 AVL </a><span class="nav dim">단가 마스터</span><span class="nav dim">외주업체</span></nav>
+<main class="main">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+<div>
+<div class="muted" style="font-size: 13px">고객사별 승인 벤더 목록 · 버전 관리 · AVL 기준 가격 요청</div>
+<h1 style="margin: 4px 0 0; font-size: 24px; font-weight: 700">고객사 AVL</h1>
+</div>
+<button class="btn" type="button">AVL 문서 업로드</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section class="card" style="flex: 0 1 220px; min-width: 0; padding: 12px" aria-label="고객사">
+<label for="cust-q" style="position: absolute; left: -9999px">고객사 검색</label>
+<input id="cust-q" type="search" placeholder="고객사 검색" style="width: 100%; box-sizing: border-box; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 10px; font: inherit; margin-bottom: 8px">
+<a class="cust on" href="#AVL">한빛케미칼 <span class="muted" style="font-weight: 400">· v3</span></a>
+<a class="cust" href="#AVL">서해에너지 <span class="muted">· v2</span></a>
+<a class="cust" href="#AVL">세진화학 <span class="muted">· v1</span></a>
+<a class="cust" href="#AVL">한결엔지니어링 <span class="muted">· v4</span></a>
+<a class="cust" href="#AVL">동해정밀화학 <span class="muted">· v2</span></a>
+</section>
+<div style="flex: 1 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<section class="card" style="padding: 14px 18px; border-color: #F2B48A; background: #FFF7F0; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center">
+<div style="font-size: 13px"><b>새 AVL 감지</b> · RV-2026-0142 입찰안내서 부록 3의 AVL이 현재 v3와 다릅니다 (밸브 1곳 추가).</div>
+<button class="btn" type="button" style="min-height: 34px; font-size: 13px">v4 후보 검토</button>
+</section>
+<section class="card" style="padding: 18px 20px" aria-label="버전">
+<h2 style="margin: 0 0 12px; font-size: 15px">한빛케미칼 AVL 버전</h2>
+<div style="display: flex; gap: 10px; flex-wrap: wrap">
+<a class="ver" href="#AVL"><span style="font-weight: 600">v1</span><span class="muted" style="font-size: 12px">2023-03 · 업체 14</span></a>
+<a class="ver" href="#AVL"><span style="font-weight: 600">v2</span><span class="muted" style="font-size: 12px">2024-08 · 업체 16</span></a>
+<a class="ver on" href="#AVL"><span style="font-weight: 600">v3 <span class="st wo">현재</span></span><span class="muted" style="font-size: 12px">2026-09 · 업체 17</span></a>
+</div>
+<div style="margin-top: 14px; border-top: 1px solid #EEF0F3; padding-top: 12px; font-size: 13px; line-height: 1.9">
+<div style="font-weight: 600; margin-bottom: 4px">v2 → v3 변경 · 승인 [견적팀장] 2026-09-12 · 근거: 한빛케미칼 AVL 개정 공문</div>
+<div><span class="add">추가</span> 펌프 · G펌프 &nbsp; <span class="add">추가</span> 도장 · E도장 &nbsp; <span class="del">삭제</span> 도장 · F코팅 (고객사 평가 탈락)</div>
+<div class="muted" style="font-size: 12px">이 버전을 쓰는 견적: QP-2026-0058</div>
+</div>
+</section>
+<section class="card" style="overflow: hidden" aria-label="업체와 최근 가격">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding: 14px 18px; border-bottom: 1px solid #E1E4EA">
+<div><h2 style="margin: 0; font-size: 15px">v3 업체와 최근 가격</h2><div class="muted" style="font-size: 12px; margin-top: 2px">가격 유효기간 90일 기준 (회사 기준으로 변경 가능) · 예시 데이터</div></div>
+<a class="btn pri" href="#QuoteTank">선택 업체에 가격 요청 (3)</a>
+</div>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th><span style="position: absolute; left: -9999px">선택</span></th><th>품목군</th><th>업체</th><th>승인 조건</th><th class="num">최근 견적가</th><th>견적일 · 출처</th><th>상태</th></tr></thead>
+<tbody>
+<tr><td><input type="checkbox" aria-label="A중공업 선택" checked></td><td>탱크 본체</td><td>A중공업</td><td>2,000㎥ 이상</td><td class="num">412 백만원</td><td>2026-10-12 · QP-2026-0058</td><td><span class="st wo">유효</span></td></tr>
+<tr><td><input type="checkbox" aria-label="B플랜트 선택" checked></td><td>탱크 본체</td><td>B플랜트</td><td>—</td><td class="num">398 백만원</td><td>2026-10-13 · QP-2026-0058</td><td><span class="st wo">유효</span></td></tr>
+<tr><td><input type="checkbox" aria-label="A펌프 선택" checked></td><td>펌프</td><td>A펌프</td><td>원심펌프</td><td class="num">[금액]</td><td>2026-05-20 · QP-2026-0040</td><td><span class="st qp">재요청 필요</span></td></tr>
+<tr><td><input type="checkbox" aria-label="G펌프 선택"></td><td>펌프</td><td>G펌프 <span class="add">v3 신규</span></td><td>—</td><td class="num">—</td><td>이력 없음</td><td><span class="st qp">첫 요청</span></td></tr>
+<tr><td><input type="checkbox" aria-label="E도장 선택"></td><td>도장</td><td>E도장 <span class="add">v3 신규</span></td><td>에폭시 계열</td><td class="num">[금액]</td><td>2026-09-30 · QP-2026-0040</td><td><span class="st wo">유효</span></td></tr>
+<tr style="color: #A3AAB6"><td><input type="checkbox" aria-label="F코팅 선택" disabled></td><td>도장</td><td>F코팅</td><td>v3에서 삭제</td><td class="num">[금액]</td><td>2025-11-02 · QP-2025-0033</td><td><span class="st end">AVL 제외</span></td></tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>고객사 AVL</b>고객사별 승인 벤더 목록(AVL)을 버전으로 관리하고, 버전 간 변경을 비교하며, AVL 업체의 최근 가격과 유효 여부를 보고 가격 요청을 보내는 화면입니다.</div></footer></main>
+</div>
+</template><template id="t-DocHub"><style>
+/*body*/:host{display:block;margin:0;background:#F4F5F7;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1A1D23;font-size:14px}
+a{color:#1F5FAD}a:hover{color:#174A87}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 200px;max-width:232px;background:#14213D;color:#D9DEE8;padding:20px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;color:#fff;font-size:16px;padding:4px 12px 20px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;color:#C9D0DD;text-decoration:none;min-height:24px}
+.nav:hover{background:#1F2F52;color:#fff}
+.nav.on{background:#2B4A85;color:#fff;font-weight:600}
+.nav.dim{color:#8D97AB}
+.cnt{background:#E8590C;color:#fff;border-radius:10px;font-size:12px;padding:1px 8px;font-weight:600}
+.navsec{font-size:12px;color:#8D97AB;padding:20px 12px 6px}
+.main{flex:999 1 560px;min-width:0;padding:24px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border:1px solid #E1E4EA;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #C9CED8;background:#fff;color:#1A1D23;font:inherit;font-weight:500;text-decoration:none;cursor:pointer}
+.btn.pri{background:#1F5FAD;border-color:#1F5FAD;color:#fff}
+.btn.pri:hover{background:#174A87;color:#fff}
+.muted{color:#5F6776}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.rv{background:#E3EDFA;color:#174A87}.qp{background:#FDEBDD;color:#9A3412}.wo{background:#DCF2E3;color:#166534}.end{background:#ECEEF2;color:#4B5363}
+.idbox{display:inline-flex;gap:8px;align-items:center;border:1px solid #E1E4EA;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600}
+.idbox.off{color:#A3AAB6;border-style:dashed;font-weight:400}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #E1E4EA;overflow-x:auto}
+.tab{padding:10px 14px;text-decoration:none;color:#5F6776;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:#1A1D23}
+.tab.on{color:#1A1D23;border-bottom-color:#1F5FAD;font-weight:600}
+.tree{font-size:13px;line-height:1.5}
+.tree a{display:flex;justify-content:space-between;padding:5px 8px;border-radius:6px;text-decoration:none;color:#1A1D23}
+.tree a.on{background:#EEF4FC;font-weight:600}
+.tree .l2{padding-left:20px}.tree .l3{padding-left:36px}
+.tree .dim{color:#A3AAB6}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;color:#5F6776;background:#F7F8FA;padding:9px 12px;border-bottom:1px solid #E1E4EA;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #EEF0F3;vertical-align:top}
+.fn{font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}
+.ev{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #EEF0F3;font-size:13px}
+.ev .t{flex:none;width:76px;color:#5F6776;font-size:12px}
+.dot{flex:none;width:8px;height:8px;border-radius:4px;margin-top:6px}
+
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box;display:block;color:#344054}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px;color:#101828}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054;text-decoration:none}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+:host{background:#F5F6F8}
+.btn.pri{background:#2457C5;border-color:#2457C5}
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴"><div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a><div class="grp">오늘 할 일</div><a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a><a class="nav" href="#Briefing">영업 브리핑 </a><a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a><div class="grp">영업 프로젝트</div><a class="nav" href="#Pipeline">파이프라인 </a><a class="nav" href="#Results">결과·분석 </a><div class="grp">문서</div><a class="nav on" href="#DocHub">문서함 </a><a class="nav" href="#DocChat">문서 채팅 </a><div class="grp">기준 정보</div><a class="nav" href="#AVL">고객사 AVL </a><span class="nav dim">단가 마스터</span><span class="nav dim">외주업체</span></nav>
+<main class="main">
+<section class="card" style="padding: 20px 24px 0; display: flex; flex-direction: column; gap: 14px">
+<div class="muted" style="font-size: 13px"><a href="#Pipeline">파이프라인</a><a class="nav" href="#EstCivil">상세 견적서</a> › 한빛케미칼(주)</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
+<h1 style="margin: 0; font-size: 22px">울산공장 저장탱크 4기 신설</h1>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><button class="btn" type="button">체크아웃 (내 작업 폴더로)</button><button class="btn pri" type="button">업로드 (체크인)</button></div>
+</div>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+<span class="idbox">RV-2026-0142 <span class="st end">참여 승인</span></span><span class="muted">›</span>
+<span class="idbox">QP-2026-0058 · R0 <span class="st qp">견적 작성</span></span><span class="muted">›</span>
+<span class="idbox off">WO · 수주 시 생성</span>
+</div>
+<nav class="tabs" aria-label="프로젝트 메뉴">
+<a class="tab on" href="#DocHub">문서함·이력</a>
+<a class="tab" href="#Analysis">문서 분석</a>
+<a class="tab" href="#Similar">유사견적</a>
+<a class="tab" href="#GoNoGo">참여보고서</a>
+<a class="tab" href="#QuoteTank">견적</a>
+<a class="tab" href="#TCM">TCM·협상</a>
+<a class="tab" href="#Results">결과</a>
+<a class="tab" href="#DocChat">문서 채팅</a>
+</nav>
+</section>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section class="card tree" style="flex: 0 1 280px; min-width: 0; padding: 14px" aria-label="표준 폴더">
+<div style="font-size: 12px; font-weight: 600; color: #5F6776; padding: 0 8px 8px">공용 드라이브 · 표준 폴더 (읽기 전용)</div>
+<a href="#DocHub"><span>RV-2026-0142_한빛케미칼_울산저장탱크</span></a>
+<a class="l2" href="#DocHub"><span>10_검토</span><span class="muted">14</span></a>
+<a class="l3" href="#DocHub"><span>11_수신메일</span><span class="muted">3</span></a>
+<a class="l3" href="#DocHub"><span>12_입찰자료_원본</span><span class="muted">5</span></a>
+<a class="l3" href="#DocHub"><span>13_현장설명회</span><span class="muted">2</span></a>
+<a class="l3" href="#DocHub"><span>14_검토분석</span><span class="muted">3</span></a>
+<a class="l3" href="#DocHub"><span>15_참여보고서</span><span class="muted">1</span></a>
+<a class="l2" href="#DocHub"><span>20_견적_QP-2026-0058</span><span class="muted">11</span></a>
+<a class="l3" href="#DocHub"><span>21_리스크_체크리스트</span><span class="muted">2</span></a>
+<a class="l3 on" href="#DocHub"><span>22_외주견적</span><span class="muted">8</span></a>
+<a class="l3" href="#DocHub"><span>23_견적서</span><span class="muted">1</span></a>
+<a class="l3 dim" href="#DocHub"><span>24_승인 · 25_제출본 · 26_TCM_협상</span></a>
+<a class="l2 dim" href="#DocHub"><span>30_수주 (WO 생성 시)</span></a>
+<div style="border-top: 1px solid #E1E4EA; margin-top: 10px; padding: 10px 8px 0; font-size: 12px" class="muted">내 작업 폴더: 개인작업/[사번]_[이름]/QP-2026-0058/<br>체크아웃 중 2건</div>
+</section>
+<section class="card" style="flex: 1.6 1 520px; min-width: 0; overflow: hidden" aria-label="파일 목록">
+<div style="padding: 14px 16px; border-bottom: 1px solid #E1E4EA; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><h2 style="margin: 0; font-size: 15px">22_외주견적 · 8</h2><span class="muted" style="font-size: 12px">파일명은 업로드 시 자동 부여</span></div>
+<div style="overflow-x: auto">
+<table>
+<thead><tr><th>파일 (표준 이름)</th><th>버전</th><th>상태</th><th>올린 사람 · 일시</th></tr></thead>
+<tbody>
+<tr><td><div class="fn">QP-2026-0058_업체견적비교_탱크본체_v3_20261014.xlsx</div></td><td>v3</td><td><span class="st qp">작업 중 · [탱크 담당자]</span></td><td>[탱크 담당자] · 10/14 17:20</td></tr>
+<tr><td><div class="fn">QP-2026-0058_업체견적_B플랜트_탱크본체_v1_20261013.pdf</div><div class="muted" style="font-size: 12px">원본명: 견적서(B플랜트)_최종.pdf</div></td><td>v1</td><td><span class="st end">원본 보존</span></td><td>시스템(메일 수신) · 10/13 11:02</td></tr>
+<tr><td><div class="fn">QP-2026-0058_업체견적_A중공업_탱크본체_v1_20261012.pdf</div></td><td>v1</td><td><span class="st end">원본 보존</span></td><td>시스템(메일 수신) · 10/12 15:47</td></tr>
+<tr><td><div class="fn">QP-2026-0058_RFQ_펌프_v1_20261012.pdf</div></td><td>v1</td><td><span class="st wo">발송 완료</span></td><td>[탱크 담당자] · 10/12 10:05</td></tr>
+</tbody>
+</table>
+</div>
+<div style="margin: 16px; border: 1px dashed #9DB7DB; border-radius: 10px; padding: 16px; background: #F7FAFE">
+<div style="font-weight: 600; margin-bottom: 10px">업로드 (체크인)</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div><label for="up-f" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px">파일</label><input id="up-f" type="text" value="내 작업 폴더 / 업체견적비교_수정.xlsx" style="width: 100%; box-sizing: border-box; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 13px"></div>
+<div><label for="up-t" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px">문서 종류</label><select id="up-t" style="width: 100%; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 13px; background: #fff"><option>업체견적비교 (22_외주견적)</option></select></div>
+</div>
+<label for="up-m" style="display: block; font-size: 12px; font-weight: 600; margin: 10px 0 4px">변경 메모 (필수)</label>
+<input id="up-m" type="text" value="펌프 A사 회신가 반영" style="width: 100%; box-sizing: border-box; min-height: 40px; border: 1px solid #C9CED8; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 13px">
+<div style="font-size: 12px; margin-top: 10px">저장될 이름 <span class="fn" style="background: #fff; border: 1px solid #E1E4EA; border-radius: 4px; padding: 2px 6px">QP-2026-0058_업체견적비교_탱크본체_v4_20261015.xlsx</span></div>
+</div>
+</section>
+<section class="card" style="flex: 1 1 300px; min-width: 0; padding: 16px 18px" aria-label="이력">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px"><h2 style="margin: 0; font-size: 15px">이력</h2><label for="h-f" style="position: absolute; left: -9999px">이력 필터</label><select id="h-f" style="min-height: 32px; border: 1px solid #C9CED8; border-radius: 6px; font: inherit; font-size: 12px; background: #fff"><option>전체</option><option>문서</option><option>상태</option><option>승인</option></select></div>
+<div class="ev"><span class="t">10/15 09:30</span><span class="dot" style="background: #1F5FAD"></span><span>[탱크 담당자] 체크아웃 · 업체견적비교 v3</span></div>
+<div class="ev"><span class="t">10/14 17:20</span><span class="dot" style="background: #1F5FAD"></span><span>[탱크 담당자] 업로드 v3 · "B플랜트 회신 반영"</span></div>
+<div class="ev"><span class="t">10/14 11:05</span><span class="dot" style="background: #9A3412"></span><span>QP 상태 변경 · 생성 → 견적 작성</span></div>
+<div class="ev"><span class="t">10/14 11:05</span><span class="dot" style="background: #15803D"></span><span>[임원] 참여 승인 · QP-2026-0058 생성 · AVL v3 고정</span></div>
+<div class="ev"><span class="t">10/14 10:12</span><span class="dot" style="background: #A3AAB6"></span><span>[대표이사] 조회 · 참여보고서 v2</span></div>
+<div class="ev"><span class="t">10/13 16:40</span><span class="dot" style="background: #174A87"></span><span>RV 상태 변경 · 검토중 → 참여보고 상신</span></div>
+<div class="ev" style="border-bottom: 0"><span class="t">10/13 11:02</span><span class="dot" style="background: #1F5FAD"></span><span>시스템 · 메일 첨부 자동 저장 · B플랜트 견적서</span></div>
+<div class="muted" style="font-size: 12px; margin-top: 8px">이력은 수정·삭제할 수 없습니다.</div>
+</section>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>문서함·이력</b>표준 폴더 구조로 프로젝트 문서를 보고, 개인 작업 폴더로 체크아웃한 문서를 업로드(체크인)하며, 업로드·상태 변경·승인 등 모든 이력을 시간순으로 확인하는 화면입니다.</div></footer></main>
+</div>
+</template><template id="t-DocChat"><style>
+/*body*/:host{display:block;margin:0;background:#F4F5F7;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1A1D23;font-size:14px}
+a{color:#1F5FAD}a:hover{color:#174A87}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 200px;max-width:232px;background:#14213D;color:#D9DEE8;padding:20px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;color:#fff;font-size:16px;padding:4px 12px 20px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;color:#C9D0DD;text-decoration:none;min-height:24px}
+.nav:hover{background:#1F2F52;color:#fff}
+.nav.on{background:#2B4A85;color:#fff;font-weight:600}
+.nav.dim{color:#8D97AB}
+.cnt{background:#E8590C;color:#fff;border-radius:10px;font-size:12px;padding:1px 8px;font-weight:600}
+.navsec{font-size:12px;color:#8D97AB;padding:20px 12px 6px}
+.main{flex:999 1 560px;min-width:0;padding:24px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border:1px solid #E1E4EA;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #C9CED8;background:#fff;color:#1A1D23;font:inherit;font-weight:500;text-decoration:none;cursor:pointer}
+.btn.pri{background:#1F5FAD;border-color:#1F5FAD;color:#fff}
+.muted{color:#5F6776}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.wo{background:#DCF2E3;color:#166534}.end{background:#ECEEF2;color:#4B5363}
+.scope{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:18px;border:1px solid #C9CED8;background:#fff;font:inherit;font-size:13px;cursor:pointer;color:#1A1D23}
+.scope.on{background:#14213D;color:#fff;border-color:#14213D}
+.q{align-self:flex-end;max-width:76%;background:#1F5FAD;color:#fff;border-radius:14px 14px 4px 14px;padding:12px 16px;line-height:1.6}
+.a{align-self:flex-start;max-width:92%;background:#fff;border:1px solid #E1E4EA;border-radius:14px 14px 14px 4px;padding:16px 18px;line-height:1.75;font-size:13px}
+.cite{display:inline-block;font-size:11px;font-weight:700;background:#EEE6FA;color:#5B2DA0;border-radius:4px;padding:0 5px;margin-left:2px;text-decoration:none}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:10px 0}
+th{text-align:left;font-weight:600;color:#5F6776;background:#F7F8FA;padding:8px 10px;border-bottom:1px solid #E1E4EA;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #EEF0F3}
+.hist{display:block;padding:10px 12px;border-radius:8px;text-decoration:none;color:#1A1D23;font-size:13px}
+.hist.on{background:#EEF4FC;font-weight:600}
+
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box;display:block;color:#344054}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px;color:#101828}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054;text-decoration:none}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+:host{background:#F5F6F8}
+.btn.pri{background:#2457C5;border-color:#2457C5}
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+.intro-btn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;padding:0 10px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;color:#344054;font-size:12.5px;font-weight:600;text-decoration:none;box-sizing:border-box}
+.intro-btn:hover{background:#F2F4F7;color:#101828}</style>
+<div class="app">
+<nav class="side" aria-label="주 메뉴"><div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a><div class="grp">오늘 할 일</div><a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a><a class="nav" href="#Briefing">영업 브리핑 </a><a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a><div class="grp">영업 프로젝트</div><a class="nav" href="#Pipeline">파이프라인 </a><a class="nav" href="#EstCivil">상세 견적서</a><a class="nav" href="#Results">결과·분석 </a><div class="grp">문서</div><a class="nav" href="#DocHub">문서함 </a><a class="nav on" href="#DocChat">문서 채팅 </a><div class="grp">기준 정보</div><a class="nav" href="#AVL">고객사 AVL </a><span class="nav dim">단가 마스터</span><span class="nav dim">외주업체</span></nav>
+<main class="main">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+<div>
+<div class="muted" style="font-size: 13px">공용 드라이브 문서를 권한 범위 안에서 검색·분석</div>
+<h1 style="margin: 4px 0 0; font-size: 24px; font-weight: 700">문서 채팅</h1>
+</div>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px"><span class="muted">[탱크 담당자]</span><span class="st end">권한: 일반 · 담당</span></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section class="card" style="flex: 0 1 220px; min-width: 0; padding: 12px" aria-label="대화 목록">
+<button class="btn pri" type="button" style="width: 100%; margin-bottom: 8px">새 대화</button>
+<a class="hist on" href="#DocChat">한빛케미칼 지체상금 조건 비교<div class="muted" style="font-size: 12px; font-weight: 400">오늘 10:52</div></a>
+<a class="hist" href="#DocChat">AVL v2 · v3 차이<div class="muted" style="font-size: 12px">어제</div></a>
+<a class="hist" href="#DocChat">광양 TCM 미반영 요청사항<div class="muted" style="font-size: 12px">10/13</div></a>
+</section>
+<section class="card" style="flex: 2 1 560px; min-width: 0; display: flex; flex-direction: column" aria-label="대화">
+<div style="padding: 14px 18px; border-bottom: 1px solid #E1E4EA; display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<span class="muted" style="font-size: 13px; margin-right: 4px">검색 범위</span>
+<button class="scope" type="button">현재 프로젝트 · QP-2026-0058</button>
+<button class="scope on" type="button">고객사 · 한빛케미칼</button>
+<button class="scope" type="button">권한 내 전체</button>
+</div>
+<div style="padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; background: #F7F8FA">
+<div class="q">한빛케미칼에 최근 3년 낸 탱크 견적에서 지체상금 조건이 어떻게 달랐고, 결과는 어땠는지 비교해줘.</div>
+<div class="a">
+<div>한빛케미칼 탱크 견적 3건을 찾았습니다. 지체상금 상한이 없었던 건은 이번 건(QP-2026-0058)이 처음입니다.</div>
+<table>
+<thead><tr><th>견적 ID</th><th>프로젝트</th><th>지체상금 조건</th><th>결과</th></tr></thead>
+<tbody>
+<tr><td>QP-2024-0052</td><td>울산 폐수 저장조</td><td>일 0.1%, 상한 10% <a class="cite" href="#DocChat">1</a></td><td>수주</td></tr>
+<tr><td>QP-2025-0033</td><td>울산 원료탱크 증설</td><td>일 0.1%, 상한 10% <a class="cite" href="#DocChat">2</a></td><td>수주</td></tr>
+<tr><td>QP-2026-0058</td><td>울산 저장탱크 4기</td><td>상한 없음 <a class="cite" href="#DocChat">3</a></td><td>견적 작성</td></tr>
+</tbody>
+</table>
+<div>앞의 두 건은 같은 조건으로 수주했으므로, 질의서에서 상한 10%를 요청할 근거로 쓸 수 있습니다.</div>
+<div class="muted" style="font-size: 12px; margin-top: 10px; border-top: 1px solid #EEF0F3; padding-top: 8px">근거 3건 · 계약 조건 원문에서 인용 · 대외비 등급 문서는 이 사용자의 검색 범위에 포함되지 않음</div>
+</div>
+</div>
+<div style="padding: 14px 18px; border-top: 1px solid #E1E4EA">
+<div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px">
+<button class="scope" type="button" style="font-size: 12px; min-height: 32px">이 건 독소조항만 정리</button>
+<button class="scope" type="button" style="font-size: 12px; min-height: 32px">AVL 신규 업체 가격 이력</button>
+<button class="scope" type="button" style="font-size: 12px; min-height: 32px">질의서 초안 만들기</button>
+</div>
+<div style="display: flex; gap: 8px">
+<label for="ask" style="position: absolute; left: -9999px">질문</label>
+<input id="ask" type="text" placeholder="문서에 대해 물어보세요" style="flex: 1; min-width: 0; min-height: 44px; border: 1px solid #C9CED8; border-radius: 10px; padding: 0 14px; font: inherit">
+<button class="btn pri" type="button" style="min-height: 44px">보내기</button>
+</div>
+</div>
+</section>
+<aside class="card" style="flex: 1 1 280px; min-width: 0; padding: 16px 18px" aria-label="근거 문서">
+<h2 style="margin: 0 0 12px; font-size: 15px">근거 문서</h2>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px">
+<div style="border: 1px solid #E1E4EA; border-radius: 8px; padding: 12px"><div><span class="cite">1</span> <a href="#DocHub">QP-2024-0052_계약서_v2</a></div><div class="muted" style="font-size: 12px; margin-top: 4px">제22조 · 9쪽 · 등급 일반</div></div>
+<div style="border: 1px solid #1F5FAD; background: #F7FAFE; border-radius: 8px; padding: 12px"><div><span class="cite">2</span> <a href="#DocHub">QP-2025-0033_계약서_v3</a></div><div class="muted" style="font-size: 12px; margin-top: 4px">제23조 · 11쪽 · 등급 일반</div><div style="margin-top: 8px; background: #fff; border: 1px solid #E1E4EA; border-radius: 6px; padding: 10px; font-size: 12px; line-height: 1.7">… 지체상금은 지체일수 1일당 계약금액의 1/1000로 하되, <mark style="background: #FEF3C7">계약금액의 100분의 10을 초과할 수 없다.</mark></div></div>
+<div style="border: 1px solid #E1E4EA; border-radius: 8px; padding: 12px"><div><span class="cite">3</span> <a href="#Analysis">계약일반조건.pdf (RV-2026-0142)</a></div><div class="muted" style="font-size: 12px; margin-top: 4px">제23조 · 12쪽 · 등급 일반</div></div>
+</div>
+<div class="muted" style="font-size: 12px; margin-top: 12px">질문과 참조 문서는 검색 이력에 기록됩니다.</div>
+</aside>
+</div>
+<footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>문서 채팅</b>사용자 권한 안의 문서와 이력에서만 찾아, 근거 문서와 페이지를 달아 답하는 AI 문서 채팅 화면입니다. 검색 범위를 프로젝트·고객사·전체로 고를 수 있습니다.</div></footer></main>
+</div>
+</template><template id="t-EstCivil"><style>
+/*body*/:host{display:block;margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#101828;font-size:14px;line-height:1.5}
+a{color:#2457C5;text-decoration:none}a:hover{color:#1A3F94}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+.main{flex:999 1 560px;min-width:0;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font-size:20px;font-weight:700}
+.sub{color:#667085;font-size:13px}
+.panel{background:#fff;border:1px solid #E4E7EC;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;color:#344054;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;background:#F2F4F7;color:#475467;white-space:nowrap}
+.p-rv{background:#EEF3FD;color:#2457C5}.p-qp{background:#FEF0E6;color:#B54708}.p-wo{background:#E7F6EC;color:#067647}
+.muted{color:#667085}
+.seg{display:inline-flex;background:#F2F4F7;border-radius:8px;padding:3px;gap:2px}
+.seg button{border:0;background:none;font:inherit;font-size:13px;color:#475467;padding:0 12px;min-height:34px;border-radius:6px;cursor:pointer}
+.seg .on{background:#fff;color:#101828;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.stg{padding:14px 18px;border-right:1px solid #EAECF0}
+.stg:last-child{border-right:0}
+.stg .n{font-size:22px;font-weight:700}
+.stg .b{font-size:12px;color:#667085;margin-top:2px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;font-size:12px;color:#667085;padding:10px 16px;border-bottom:1px solid #EAECF0;white-space:nowrap;background:#F9FAFB}
+td{padding:12px 16px;border-bottom:1px solid #EAECF0;vertical-align:top}
+.gh td{background:#F5F6F8;font-size:12px;font-weight:700;color:#475467;padding:8px 16px}
+.id{font-size:12px;font-weight:600;color:#475467;white-space:nowrap}
+.par{font-size:11px;color:#98A2B3;white-space:nowrap}
+
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+
+.es{--es-acc:#2457C5;--es-line:#E4E6EB;--es-line2:#EEF0F3;--es-sub:#626875;--es-won:#067647;--es-warn:#B54708;--es-warn-w:#FEF3E8;--es-ai:#6D28D9;--es-ai-w:#F3EEFD;display:flex;flex-direction:column;gap:16px;color:#141518;font-size:13.5px;line-height:1.5}
+.es *{box-sizing:border-box}
+.es a{color:var(--es-acc);text-decoration:none}
+.es-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.es-top h1{margin:2px 0 0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.es-crumb{font-size:12.5px;color:var(--es-sub)}
+.es-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.es-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:9px;border:1px solid var(--es-line);background:#fff;color:#141518 !important;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}
+.es-btn.pri{background:var(--es-acc);border-color:var(--es-acc);color:#fff !important}
+.es-kind{display:inline-flex;background:#ECEEF2;border-radius:10px;padding:3px;gap:2px}
+.es-kind a{display:inline-flex;align-items:center;min-height:34px;padding:0 14px;border-radius:8px;font-size:13px;color:var(--es-sub) !important;font-weight:600}
+.es-kind a.on{background:#fff;color:#141518 !important;font-weight:800;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.es-card{background:#fff;border:1px solid var(--es-line);border-radius:14px;overflow:hidden}
+.es-ch{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--es-line2);flex-wrap:wrap}
+.es-ch h2{margin:0;font-size:14.5px;font-weight:800}
+.es-ch h2 span{font-weight:600;color:var(--es-sub);font-size:12.5px;margin-left:6px}
+.es-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.es-meta div{padding:12px 16px;border-right:1px solid var(--es-line2);border-bottom:1px solid var(--es-line2)}
+.es-meta div:nth-child(4n){border-right:0}
+.es-meta dt{font-size:11.5px;color:var(--es-sub)}
+.es-meta dd{margin:2px 0 0;font-weight:700}
+.es-cols{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.es-scroll{overflow-x:auto}.es-scroll table.es-wide{min-width:1120px}.es-wide td:first-child,.es-wide td:nth-child(2){white-space:nowrap}
+.es table{border-collapse:collapse;width:100%;font-size:12.5px}
+.es th{text-align:left;font-weight:700;font-size:11.5px;color:var(--es-sub);padding:8px 10px;border-bottom:1px solid var(--es-line);background:#F8F9FA;white-space:nowrap}
+.es td{padding:8px 10px;border-bottom:1px solid var(--es-line2);vertical-align:top}
+.es td.n,.es th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.es tr.g td{background:#F4F5F7;font-weight:800;font-size:12px}
+.es tr.st td{font-weight:800;background:#FAFAFB}
+.es tr.tot td{font-weight:800;background:#141518;color:#fff;border-bottom:0}
+.es tr.hl td{background:#F5F8FF}
+.es .src{font-size:11px;color:var(--es-sub)}
+.es .warn{display:inline-block;font-size:11px;font-weight:800;color:var(--es-warn);background:var(--es-warn-w);border-radius:999px;padding:0 7px}
+.es .okt{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--es-won);border-radius:999px;padding:0 7px}
+.es .pick{font-weight:800;color:var(--es-won)}
+.es .out{color:#A0A4AE}
+.es-sum{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+.es-big{padding:16px}
+.es-big .l{font-size:12px;color:var(--es-sub)}
+.es-big .v{font-size:26px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.es-kv{display:flex;justify-content:space-between;gap:8px;padding:7px 16px;border-top:1px solid var(--es-line2);font-size:12.5px}
+.es-kv b{font-variant-numeric:tabular-nums}
+.es-sign{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--es-line2)}
+.es-sign div{padding:10px 8px;text-align:center;border-right:1px solid var(--es-line2);font-size:12px}
+.es-sign div:last-child{border-right:0}
+.es-sign b{display:block;font-size:11px;color:var(--es-sub);margin-bottom:16px}
+.es-ai{display:flex;gap:10px;background:var(--es-ai-w);padding:12px 16px;font-size:12.5px}
+.es-ai b{flex:none;color:var(--es-ai);font-size:11px;padding-top:1px}
+.es ul.es-list{margin:0;padding:12px 16px 12px 32px;font-size:12.5px;line-height:1.75}
+.es-note{font-size:11.5px;color:var(--es-sub);padding:10px 16px;border-top:1px solid var(--es-line2)}
+@media (max-width:1100px){.es-cols{grid-template-columns:1fr}.es-sum{position:static}.es-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.es-meta div:nth-child(2n){border-right:0}}
+</style><div class="app"><nav class="side" aria-label="주 메뉴">
+<div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a>
+<div class="grp">오늘 할 일</div>
+<a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a>
+<a class="nav" href="#Briefing">영업 브리핑</a>
+<a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a>
+<div class="grp">영업 프로젝트</div>
+<a class="nav" href="#Pipeline">파이프라인</a><a class="nav on" href="#EstCivil">상세 견적서</a>
+<a class="nav" href="#Results">결과·분석</a>
+<div class="grp">문서</div>
+<a class="nav" href="#DocHub">문서함</a>
+<a class="nav" href="#DocChat">문서 채팅</a>
+<div class="grp">기준 정보</div>
+<a class="nav" href="#AVL">고객사 AVL</a>
+<span class="nav dim">단가 마스터</span>
+<span class="nav dim">외주업체</span>
+</nav><main class="main"><div class="es"><div class="es-top"><div><div class="es-crumb">Gate A · 파이프라인 › 견적 · 예시 데이터</div><h1>공사 견적서 · S-OIL 온산 TA 배관 2026</h1></div><div class="es-acts"><div class="es-kind" role="group" aria-label="견적 구분"><a href="#EstCivil" class="on">공사 견적서</a><a href="#EstTank" class="">탱크 제작 견적서</a></div><a class="es-btn" href="#QuoteCivil">견적 작성으로</a><span class="es-btn">회사 양식 출력 (xlsx · pdf)</span><a class="es-btn pri" href="#Approvals">견적 승인 요청</a></div></div><div class="es-card"><dl class="es-meta" style="margin:0"><div><dt>견적번호</dt><dd>QP-2026-0063 · R0</dd></div><div><dt>고객사</dt><dd>S-OIL 온산공장</dd></div><div><dt>공사명</dt><dd>2026 정기보수(TA) 배관 교체</dd></div><div><dt>견적 구분</dt><dd>공사</dd></div><div><dt>견적일 · 유효기간</dt><dd>2026-10-22 · 30일</dd></div><div><dt>공사기간</dt><dd>2026-11 ~ 2027-06 (8개월)</dd></div><div><dt>적용 기준</dt><dd>노무비: 내부 실적</dd></div><div><dt>검토 ID · 계열</dt><dd>RV-2026-0151 · 온산 TA 배관</dd></div></dl></div><div class="es-cols"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="es-card"><div class="es-ch"><h2>① 총괄표 (원가계산서)<span>요율은 예시 값 · 리스크·이윤율은 임원 결정</span></h2></div><div class="es-scroll"><table><thead><tr><th>비목</th><th>산출 기준</th><th class="n">요율</th><th class="n">금액 (원)</th></tr></thead><tbody><tr class=""><td>직접재료비</td><td class="src">내역서 재료비 합계</td><td class="n"></td><td class="n">306,146,250</td></tr><tr class=""><td>직접노무비</td><td class="src">내역서 노무비 합계</td><td class="n"></td><td class="n">197,464,100</td></tr><tr class=""><td>간접노무비</td><td class="src">직접노무비 ×</td><td class="n">9%</td><td class="n">17,771,769</td></tr><tr class=""><td>직접경비</td><td class="src">장비·검사·현장 경비</td><td class="n"></td><td class="n">61,389,650</td></tr><tr class=""><td>산재보험료</td><td class="src">노무비 계 ×</td><td class="n">3.7%</td><td class="n">7,963,727</td></tr><tr class=""><td>고용보험료</td><td class="src">노무비 계 ×</td><td class="n">1.01%</td><td class="n">2,173,882</td></tr><tr class=""><td>안전관리비</td><td class="src">(재료비+직접노무비) ×</td><td class="n">1.86%</td><td class="n">9,367,153</td></tr><tr class=""><td>기타경비</td><td class="src">(재료비+노무비 계) ×</td><td class="n">4.5%</td><td class="n">23,462,195</td></tr><tr class="st"><td>순공사원가</td><td class="src">재료비 + 노무비 계 + 경비 계</td><td class="n"></td><td class="n">625,738,726</td></tr><tr class=""><td>일반관리비</td><td class="src">순공사원가 ×</td><td class="n">6%</td><td class="n">37,544,324</td></tr><tr class=""><td>리스크 반영</td><td class="src">순공사원가 × (임원 결정)</td><td class="n">2%</td><td class="n">12,514,775</td></tr><tr class=""><td>이윤</td><td class="src">(노무비 계+경비 계+일반관리비) ×</td><td class="n">10%</td><td class="n">35,713,680</td></tr><tr class="st"><td>총원가</td><td class="src"></td><td class="n"></td><td class="n">711,511,504</td></tr><tr class="tot"><td>견적가 (천원 미만 절사 · 부가세 별도)</td><td></td><td></td><td class="n">711,511,000</td></tr></tbody></table></div></div><div class="es-card"><div class="es-ch"><h2>② 공종별 내역서<span>7개 공종 · 23개 품목 · 파란 행 = 작년 수주 대비 확인 항목</span></h2></div><div class="es-scroll"><table class="es-wide"><thead><tr><th>품명</th><th>규격</th><th>단위</th><th class="n">수량</th><th class="n">재료 단가</th><th class="n">재료비</th><th class="n">노무 단가</th><th class="n">노무비</th><th class="n">경비 단가</th><th class="n">경비</th><th class="n">합계</th><th>단가 출처</th></tr></thead><tbody><tr class="g"><td colspan="12">가설공사</td></tr><tr class="hl"><td>비계 설치·해체</td><td class="src">강관 비계</td><td>㎡</td><td class="n">960</td><td class="n">4,500</td><td class="n">4,320,000</td><td class="n">11,700</td><td class="n">11,232,000</td><td class="n"></td><td class="n"></td><td class="n"><b>15,552,000</b></td><td class="src">실적 인공 0.045 · 단가 마스터</td></tr><tr><td>안전시설 (운전 중 작업)</td><td class="src">방호·차단·감시</td><td>식</td><td class="n">1</td><td class="n">6,500,000</td><td class="n">6,500,000</td><td class="n">3,800,000</td><td class="n">3,800,000</td><td class="n"></td><td class="n"></td><td class="n"><b>10,300,000</b></td><td class="src">체크리스트 #5</td></tr><tr class="st"><td colspan="5">가설공사 소계</td><td class="n">10,820,000</td><td></td><td class="n">15,032,000</td><td></td><td class="n">0</td><td class="n">25,852,000</td><td></td></tr><tr class="g"><td colspan="12">철거공사</td></tr><tr><td>기존 배관 철거</td><td class="src">6"~10"</td><td>m</td><td class="n">620</td><td class="n"></td><td class="n"></td><td class="n">18,500</td><td class="n">11,470,000</td><td class="n"></td><td class="n"></td><td class="n"><b>11,470,000</b></td><td class="src">2025 수주 실행</td></tr><tr><td>폐기물 처리</td><td class="src">지정폐기물 포함</td><td>식</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">4,200,000</td><td class="n">4,200,000</td><td class="n"><b>4,200,000</b></td><td class="src">업체 견적 10/12</td></tr><tr class="st"><td colspan="5">철거공사 소계</td><td class="n">0</td><td></td><td class="n">11,470,000</td><td></td><td class="n">4,200,000</td><td class="n">15,670,000</td><td></td></tr><tr class="g"><td colspan="12">배관공사</td></tr><tr class="hl"><td>탄소강관 6" Sch40 A106B</td><td class="src">할증 5% 포함</td><td>m</td><td class="n">892.5</td><td class="n">68,500</td><td class="n">61,136,250</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>61,136,250</b></td><td class="src">자재 시세 10/01</td></tr><tr><td>탄소강관 8" Sch40 A106B</td><td class="src">할증 5% 포함</td><td>m</td><td class="n">640</td><td class="n">98,000</td><td class="n">62,720,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>62,720,000</b></td><td class="src">자재 시세 10/01</td></tr><tr><td>탄소강관 10" Sch40 A106B</td><td class="src">할증 5% 포함</td><td>m</td><td class="n">420</td><td class="n">142,000</td><td class="n">59,640,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>59,640,000</b></td><td class="src">자재 시세 10/01</td></tr><tr><td>피팅류</td><td class="src">엘보·티·리듀서 6"~10"</td><td>식</td><td class="n">1</td><td class="n">40,000,000</td><td class="n">40,000,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>40,000,000</b></td><td class="src">BM List 기준 산출</td></tr><tr><td>플랜지 6" 150# RF</td><td class="src"></td><td>EA</td><td class="n">140</td><td class="n">54,000</td><td class="n">7,560,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>7,560,000</b></td><td class="src">업체 견적 08/12 · 갱신 필요</td></tr><tr><td>게이트밸브 6" 150#</td><td class="src"></td><td>EA</td><td class="n">24</td><td class="n">1,280,000</td><td class="n">30,720,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>30,720,000</b></td><td class="src">AVL 업체 견적 09/05</td></tr><tr class="hl"><td>배관 설치 6"</td><td class="src"></td><td>m</td><td class="n">850</td><td class="n"></td><td class="n"></td><td class="n">31,850</td><td class="n">27,072,500</td><td class="n"></td><td class="n"></td><td class="n"><b>27,072,500</b></td><td class="src">실적 인공 0.130</td></tr><tr><td>배관 설치 8"·10"</td><td class="src"></td><td>m</td><td class="n">1,060</td><td class="n"></td><td class="n"></td><td class="n">36,500</td><td class="n">38,690,000</td><td class="n"></td><td class="n"></td><td class="n"><b>38,690,000</b></td><td class="src">단가 마스터</td></tr><tr class="hl"><td>배관 용접 6"</td><td class="src"></td><td>DI</td><td class="n">1,200</td><td class="n"></td><td class="n"></td><td class="n">23,120</td><td class="n">27,744,000</td><td class="n"></td><td class="n"></td><td class="n"><b>27,744,000</b></td><td class="src">실적 인공 0.085</td></tr><tr><td>배관 용접 8"·10"</td><td class="src"></td><td>DI</td><td class="n">1,880</td><td class="n"></td><td class="n"></td><td class="n">23,120</td><td class="n">43,465,600</td><td class="n"></td><td class="n"></td><td class="n"><b>43,465,600</b></td><td class="src">실적 인공 0.085</td></tr><tr><td>밸브 설치</td><td class="src"></td><td>EA</td><td class="n">24</td><td class="n"></td><td class="n"></td><td class="n">185,000</td><td class="n">4,440,000</td><td class="n"></td><td class="n"></td><td class="n"><b>4,440,000</b></td><td class="src">단가 마스터</td></tr><tr class="st"><td colspan="5">배관공사 소계</td><td class="n">261,776,250</td><td></td><td class="n">141,412,100</td><td></td><td class="n">0</td><td class="n">403,188,350</td><td></td></tr><tr class="g"><td colspan="12">검사·시험</td></tr><tr><td>RT 비파괴검사</td><td class="src">용접부 10%</td><td>매</td><td class="n">308</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">38,000</td><td class="n">11,704,000</td><td class="n"><b>11,704,000</b></td><td class="src">검사업체 단가</td></tr><tr><td>수압시험</td><td class="src"></td><td>식</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="n">2,600,000</td><td class="n">2,600,000</td><td class="n">3,900,000</td><td class="n">3,900,000</td><td class="n"><b>6,500,000</b></td><td class="src">2025 수주 실행</td></tr><tr class="st"><td colspan="5">검사·시험 소계</td><td class="n">0</td><td></td><td class="n">2,600,000</td><td></td><td class="n">15,604,000</td><td class="n">18,204,000</td><td></td></tr><tr class="g"><td colspan="12">도장·보온</td></tr><tr><td>배관 도장</td><td class="src">에폭시 3coat</td><td>㎡</td><td class="n">1,850</td><td class="n">8,600</td><td class="n">15,910,000</td><td class="n">9,800</td><td class="n">18,130,000</td><td class="n"></td><td class="n"></td><td class="n"><b>34,040,000</b></td><td class="src">자재 시세 · 단가 마스터</td></tr><tr><td>보온</td><td class="src">미네랄울 50t</td><td>m</td><td class="n">420</td><td class="n">42,000</td><td class="n">17,640,000</td><td class="n">21,000</td><td class="n">8,820,000</td><td class="n"></td><td class="n"></td><td class="n"><b>26,460,000</b></td><td class="src">단가 마스터</td></tr><tr class="st"><td colspan="5">도장·보온 소계</td><td class="n">33,550,000</td><td></td><td class="n">26,950,000</td><td></td><td class="n">0</td><td class="n">60,500,000</td><td></td></tr><tr class="g"><td colspan="12">장비</td></tr><tr><td>크레인 50ton</td><td class="src"></td><td>일</td><td class="n">14</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">1,350,000</td><td class="n">18,900,000</td><td class="n"><b>18,900,000</b></td><td class="src">장비 손료</td></tr><tr><td>지게차 5ton</td><td class="src"></td><td>일</td><td class="n">20</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">280,000</td><td class="n">5,600,000</td><td class="n"><b>5,600,000</b></td><td class="src">장비 손료</td></tr><tr><td>용접기 임차</td><td class="src"></td><td>식</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">6,300,000</td><td class="n">6,300,000</td><td class="n"><b>6,300,000</b></td><td class="src">장비 손료</td></tr><tr class="st"><td colspan="5">장비 소계</td><td class="n">0</td><td></td><td class="n">0</td><td></td><td class="n">30,800,000</td><td class="n">30,800,000</td><td></td></tr><tr class="g"><td colspan="12">현장 경비</td></tr><tr><td>숙박·식대·운반·소모품</td><td class="src">8개월 운영</td><td>식</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">10,785,650</td><td class="n">10,785,650</td><td class="n"><b>10,785,650</b></td><td class="src">실행 실적 비율</td></tr><tr class="st"><td colspan="5">현장 경비 소계</td><td class="n">0</td><td></td><td class="n">0</td><td></td><td class="n">10,785,650</td><td class="n">10,785,650</td><td></td></tr><tr class="tot"><td colspan="5">직접비 합계</td><td class="n">306,146,250</td><td></td><td class="n">197,464,100</td><td></td><td class="n">61,389,650</td><td class="n">565,000,000</td><td></td></tr></tbody></table></div></div><div class="es-card"><div class="es-ch"><h2>③ 단가 산출 근거 (일위대가)<span>1단위당 · 내부 실적과 표준품셈 비교</span></h2></div><div class="es-scroll"><table><thead><tr><th>항목 (1단위)</th><th>직종</th><th class="n">실적 인공</th><th class="n">사내 단가</th><th class="n">적용 단가</th><th class="n">품셈 인공</th><th class="n">시중노임</th><th class="n">품셈 단가</th><th class="n">차이</th></tr></thead><tbody><tr><td>배관 용접 6" (1 DI)</td><td>용접공</td><td class="n">0.085</td><td class="n">272,000</td><td class="n"><b>23,120</b></td><td class="n">0.100</td><td class="n">280,000</td><td class="n">28,000</td><td class="n" style="color:#067647">−4,880</td></tr><tr><td>배관 설치 6" (1 m)</td><td>배관공</td><td class="n">0.130</td><td class="n">245,000</td><td class="n"><b>31,850</b></td><td class="n">0.120</td><td class="n">250,000</td><td class="n">30,000</td><td class="n" style="color:#B42318">+1,850</td></tr><tr><td>비계 설치·해체 (1 ㎡)</td><td>비계공</td><td class="n">0.045</td><td class="n">260,000</td><td class="n"><b>11,700</b></td><td class="n">0.050</td><td class="n">270,000</td><td class="n">13,500</td><td class="n" style="color:#067647">−1,800</td></tr></tbody></table></div><div class="es-note">실적 인공 = 수주 4건(2019·2021·2023·2025) 실행 평균. 사내 단가·시중노임은 예시 값.</div></div><div class="es-card"><div class="es-ch"><h2>④ 견적 조건 · 제외 · 리스크 반영</h2></div><ul class="es-list"><li>부가가치세 별도 · 견적 유효기간 30일 · 대금: 기성 70% / 준공 30%</li><li>제외: 발주처 지급 자재(가스켓·볼트 일부), 운전 중 정지·퍼지 작업, 설계 변경분</li><li>RT 비율 10% 기준 (2025 TCM 합의) · 100% 요구 시 약 105백만 증가 <span class="warn">질의 중</span></li><li>야간 작업 할증 미포함 · 필요 시 별도 항목 <span class="warn">질의 중</span></li><li>지체상금: 계약금액 10% 상한 전제 (2025 계약 조건)</li></ul></div></div><div class="es-sum"><div class="es-card"><div class="es-big"><div class="l">견적가 (부가세 별도)</div><div class="v">711,511,000</div></div><div class="es-kv"><span>직접비</span><b>565,000,000</b></div><div class="es-kv"><span>작년 수주 직접비</span><b>548,000,000 <span style="color:#B42318">+3.1%</span></b></div><div class="es-kv"><span>품셈 기준 시 차이 (6" 3공종)</span><b>+6,011,500</b></div><div class="es-kv"><span>순공사원가</span><b>625,738,726</b></div><div class="es-sign"><div><b>작성</b>[공사 담당자]</div><div><b>검토</b>[영업팀장]</div><div><b>승인</b>[임원]</div></div></div><div class="es-card"><div class="es-ai"><b>AI</b><div>이 계열에서 실주한 해는 직접비가 전년보다 늘었습니다. 강관 단가(+6.2%)가 가장 큰 상승 요인이고, 배관 설치 6"만 표준품셈 기준으로 바꾸면 직접비가 1,572,500원 줄어듭니다.</div></div></div><div class="es-card"><div class="es-ch"><h2>체크리스트 4 / 6</h2></div><ul class="es-list"><li>BM 물량 검증 ✓</li><li>AVL 가격 요청 ✓</li><li>노무비 기준 결정 ✓</li><li>단가 확인 ✓</li><li>RT 비율 질의</li><li>야간 할증 질의</li></ul></div></div></div></div><footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>상세 견적서 · 공사</b>고객사에 낼 공사 견적의 최종 구성을 한 화면에서 확인합니다. ① 총괄표로 직접비에서 견적가까지의 계산 과정을, ② 공종별 내역서로 품목별 재료·노무·경비와 단가 출처를, ③ 일위대가로 내부 실적과 표준품셈 단가 근거를, ④ 조건·제외·리스크를 봅니다. 오른쪽에서 견적가·작년 대비·결재선을 보고 승인을 요청합니다.</div></footer></main></div></template><template id="t-EstTank"><style>
+/*body*/:host{display:block;margin:0;background:#F5F6F8;font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#101828;font-size:14px;line-height:1.5}
+a{color:#2457C5;text-decoration:none}a:hover{color:#1A3F94}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 184px;max-width:208px;background:#fff;border-right:1px solid #E4E7EC;padding:20px 12px;box-sizing:border-box}
+.brand{font-weight:700;font-size:15px;padding:0 10px 10px}
+.grp{font-size:11px;font-weight:600;color:#667085;padding:16px 10px 4px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:0 10px;min-height:40px;border-radius:6px;color:#344054}
+.nav:hover{background:#F2F4F7;color:#101828}
+.nav.on{background:#EEF3FD;color:#2457C5;font-weight:600}
+.nav.dim{color:#98A2B3}
+.badge{font-size:11px;font-weight:700;color:#fff;background:#C4320A;border-radius:9px;padding:0 7px;line-height:18px}
+.main{flex:999 1 560px;min-width:0;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font-size:20px;font-weight:700}
+.sub{color:#667085;font-size:13px}
+.panel{background:#fff;border:1px solid #E4E7EC;border-radius:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;color:#344054;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;background:#F2F4F7;color:#475467;white-space:nowrap}
+.p-rv{background:#EEF3FD;color:#2457C5}.p-qp{background:#FEF0E6;color:#B54708}.p-wo{background:#E7F6EC;color:#067647}
+.muted{color:#667085}
+.seg{display:inline-flex;background:#F2F4F7;border-radius:8px;padding:3px;gap:2px}
+.seg button{border:0;background:none;font:inherit;font-size:13px;color:#475467;padding:0 12px;min-height:34px;border-radius:6px;cursor:pointer}
+.seg .on{background:#fff;color:#101828;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.stg{padding:14px 18px;border-right:1px solid #EAECF0}
+.stg:last-child{border-right:0}
+.stg .n{font-size:22px;font-weight:700}
+.stg .b{font-size:12px;color:#667085;margin-top:2px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;font-size:12px;color:#667085;padding:10px 16px;border-bottom:1px solid #EAECF0;white-space:nowrap;background:#F9FAFB}
+td{padding:12px 16px;border-bottom:1px solid #EAECF0;vertical-align:top}
+.gh td{background:#F5F6F8;font-size:12px;font-weight:700;color:#475467;padding:8px 16px}
+.id{font-size:12px;font-weight:600;color:#475467;white-space:nowrap}
+.par{font-size:11px;color:#98A2B3;white-space:nowrap}
+
+.rolef{margin-top:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #E4E7EC;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;color:#344054}.rolef .rk{flex:none;font-size:11px;font-weight:800;color:#fff;background:#101828;border-radius:6px;padding:3px 8px}.rolef .rt{flex:1;min-width:240px}.rolef b{display:block;color:#101828;font-size:14px;margin-bottom:2px}
+
+.es{--es-acc:#2457C5;--es-line:#E4E6EB;--es-line2:#EEF0F3;--es-sub:#626875;--es-won:#067647;--es-warn:#B54708;--es-warn-w:#FEF3E8;--es-ai:#6D28D9;--es-ai-w:#F3EEFD;display:flex;flex-direction:column;gap:16px;color:#141518;font-size:13.5px;line-height:1.5}
+.es *{box-sizing:border-box}
+.es a{color:var(--es-acc);text-decoration:none}
+.es-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.es-top h1{margin:2px 0 0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.es-crumb{font-size:12.5px;color:var(--es-sub)}
+.es-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.es-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:9px;border:1px solid var(--es-line);background:#fff;color:#141518 !important;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}
+.es-btn.pri{background:var(--es-acc);border-color:var(--es-acc);color:#fff !important}
+.es-kind{display:inline-flex;background:#ECEEF2;border-radius:10px;padding:3px;gap:2px}
+.es-kind a{display:inline-flex;align-items:center;min-height:34px;padding:0 14px;border-radius:8px;font-size:13px;color:var(--es-sub) !important;font-weight:600}
+.es-kind a.on{background:#fff;color:#141518 !important;font-weight:800;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.es-card{background:#fff;border:1px solid var(--es-line);border-radius:14px;overflow:hidden}
+.es-ch{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--es-line2);flex-wrap:wrap}
+.es-ch h2{margin:0;font-size:14.5px;font-weight:800}
+.es-ch h2 span{font-weight:600;color:var(--es-sub);font-size:12.5px;margin-left:6px}
+.es-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.es-meta div{padding:12px 16px;border-right:1px solid var(--es-line2);border-bottom:1px solid var(--es-line2)}
+.es-meta div:nth-child(4n){border-right:0}
+.es-meta dt{font-size:11.5px;color:var(--es-sub)}
+.es-meta dd{margin:2px 0 0;font-weight:700}
+.es-cols{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.es-scroll{overflow-x:auto}.es-scroll table.es-wide{min-width:1120px}.es-wide td:first-child,.es-wide td:nth-child(2){white-space:nowrap}
+.es table{border-collapse:collapse;width:100%;font-size:12.5px}
+.es th{text-align:left;font-weight:700;font-size:11.5px;color:var(--es-sub);padding:8px 10px;border-bottom:1px solid var(--es-line);background:#F8F9FA;white-space:nowrap}
+.es td{padding:8px 10px;border-bottom:1px solid var(--es-line2);vertical-align:top}
+.es td.n,.es th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.es tr.g td{background:#F4F5F7;font-weight:800;font-size:12px}
+.es tr.st td{font-weight:800;background:#FAFAFB}
+.es tr.tot td{font-weight:800;background:#141518;color:#fff;border-bottom:0}
+.es tr.hl td{background:#F5F8FF}
+.es .src{font-size:11px;color:var(--es-sub)}
+.es .warn{display:inline-block;font-size:11px;font-weight:800;color:var(--es-warn);background:var(--es-warn-w);border-radius:999px;padding:0 7px}
+.es .okt{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--es-won);border-radius:999px;padding:0 7px}
+.es .pick{font-weight:800;color:var(--es-won)}
+.es .out{color:#A0A4AE}
+.es-sum{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+.es-big{padding:16px}
+.es-big .l{font-size:12px;color:var(--es-sub)}
+.es-big .v{font-size:26px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.es-kv{display:flex;justify-content:space-between;gap:8px;padding:7px 16px;border-top:1px solid var(--es-line2);font-size:12.5px}
+.es-kv b{font-variant-numeric:tabular-nums}
+.es-sign{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--es-line2)}
+.es-sign div{padding:10px 8px;text-align:center;border-right:1px solid var(--es-line2);font-size:12px}
+.es-sign div:last-child{border-right:0}
+.es-sign b{display:block;font-size:11px;color:var(--es-sub);margin-bottom:16px}
+.es-ai{display:flex;gap:10px;background:var(--es-ai-w);padding:12px 16px;font-size:12.5px}
+.es-ai b{flex:none;color:var(--es-ai);font-size:11px;padding-top:1px}
+.es ul.es-list{margin:0;padding:12px 16px 12px 32px;font-size:12.5px;line-height:1.75}
+.es-note{font-size:11.5px;color:var(--es-sub);padding:10px 16px;border-top:1px solid var(--es-line2)}
+@media (max-width:1100px){.es-cols{grid-template-columns:1fr}.es-sum{position:static}.es-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.es-meta div:nth-child(2n){border-right:0}}
+</style><div class="app"><nav class="side" aria-label="주 메뉴">
+<div class="brand">영업·견적 허브</div><a class="intro-btn" href="index.html">← 인트로</a>
+<div class="grp">오늘 할 일</div>
+<a class="nav" href="#Main">메일 분류함 <span class="badge">3</span></a>
+<a class="nav" href="#Briefing">영업 브리핑</a>
+<a class="nav" href="#Approvals">승인함 <span class="badge">2</span></a>
+<div class="grp">영업 프로젝트</div>
+<a class="nav" href="#Pipeline">파이프라인</a><a class="nav on" href="#EstCivil">상세 견적서</a>
+<a class="nav" href="#Results">결과·분석</a>
+<div class="grp">문서</div>
+<a class="nav" href="#DocHub">문서함</a>
+<a class="nav" href="#DocChat">문서 채팅</a>
+<div class="grp">기준 정보</div>
+<a class="nav" href="#AVL">고객사 AVL</a>
+<span class="nav dim">단가 마스터</span>
+<span class="nav dim">외주업체</span>
+</nav><main class="main"><div class="es"><div class="es-top"><div><div class="es-crumb">Gate A · 파이프라인 › 견적 · 예시 데이터</div><h1>탱크 제작 견적서 · 한빛케미칼 울산 저장탱크 4기</h1></div><div class="es-acts"><div class="es-kind" role="group" aria-label="견적 구분"><a href="#EstCivil" class="">공사 견적서</a><a href="#EstTank" class="on">탱크 제작 견적서</a></div><a class="es-btn" href="#QuoteCivil">견적 작성으로</a><span class="es-btn">회사 양식 출력 (xlsx · pdf)</span><a class="es-btn pri" href="#Approvals">견적 승인 요청</a></div></div><div class="es-card"><dl class="es-meta" style="margin:0"><div><dt>견적번호</dt><dd>QP-2026-0058 · R0</dd></div><div><dt>고객사</dt><dd>한빛케미칼 울산공장</dd></div><div><dt>공사명</dt><dd>저장탱크 4기 신설 (TK-301~304)</dd></div><div><dt>견적 구분</dt><dd>탱크 제작 · 외주 재구성</dd></div><div><dt>견적일 · 유효기간</dt><dd>2026-10-28 · 30일</dd></div><div><dt>공기</dt><dd>8개월</dd></div><div><dt>사양</dt><dd>CS(SS275) 2,500㎥ × 4기 · 고정 지붕형 · API 650</dd></div><div><dt>적용 AVL</dt><dd>한빛케미칼 v3 (10/14 고정)</dd></div></dl></div><div class="es-cols"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="es-card"><div class="es-ch"><h2>① 총괄표 (원가계산서)<span>요율은 예시 값 · 리스크·이윤율은 임원 결정</span></h2></div><div class="es-scroll"><table><thead><tr><th>비목</th><th>산출 기준</th><th class="n">요율</th><th class="n">금액 (원)</th></tr></thead><tbody><tr class=""><td>외주비</td><td class="src">AVL 업체 최적가 재구성</td><td class="n"></td><td class="n">913,500,000</td></tr><tr class=""><td>자사 직접비</td><td class="src">기초·감독·검사·가설</td><td class="n"></td><td class="n">180,100,000</td></tr><tr class="st"><td>원가 계</td><td class="src"></td><td class="n"></td><td class="n">1,093,600,000</td></tr><tr class=""><td>일반관리비</td><td class="src">원가 계 ×</td><td class="n">5%</td><td class="n">54,680,000</td></tr><tr class=""><td>리스크 반영</td><td class="src">원가 계 × (지체상금 상한 없음)</td><td class="n">3.5%</td><td class="n">38,276,000</td></tr><tr class=""><td>이윤</td><td class="src">(원가 계+일반관리비) ×</td><td class="n">7%</td><td class="n">80,379,600</td></tr><tr class="st"><td>총원가</td><td class="src"></td><td class="n"></td><td class="n">1,266,935,600</td></tr><tr class="tot"><td>견적가 (천원 미만 절사 · 부가세 별도)</td><td></td><td></td><td class="n">1,266,935,000</td></tr></tbody></table></div></div><div class="es-card"><div class="es-ch"><h2>② 패키지별 내역<span>외주 8개 · 자사 4개 · 노란 표시 = 회신 대기·추정 금액</span></h2></div><div class="es-scroll"><table><thead><tr><th>패키지</th><th>업체 / 규격</th><th>AVL</th><th class="n">금액 (원)</th><th>상태</th><th>비고</th><th class="n">비중</th></tr></thead><tbody><tr class="g"><td colspan="7">외주 패키지 · AVL 업체 최적가 재구성</td></tr><tr><td>판재 제작</td><td>B플랜트</td><td class="src">AVL</td><td class="n">398,000,000</td><td><span class="okt">확정</span></td><td class="src">3개사 중 최저</td><td class="n">36.4%</td></tr><tr><td>용접·조립</td><td>C엔지니어링</td><td class="src">AVL</td><td class="n">179,000,000</td><td><span class="warn">확인 필요</span></td><td class="src">판재와 다른 업체 · 분할 발주 확인</td><td class="n">16.4%</td></tr><tr><td>수압시험</td><td>B플랜트</td><td class="src">AVL</td><td class="n">21,000,000</td><td><span class="okt">확정</span></td><td class="src"></td><td class="n">1.9%</td></tr><tr><td>운반·설치</td><td>C엔지니어링</td><td class="src">AVL</td><td class="n">55,000,000</td><td><span class="okt">확정</span></td><td class="src"></td><td class="n">5.0%</td></tr><tr><td>펌프 (원심 8EA)</td><td>A펌프</td><td class="src">AVL</td><td class="n">96,000,000</td><td><span class="warn">회신 1/2</span></td><td class="src">G펌프 회신 대기</td><td class="n">8.8%</td></tr><tr><td>밸브류 1식</td><td>—</td><td class="src">AVL 3곳 요청</td><td class="n">58,400,000</td><td><span class="warn">추정</span></td><td class="src">회신 0/3 · 단가 마스터 추정</td><td class="n">5.3%</td></tr><tr><td>계장 (레벨·압력·온도)</td><td>[계장 업체]</td><td class="src">AVL</td><td class="n">42,300,000</td><td><span class="okt">확정</span></td><td class="src"></td><td class="n">3.9%</td></tr><tr><td>도장 (외부 3coat·내부 에폭시)</td><td>E도장</td><td class="src">AVL v3 신규</td><td class="n">63,800,000</td><td><span class="okt">확정</span></td><td class="src"></td><td class="n">5.8%</td></tr><tr class="st"><td colspan="3">외주비 소계</td><td class="n">913,500,000</td><td colspan="2"></td><td class="n">83.5%</td></tr><tr class="g"><td colspan="7">자사 직접비</td></tr><tr><td>기초 앵커·그라우팅</td><td>자사 시공</td><td class="src">자사</td><td class="n">18,600,000</td><td><span class="okt">확정</span></td><td class="src">단가 마스터</td><td class="n">1.7%</td></tr><tr><td>현장 감독·QC</td><td>2인 × 8개월 × 6,000,000</td><td class="src">자사</td><td class="n">96,000,000</td><td><span class="okt">확정</span></td><td class="src">사내 노무단가</td><td class="n">8.8%</td></tr><tr><td>시험·검사</td><td>RT 100%, 제3자 검사</td><td class="src">자사</td><td class="n">38,500,000</td><td><span class="okt">확정</span></td><td class="src">계약조건 제36조</td><td class="n">3.5%</td></tr><tr><td>가설·안전</td><td>운전 중 공장 작업</td><td class="src">자사</td><td class="n">27,000,000</td><td><span class="okt">확정</span></td><td class="src">계약조건 제34조</td><td class="n">2.5%</td></tr><tr class="st"><td colspan="3">자사 직접비 소계</td><td class="n">180,100,000</td><td colspan="2"></td><td class="n">16.5%</td></tr><tr class="tot"><td colspan="3">원가 계</td><td class="n">1,093,600,000</td><td colspan="2"></td><td class="n">100%</td></tr></tbody></table></div></div><div class="es-card"><div class="es-ch"><h2>③ 업체 견적 비교 · 탱크 본체<span>백만원 · 초록 = 선택 · D산업은 AVL 외라 비교만</span></h2></div><div class="es-scroll"><table><thead><tr><th>항목</th><th class="n">A중공업</th><th class="n">B플랜트</th><th class="n">C엔지니어링</th><th class="n">D산업 (AVL 외)</th><th class="n">선택가</th></tr></thead><tbody><tr><td>판재 제작</td><td class="n ">412</td><td class="n pick">398</td><td class="n ">425</td><td class="n out">380</td><td class="n"><b>398</b></td></tr><tr><td>용접·조립</td><td class="n ">186</td><td class="n ">201</td><td class="n pick">179</td><td class="n out">170</td><td class="n"><b>179</b></td></tr><tr><td>수압시험</td><td class="n ">24</td><td class="n pick">21</td><td class="n ">26</td><td class="n out">20</td><td class="n"><b>21</b></td></tr><tr><td>운반·설치</td><td class="n ">58</td><td class="n ">64</td><td class="n pick">55</td><td class="n out">50</td><td class="n"><b>55</b></td></tr><tr class="st"><td>합계</td><td class="n">680</td><td class="n">684</td><td class="n">685</td><td class="n out">620</td><td class="n">653</td></tr></tbody></table></div><div class="es-note">항목별 최적가 653 = 단일 업체 최저(A중공업 680)보다 27 낮음. 용접·조립 분할 발주 가능 여부 확인 후 확정.</div></div><div class="es-card"><div class="es-ch"><h2>④ 견적 조건 · 제외 · 리스크 반영</h2></div><ul class="es-list"><li>부가가치세 별도 · 견적 유효기간 30일 (외주 견적 최단 유효기간 60일 이내)</li><li>제외: 기초 콘크리트 타설, 탱크 내부 라이닝 추가 사양, 인허가 대행</li><li>지체상금 상한 없음 (계약일반조건 제23조) → 리스크율 3.5% 반영 · 10% 상한 질의 중</li><li>회신 대기·추정 금액 154,400,000원 (펌프 1곳, 밸브 3곳) · 회신 후 R1에서 확정</li><li>물량 오류 증가분 조정 불가 (제31조) → BM 물량 검증 완료</li></ul></div></div><div class="es-sum"><div class="es-card"><div class="es-big"><div class="l">견적가 (부가세 별도)</div><div class="v">1,266,935,000</div></div><div class="es-kv"><span>외주비</span><b>913,500,000</b></div><div class="es-kv"><span>자사 직접비</span><b>180,100,000</b></div><div class="es-kv"><span>회신 대기·추정</span><b style="color:#B54708">154,400,000</b></div><div class="es-kv"><span>최유사 견적</span><b>QP-2025-0033 · 수주</b></div><div class="es-sign"><div><b>작성</b>[탱크 담당자]</div><div><b>검토</b>[영업팀장]</div><div><b>승인</b>[임원]</div></div></div><div class="es-card"><div class="es-ai"><b>AI</b><div>펌프·밸브 회신이 오기 전이라 154,400,000원이 추정 금액입니다. 회신 기한(10/22·10/23) 이후 승인 요청을 권장합니다. 지체상금 상한이 확보되면 리스크율을 낮출 수 있습니다.</div></div></div></div></div></div><footer class="rolef" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>상세 견적서 · 탱크 제작</b>외주 업체 견적을 AVL 기준으로 재구성한 탱크 제작 견적의 최종 구성을 확인합니다. ① 총괄표, ② 패키지별 내역(업체·확정/추정 상태·비중), ③ 업체 견적 비교와 선택 근거, ④ 조건·리스크를 봅니다. 회신 대기·추정 금액이 얼마인지 따로 보여줘, 승인 시점을 판단할 수 있습니다.</div></footer></main></div></template>
+<script>
+(function(){
+  var START="Main", TITLES={"Main": "메일 분류함", "Briefing": "영업 브리핑", "Pipeline": "파이프라인", "Analysis": "검토 · 문서 분석", "Similar": "검토 · 유사견적", "GoNoGo": "검토 · 참여보고서", "QuoteCivil": "공사 견적 편집기", "QuoteTank": "탱크 외주견적 비교표", "Approvals": "승인함", "TCM": "TCM·협상 기록", "Results": "결과 관리", "AVL": "고객사 AVL 관리", "DocHub": "프로젝트 문서함과 이력", "DocChat": "문서 채팅", "EstCivil": "상세 견적서 · 공사", "EstTank": "상세 견적서 · 탱크 제작"};
+  var host=document.getElementById('host');
+  function show(){
+    var id=(location.hash||'').slice(1); if(!document.getElementById('t-'+id)) id=START;
+    var t=document.getElementById('t-'+id);
+    host.innerHTML=''; var d=document.createElement('div'); host.appendChild(d);
+    var sr=d.attachShadow({mode:'open'}); sr.appendChild(t.content.cloneNode(true));
+    sr.addEventListener('click',function(e){
+      var b=e.target.closest('button');
+      if(b && b.parentElement && b.parentElement.classList.contains('seg')){
+        Array.prototype.forEach.call(b.parentElement.children,function(x){x.classList.remove('on')}); b.classList.add('on');
+      }
+    });
+    document.title=(TITLES[id]||'')+' · Gate A';
+    window.scrollTo(0,0);
+  }
+  window.addEventListener('hashchange',show); show();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gate E · 통합 워크스페이스</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{--bg:#F7F7F8;--surf:#FFFFFF;--line:#E6E6EA;--line2:#F0F0F3;--ink:#111114;--sub:#64646E;--faint:#A1A1AA;
+--acc:#4338CA;--acc-w:#EEF0FF;--won:#047857;--won-w:#E8F6F0;--due:#C2410C;--due-w:#FFF1E8;--ai:#7C3AED;--ai-w:#F4EEFF;
+--req:#0F766E;--req-w:#E6F4F2;--site:#2563EB;--site-w:#EAF0FE;--tcm:#4B5563;--tcm-w:#EFF0F2;--lost:#71717A;--lost-w:#F2F2F3}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{color:#3730A3}
+button{font:inherit;color:inherit}
+.shell{display:flex;flex-wrap:wrap;min-height:100vh}
+.rail{flex:1 1 200px;max-width:220px;background:var(--surf);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:2px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;padding:2px 8px 14px}
+.logo i{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--acc);color:#fff;font-style:normal;font-size:13px}
+.introbtn{display:flex;align-items:center;justify-content:center;min-height:36px;margin:0 2px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surf);color:var(--ink);font-weight:700;font-size:13px}
+.introbtn:hover{background:var(--bg);color:var(--ink)}
+.rail .lb{font-size:11px;font-weight:700;color:var(--faint);padding:14px 10px 4px;letter-spacing:.02em}
+.nv{display:flex;align-items:center;justify-content:space-between;min-height:42px;padding:0 10px;border-radius:10px;color:#3F3F46;font-weight:500}
+.nv:hover{background:var(--bg);color:var(--ink)}
+.nv.on{background:var(--acc-w);color:var(--acc);font-weight:700}
+.cnt{font-size:11px;font-weight:800;background:var(--due);color:#fff;border-radius:9px;padding:0 7px;line-height:18px}
+.rail .aib{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border-radius:12px;border:1px solid var(--ai);background:var(--ai-w);color:var(--ai);font-weight:800;cursor:pointer}
+.main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.content{padding:24px 28px 28px;display:flex;flex-direction:column;gap:16px;flex:1}
+.ph{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.ph h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.ph .s{color:var(--sub);font-size:13px;margin-top:2px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:16px}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.ch h2{margin:0;font-size:15px;font-weight:700}
+.cb{padding:14px 18px}
+.muted{color:var(--sub)}.faint{color:var(--faint)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surf);font-weight:700;font-size:13px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:#CFCFD6;color:var(--ink)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.pri:hover{background:#3730A3;color:#fff}
+.btn.sm{min-height:34px;padding:0 10px;font-size:12px}
+.seg{display:inline-flex;background:#EEEEF1;border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;min-height:34px;padding:0 12px;border-radius:8px;font-size:13px;color:var(--sub);cursor:pointer}
+.seg button.on{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.tag{display:inline-flex;align-items:center;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.t-req{background:var(--req-w);color:var(--req)}.t-site{background:var(--site-w);color:var(--site)}.t-due{background:var(--due-w);color:var(--due)}.t-tcm{background:var(--tcm-w);color:var(--tcm)}
+.t-won{background:var(--won);color:#fff}.t-lost{background:var(--lost-w);color:#52525B}.t-rv{background:var(--acc-w);color:var(--acc)}.t-qp{background:var(--due-w);color:var(--due)}
+.ai{font-size:11px;font-weight:800;color:var(--ai)}
+.aibox{display:flex;gap:10px;background:var(--ai-w);border-radius:12px;padding:12px 14px;font-size:13px}
+.aibox b{flex:none;font-size:11px;color:var(--ai);padding-top:2px}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.up{color:#B42318}.dn{color:var(--won)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--sub);padding:10px 14px;border-bottom:1px solid var(--line2);white-space:nowrap;background:#FAFAFB}
+td{padding:11px 14px;border-bottom:1px solid var(--line2)}
+tr:last-child td{border-bottom:0}
+tr.won td{background:var(--won-w)}
+tr.won td:first-child{box-shadow:inset 3px 0 0 var(--won)}
+.scroll{overflow-x:auto}
+.two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:16px;align-items:start}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.kpi{padding:14px 18px;border-right:1px solid var(--line2)}
+.kpi:last-child{border-right:0}
+.kpi .l{font-size:12px;color:var(--sub)}.kpi .v{font-size:24px;font-weight:800;letter-spacing:-.02em}.kpi .s{font-size:12px;color:var(--sub)}
+/* tasks */
+.trow{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line2)}
+.trow:last-child{border-bottom:0}
+.trow .n{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;background:var(--bg)}
+.trow.done .n{background:var(--won);color:#fff}.trow.done .tt{color:var(--faint);text-decoration:line-through}
+.trow .tt{font-weight:700}.trow .ds{font-size:12.5px;color:var(--sub)}
+.due{font-size:12px;font-weight:700;color:var(--due);background:var(--due-w);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wd{border:1px solid var(--line2);border-radius:10px;padding:8px 6px;text-align:center;min-height:74px}
+.wd.today{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.wd .d{font-size:11px;color:var(--sub)}.wd .n2{font-weight:800}
+.dots{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.dots i{width:7px;height:7px;border-radius:50%;display:block}
+.ag{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line2);font-size:13px}
+.ag:last-child{border-bottom:0}
+/* calendar */
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.dow{padding:8px 10px;font-size:12px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--line2)}
+.day{min-height:104px;border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:6px;display:flex;flex-direction:column;gap:3px}
+.day:nth-child(7n){border-right:0}
+.day .dn{font-size:12px;font-weight:700;color:var(--sub);padding:0 2px}
+.day.out .dn{color:#D4D4D8}
+.day.today .dn{color:#fff;background:var(--ink);border-radius:6px;padding:0 6px;align-self:flex-start}
+.ev{display:block;width:100%;text-align:left;border:0;border-radius:6px;padding:3px 6px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev.sel{outline:2px solid var(--ink);outline-offset:1px}
+.ev.ghost{background:transparent !important;border:1px dashed currentColor;font-weight:500}
+.e-req{background:var(--req-w);color:var(--req)}.e-site{background:var(--site-w);color:var(--site)}.e-due{background:var(--due-w);color:var(--due)}.e-tcm{background:var(--tcm-w);color:var(--tcm)}.e-won{background:var(--won);color:#fff}.e-lost{background:var(--lost-w);color:#52525B}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12.5px;cursor:pointer}
+.chip.on{border-color:var(--ink);background:var(--ink);color:#fff}
+/* project */
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line2)}
+.steps div{padding:12px 16px;border-right:1px solid var(--line2);font-size:13px}
+.steps div:last-child{border-right:0}
+.steps .k{font-size:11px;font-weight:800;color:var(--faint)}
+.steps .done .k{color:var(--won)}.steps .now{background:var(--acc-w)}.steps .now .k{color:var(--acc)}
+.now-card{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:18px;border-radius:16px;background:var(--ink);color:#fff}
+.now-card .k{font-size:12px;color:#C7C7D1;font-weight:700}
+.now-card b{font-size:17px}
+.now-card .btn{background:#fff;color:var(--ink);border-color:#fff;min-height:44px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line2);font-size:13px}
+.chk:last-child{border-bottom:0}
+.chk input{width:16px;height:16px;margin-top:2px;accent-color:var(--ink)}
+.src{margin-left:auto;font-size:11px;color:var(--ai);white-space:nowrap}
+.bars{display:flex;align-items:flex-end;gap:8px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:3px;min-width:0}
+.bar .v{font-size:11px;color:var(--sub)}
+.lbls{display:flex;gap:8px;margin-top:6px}.lbls span{flex:1;text-align:center;font-size:11px;color:var(--sub)}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line2);font-size:13px}
+.kv:last-child{border-bottom:0}
+/* heat */
+.heat td,.heat th{text-align:center;padding:4px 3px;border:0;background:none}
+.cell{display:grid;place-items:center;height:30px;border-radius:6px;font-size:11.5px;font-weight:700}
+.yrchip{display:inline-block;font-size:11px;font-weight:800;padding:0 6px;border-radius:5px;background:var(--won);color:#fff;margin:0 3px 3px 0}
+/* focus */
+.focus{max-width:760px;margin:0 auto;padding:28px 20px 120px;width:100%}
+.ftop{display:flex;align-items:center;gap:12px;min-height:60px;padding:0 24px;border-bottom:1px solid var(--line);background:var(--surf)}
+.fdots{display:flex;gap:6px;margin:0 auto;align-items:center}
+.fdots i{flex:none;width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.fdots i.done{background:var(--won)}.fdots i.cur{background:var(--ink);width:22px;border-radius:5px}
+.focus h1{margin:6px 0 8px;font-size:27px;line-height:1.3;font-weight:800;letter-spacing:-.02em}
+.focus .lead{margin:0 0 20px;color:var(--sub);font-size:15.5px}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.facts div{background:#fff;padding:12px 16px}.facts dt{font-size:12px;color:var(--sub)}.facts dd{margin:2px 0 0;font-weight:700;font-size:15.5px}
+.opt{display:flex;gap:12px;align-items:center;min-height:54px;padding:10px 16px;border:1px solid var(--line);border-radius:14px;cursor:pointer;background:#fff;margin-bottom:8px}
+.opt input{width:18px;height:18px;accent-color:var(--ink)}
+.opt.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.opt .r{margin-left:auto;font-size:13px;color:var(--sub)}
+.lines{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.line{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line2)}
+.line:last-child{border-bottom:0}
+.fbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);z-index:15}
+.fbar .in{max-width:760px;margin:0 auto;padding:14px 20px;display:flex;gap:10px}
+.fbar .btn{min-height:50px;font-size:15px}
+.fbar .grow{flex:1}
+.okc{text-align:center;padding:30px 0 0}
+.okc .ic{width:68px;height:68px;border-radius:50%;background:var(--won-w);display:grid;place-items:center;margin:0 auto 16px}
+.okc ul{list-style:none;padding:0;margin:16px auto 0;max-width:440px;text-align:left}
+.okc li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line2);font-size:14px}
+.okc li:before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--won);margin-top:7px}
+/* role footer */
+.role{margin-top:auto;border-top:1px solid var(--line);background:var(--surf);padding:16px 28px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.role .rk{flex:none;font-size:11px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--ink);border-radius:6px;padding:3px 8px}
+.role .rt{flex:1;min-width:260px;font-size:13.5px}
+.role .rt b{display:block;font-size:14px;margin-bottom:2px}
+.role .rf{font-size:12px;color:var(--sub);margin-top:4px}
+.focus-role{max-width:760px;margin:0 auto 90px;padding:0 20px;width:100%}
+.focus-role .role{border:1px solid var(--line);border-radius:14px}
+/* ai drawer */
+.aid{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:100vw;background:var(--surf);border-left:1px solid var(--line);z-index:30;display:flex;flex-direction:column;box-shadow:-12px 0 24px rgba(0,0,0,.08)}
+.aid .bd{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#FAFAFB}
+.bub{border-radius:14px;padding:10px 14px;font-size:13px;line-height:1.6;max-width:92%}
+.bub.q{align-self:flex-end;background:var(--ink);color:#fff}.bub.a{align-self:flex-start;background:#fff;border:1px solid var(--line)}
+.sr{display:inline-block;font-size:11px;font-weight:700;color:var(--ai);background:var(--ai-w);border-radius:4px;padding:0 5px;margin:2px 3px 0 0}
+.qchip{display:block;width:100%;text-align:left;min-height:36px;padding:7px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:12.5px;cursor:pointer;margin-bottom:6px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;z-index:60}
+#gate{position:fixed;right:14px;bottom:14px;z-index:20;background:var(--ink);color:#fff;font-weight:700;font-size:12px;padding:8px 12px;border-radius:999px}
+#gate b{color:#B4B0FF;margin-right:6px}#gate:hover{color:#fff;background:#000}
+@media (max-width:1100px){.two{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.rail{max-width:none;flex-basis:100%;flex-direction:row;flex-wrap:wrap;gap:4px}.rail .lb{display:none}.rail .aib{margin:0}.content{padding:16px}.steps{grid-template-columns:repeat(2,1fr)}.facts{grid-template-columns:1fr}.day{min-height:70px}.focus h1{font-size:22px}#gate{bottom:86px}}
+
+.es{--es-acc:#2457C5;--es-line:#E4E6EB;--es-line2:#EEF0F3;--es-sub:#626875;--es-won:#067647;--es-warn:#B54708;--es-warn-w:#FEF3E8;--es-ai:#6D28D9;--es-ai-w:#F3EEFD;display:flex;flex-direction:column;gap:16px;color:#141518;font-size:13.5px;line-height:1.5}
+.es *{box-sizing:border-box}
+.es a{color:var(--es-acc);text-decoration:none}
+.es-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.es-top h1{margin:2px 0 0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.es-crumb{font-size:12.5px;color:var(--es-sub)}
+.es-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.es-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:9px;border:1px solid var(--es-line);background:#fff;color:#141518 !important;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}
+.es-btn.pri{background:var(--es-acc);border-color:var(--es-acc);color:#fff !important}
+.es-kind{display:inline-flex;background:#ECEEF2;border-radius:10px;padding:3px;gap:2px}
+.es-kind a{display:inline-flex;align-items:center;min-height:34px;padding:0 14px;border-radius:8px;font-size:13px;color:var(--es-sub) !important;font-weight:600}
+.es-kind a.on{background:#fff;color:#141518 !important;font-weight:800;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.es-card{background:#fff;border:1px solid var(--es-line);border-radius:14px;overflow:hidden}
+.es-ch{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--es-line2);flex-wrap:wrap}
+.es-ch h2{margin:0;font-size:14.5px;font-weight:800}
+.es-ch h2 span{font-weight:600;color:var(--es-sub);font-size:12.5px;margin-left:6px}
+.es-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.es-meta div{padding:12px 16px;border-right:1px solid var(--es-line2);border-bottom:1px solid var(--es-line2)}
+.es-meta div:nth-child(4n){border-right:0}
+.es-meta dt{font-size:11.5px;color:var(--es-sub)}
+.es-meta dd{margin:2px 0 0;font-weight:700}
+.es-cols{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.es-scroll{overflow-x:auto}.es-scroll table.es-wide{min-width:1120px}.es-wide td:first-child,.es-wide td:nth-child(2){white-space:nowrap}
+.es table{border-collapse:collapse;width:100%;font-size:12.5px}
+.es th{text-align:left;font-weight:700;font-size:11.5px;color:var(--es-sub);padding:8px 10px;border-bottom:1px solid var(--es-line);background:#F8F9FA;white-space:nowrap}
+.es td{padding:8px 10px;border-bottom:1px solid var(--es-line2);vertical-align:top}
+.es td.n,.es th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.es tr.g td{background:#F4F5F7;font-weight:800;font-size:12px}
+.es tr.st td{font-weight:800;background:#FAFAFB}
+.es tr.tot td{font-weight:800;background:#141518;color:#fff;border-bottom:0}
+.es tr.hl td{background:#F5F8FF}
+.es .src{font-size:11px;color:var(--es-sub)}
+.es .warn{display:inline-block;font-size:11px;font-weight:800;color:var(--es-warn);background:var(--es-warn-w);border-radius:999px;padding:0 7px}
+.es .okt{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--es-won);border-radius:999px;padding:0 7px}
+.es .pick{font-weight:800;color:var(--es-won)}
+.es .out{color:#A0A4AE}
+.es-sum{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+.es-big{padding:16px}
+.es-big .l{font-size:12px;color:var(--es-sub)}
+.es-big .v{font-size:26px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.es-kv{display:flex;justify-content:space-between;gap:8px;padding:7px 16px;border-top:1px solid var(--es-line2);font-size:12.5px}
+.es-kv b{font-variant-numeric:tabular-nums}
+.es-sign{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--es-line2)}
+.es-sign div{padding:10px 8px;text-align:center;border-right:1px solid var(--es-line2);font-size:12px}
+.es-sign div:last-child{border-right:0}
+.es-sign b{display:block;font-size:11px;color:var(--es-sub);margin-bottom:16px}
+.es-ai{display:flex;gap:10px;background:var(--es-ai-w);padding:12px 16px;font-size:12.5px}
+.es-ai b{flex:none;color:var(--es-ai);font-size:11px;padding-top:1px}
+.es ul.es-list{margin:0;padding:12px 16px 12px 32px;font-size:12.5px;line-height:1.75}
+.es-note{font-size:11.5px;color:var(--es-sub);padding:10px 16px;border-top:1px solid var(--es-line2)}
+@media (max-width:1100px){.es-cols{grid-template-columns:1fr}.es-sum{position:static}.es-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.es-meta div:nth-child(2n){border-right:0}}
+
+.es{--es-acc:#4338CA}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="aid"></div>
+<div id="toast"></div>
+<template id="tpl-est-civil"><div class="es"><div class="es-top"><div><div class="es-crumb">Gate E · 프로젝트 › 견적서 · 예시 데이터</div><h1>공사 견적서 · S-OIL 온산 TA 배관 2026</h1></div><div class="es-acts"><div class="es-kind" role="group" aria-label="견적 구분"><a href="#est/civil" class="on">공사 견적서</a><a href="#est/tank" class="">탱크 제작 견적서</a></div><a class="es-btn" href="#project">프로젝트로</a><span class="es-btn">회사 양식 출력 (xlsx · pdf)</span><a class="es-btn pri" href="#exec">견적 승인 요청</a></div></div><div class="es-card"><dl class="es-meta" style="margin:0"><div><dt>견적번호</dt><dd>QP-2026-0063 · R0</dd></div><div><dt>고객사</dt><dd>S-OIL 온산공장</dd></div><div><dt>공사명</dt><dd>2026 정기보수(TA) 배관 교체</dd></div><div><dt>견적 구분</dt><dd>공사</dd></div><div><dt>견적일 · 유효기간</dt><dd>2026-10-22 · 30일</dd></div><div><dt>공사기간</dt><dd>2026-11 ~ 2027-06 (8개월)</dd></div><div><dt>적용 기준</dt><dd>노무비: 내부 실적</dd></div><div><dt>검토 ID · 계열</dt><dd>RV-2026-0151 · 온산 TA 배관</dd></div></dl></div><div class="es-cols"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="es-card"><div class="es-ch"><h2>① 총괄표 (원가계산서)<span>요율은 예시 값 · 리스크·이윤율은 임원 결정</span></h2></div><div class="es-scroll"><table><thead><tr><th>비목</th><th>산출 기준</th><th class="n">요율</th><th class="n">금액 (원)</th></tr></thead><tbody><tr class=""><td>직접재료비</td><td class="src">내역서 재료비 합계</td><td class="n"></td><td class="n">306,146,250</td></tr><tr class=""><td>직접노무비</td><td class="src">내역서 노무비 합계</td><td class="n"></td><td class="n">197,464,100</td></tr><tr class=""><td>간접노무비</td><td class="src">직접노무비 ×</td><td class="n">9%</td><td class="n">17,771,769</td></tr><tr class=""><td>직접경비</td><td class="src">장비·검사·현장 경비</td><td class="n"></td><td class="n">61,389,650</td></tr><tr class=""><td>산재보험료</td><td class="src">노무비 계 ×</td><td class="n">3.7%</td><td class="n">7,963,727</td></tr><tr class=""><td>고용보험료</td><td class="src">노무비 계 ×</td><td class="n">1.01%</td><td class="n">2,173,882</td></tr><tr class=""><td>안전관리비</td><td class="src">(재료비+직접노무비) ×</td><td class="n">1.86%</td><td class="n">9,367,153</td></tr><tr class=""><td>기타경비</td><td class="src">(재료비+노무비 계) ×</td><td class="n">4.5%</td><td class="n">23,462,195</td></tr><tr class="st"><td>순공사원가</td><td class="src">재료비 + 노무비 계 + 경비 계</td><td class="n"></td><td class="n">625,738,726</td></tr><tr class=""><td>일반관리비</td><td class="src">순공사원가 ×</td><td class="n">6%</td><td class="n">37,544,324</td></tr><tr class=""><td>리스크 반영</td><td class="src">순공사원가 × (임원 결정)</td><td class="n">2%</td><td class="n">12,514,775</td></tr><tr class=""><td>이윤</td><td class="src">(노무비 계+경비 계+일반관리비) ×</td><td class="n">10%</td><td class="n">35,713,680</td></tr><tr class="st"><td>총원가</td><td class="src"></td><td class="n"></td><td class="n">711,511,504</td></tr><tr class="tot"><td>견적가 (천원 미만 절사 · 부가세 별도)</td><td></td><td></td><td class="n">711,511,000</td></tr></tbody></table></div></div><div class="es-card"><div class="es-ch"><h2>② 공종별 내역서<span>7개 공종 · 23개 품목 · 파란 행 = 작년 수주 대비 확인 항목</span></h2></div><div class="es-scroll"><table class="es-wide"><thead><tr><th>품명</th><th>규격</th><th>단위</th><th class="n">수량</th><th class="n">재료 단가</th><th class="n">재료비</th><th class="n">노무 단가</th><th class="n">노무비</th><th class="n">경비 단가</th><th class="n">경비</th><th class="n">합계</th><th>단가 출처</th></tr></thead><tbody><tr class="g"><td colspan="12">가설공사</td></tr><tr class="hl"><td>비계 설치·해체</td><td class="src">강관 비계</td><td>㎡</td><td class="n">960</td><td class="n">4,500</td><td class="n">4,320,000</td><td class="n">11,700</td><td class="n">11,232,000</td><td class="n"></td><td class="n"></td><td class="n"><b>15,552,000</b></td><td class="src">실적 인공 0.045 · 단가 마스터</td></tr><tr><td>안전시설 (운전 중 작업)</td><td class="src">방호·차단·감시</td><td>식</td><td class="n">1</td><td class="n">6,500,000</td><td class="n">6,500,000</td><td class="n">3,800,000</td><td class="n">3,800,000</td><td class="n"></td><td class="n"></td><td class="n"><b>10,300,000</b></td><td class="src">체크리스트 #5</td></tr><tr class="st"><td colspan="5">가설공사 소계</td><td class="n">10,820,000</td><td></td><td class="n">15,032,000</td><td></td><td class="n">0</td><td class="n">25,852,000</td><td></td></tr><tr class="g"><td colspan="12">철거공사</td></tr><tr><td>기존 배관 철거</td><td class="src">6"~10"</td><td>m</td><td class="n">620</td><td class="n"></td><td class="n"></td><td class="n">18,500</td><td class="n">11,470,000</td><td class="n"></td><td class="n"></td><td class="n"><b>11,470,000</b></td><td class="src">2025 수주 실행</td></tr><tr><td>폐기물 처리</td><td class="src">지정폐기물 포함</td><td>식</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">4,200,000</td><td class="n">4,200,000</td><td class="n"><b>4,200,000</b></td><td class="src">업체 견적 10/12</td></tr><tr class="st"><td colspan="5">철거공사 소계</td><td class="n">0</td><td></td><td class="n">11,470,000</td><td></td><td class="n">4,200,000</td><td class="n">15,670,000</td><td></td></tr><tr class="g"><td colspan="12">배관공사</td></tr><tr class="hl"><td>탄소강관 6" Sch40 A106B</td><td class="src">할증 5% 포함</td><td>m</td><td class="n">892.5</td><td class="n">68,500</td><td class="n">61,136,250</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>61,136,250</b></td><td class="src">자재 시세 10/01</td></tr><tr><td>탄소강관 8" Sch40 A106B</td><td class="src">할증 5% 포함</td><td>m</td><td class="n">640</td><td class="n">98,000</td><td class="n">62,720,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>62,720,000</b></td><td class="src">자재 시세 10/01</td></tr><tr><td>탄소강관 10" Sch40 A106B</td><td class="src">할증 5% 포함</td><td>m</td><td class="n">420</td><td class="n">142,000</td><td class="n">59,640,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>59,640,000</b></td><td class="src">자재 시세 10/01</td></tr><tr><td>피팅류</td><td class="src">엘보·티·리듀서 6"~10"</td><td>식</td><td class="n">1</td><td class="n">40,000,000</td><td class="n">40,000,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>40,000,000</b></td><td class="src">BM List 기준 산출</td></tr><tr><td>플랜지 6" 150# RF</td><td class="src"></td><td>EA</td><td class="n">140</td><td class="n">54,000</td><td class="n">7,560,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>7,560,000</b></td><td class="src">업체 견적 08/12 · 갱신 필요</td></tr><tr><td>게이트밸브 6" 150#</td><td class="src"></td><td>EA</td><td class="n">24</td><td class="n">1,280,000</td><td class="n">30,720,000</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"><b>30,720,000</b></td><td class="src">AVL 업체 견적 09/05</td></tr><tr class="hl"><td>배관 설치 6"</td><td class="src"></td><td>m</td><td class="n">850</td><td class="n"></td><td class="n"></td><td class="n">31,850</td><td class="n">27,072,500</td><td class="n"></td><td class="n"></td><td class="n"><b>27,072,500</b></td><td class="src">실적 인공 0.130</td></tr><tr><td>배관 설치 8"·10"</td><td class="src"></td><td>m</td><td class="n">1,060</td><td class="n"></td><td class="n"></td><td class="n">36,500</td><td class="n">38,690,000</td><td class="n"></td><td class="n"></td><td class="n"><b>38,690,000</b></td><td class="src">단가 마스터</td></tr><tr class="hl"><td>배관 용접 6"</td><td class="src"></td><td>DI</td><td class="n">1,200</td><td class="n"></td><td class="n"></td><td class="n">23,120</td><td class="n">27,744,000</td><td class="n"></td><td class="n"></td><td class="n"><b>27,744,000</b></td><td class="src">실적 인공 0.085</td></tr><tr><td>배관 용접 8"·10"</td><td class="src"></td><td>DI</td><td class="n">1,880</td><td class="n"></td><td class="n"></td><td class="n">23,120</td><td class="n">43,465,600</td><td class="n"></td><td class="n"></td><td class="n"><b>43,465,600</b></td><td class="src">실적 인공 0.085</td></tr><tr><td>밸브 설치</td><td class="src"></td><td>EA</td><td class="n">24</td><td class="n"></td><td class="n"></td><td class="n">185,000</td><td class="n">4,440,000</td><td class="n"></td><td class="n"></td><td class="n"><b>4,440,000</b></td><td class="src">단가 마스터</td></tr><tr class="st"><td colspan="5">배관공사 소계</td><td class="n">261,776,250</td><td></td><td class="n">141,412,100</td><td></td><td class="n">0</td><td class="n">403,188,350</td><td></td></tr><tr class="g"><td colspan="12">검사·시험</td></tr><tr><td>RT 비파괴검사</td><td class="src">용접부 10%</td><td>매</td><td class="n">308</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">38,000</td><td class="n">11,704,000</td><td class="n"><b>11,704,000</b></td><td class="src">검사업체 단가</td></tr><tr><td>수압시험</td><td class="src"></td><td>식</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="n">2,600,000</td><td class="n">2,600,000</td><td class="n">3,900,000</td><td class="n">3,900,000</td><td class="n"><b>6,500,000</b></td><td class="src">2025 수주 실행</td></tr><tr class="st"><td colspan="5">검사·시험 소계</td><td class="n">0</td><td></td><td class="n">2,600,000</td><td></td><td class="n">15,604,000</td><td class="n">18,204,000</td><td></td></tr><tr class="g"><td colspan="12">도장·보온</td></tr><tr><td>배관 도장</td><td class="src">에폭시 3coat</td><td>㎡</td><td class="n">1,850</td><td class="n">8,600</td><td class="n">15,910,000</td><td class="n">9,800</td><td class="n">18,130,000</td><td class="n"></td><td class="n"></td><td class="n"><b>34,040,000</b></td><td class="src">자재 시세 · 단가 마스터</td></tr><tr><td>보온</td><td class="src">미네랄울 50t</td><td>m</td><td class="n">420</td><td class="n">42,000</td><td class="n">17,640,000</td><td class="n">21,000</td><td class="n">8,820,000</td><td class="n"></td><td class="n"></td><td class="n"><b>26,460,000</b></td><td class="src">단가 마스터</td></tr><tr class="st"><td colspan="5">도장·보온 소계</td><td class="n">33,550,000</td><td></td><td class="n">26,950,000</td><td></td><td class="n">0</td><td class="n">60,500,000</td><td></td></tr><tr class="g"><td colspan="12">장비</td></tr><tr><td>크레인 50ton</td><td class="src"></td><td>일</td><td class="n">14</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">1,350,000</td><td class="n">18,900,000</td><td class="n"><b>18,900,000</b></td><td class="src">장비 손료</td></tr><tr><td>지게차 5ton</td><td class="src"></td><td>일</td><td class="n">20</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">280,000</td><td class="n">5,600,000</td><td class="n"><b>5,600,000</b></td><td class="src">장비 손료</td></tr><tr><td>용접기 임차</td><td class="src"></td><td>식</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">6,300,000</td><td class="n">6,300,000</td><td class="n"><b>6,300,000</b></td><td class="src">장비 손료</td></tr><tr class="st"><td colspan="5">장비 소계</td><td class="n">0</td><td></td><td class="n">0</td><td></td><td class="n">30,800,000</td><td class="n">30,800,000</td><td></td></tr><tr class="g"><td colspan="12">현장 경비</td></tr><tr><td>숙박·식대·운반·소모품</td><td class="src">8개월 운영</td><td>식</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">10,785,650</td><td class="n">10,785,650</td><td class="n"><b>10,785,650</b></td><td class="src">실행 실적 비율</td></tr><tr class="st"><td colspan="5">현장 경비 소계</td><td class="n">0</td><td></td><td class="n">0</td><td></td><td class="n">10,785,650</td><td class="n">10,785,650</td><td></td></tr><tr class="tot"><td colspan="5">직접비 합계</td><td class="n">306,146,250</td><td></td><td class="n">197,464,100</td><td></td><td class="n">61,389,650</td><td class="n">565,000,000</td><td></td></tr></tbody></table></div></div><div class="es-card"><div class="es-ch"><h2>③ 단가 산출 근거 (일위대가)<span>1단위당 · 내부 실적과 표준품셈 비교</span></h2></div><div class="es-scroll"><table><thead><tr><th>항목 (1단위)</th><th>직종</th><th class="n">실적 인공</th><th class="n">사내 단가</th><th class="n">적용 단가</th><th class="n">품셈 인공</th><th class="n">시중노임</th><th class="n">품셈 단가</th><th class="n">차이</th></tr></thead><tbody><tr><td>배관 용접 6" (1 DI)</td><td>용접공</td><td class="n">0.085</td><td class="n">272,000</td><td class="n"><b>23,120</b></td><td class="n">0.100</td><td class="n">280,000</td><td class="n">28,000</td><td class="n" style="color:#067647">−4,880</td></tr><tr><td>배관 설치 6" (1 m)</td><td>배관공</td><td class="n">0.130</td><td class="n">245,000</td><td class="n"><b>31,850</b></td><td class="n">0.120</td><td class="n">250,000</td><td class="n">30,000</td><td class="n" style="color:#B42318">+1,850</td></tr><tr><td>비계 설치·해체 (1 ㎡)</td><td>비계공</td><td class="n">0.045</td><td class="n">260,000</td><td class="n"><b>11,700</b></td><td class="n">0.050</td><td class="n">270,000</td><td class="n">13,500</td><td class="n" style="color:#067647">−1,800</td></tr></tbody></table></div><div class="es-note">실적 인공 = 수주 4건(2019·2021·2023·2025) 실행 평균. 사내 단가·시중노임은 예시 값.</div></div><div class="es-card"><div class="es-ch"><h2>④ 견적 조건 · 제외 · 리스크 반영</h2></div><ul class="es-list"><li>부가가치세 별도 · 견적 유효기간 30일 · 대금: 기성 70% / 준공 30%</li><li>제외: 발주처 지급 자재(가스켓·볼트 일부), 운전 중 정지·퍼지 작업, 설계 변경분</li><li>RT 비율 10% 기준 (2025 TCM 합의) · 100% 요구 시 약 105백만 증가 <span class="warn">질의 중</span></li><li>야간 작업 할증 미포함 · 필요 시 별도 항목 <span class="warn">질의 중</span></li><li>지체상금: 계약금액 10% 상한 전제 (2025 계약 조건)</li></ul></div></div><div class="es-sum"><div class="es-card"><div class="es-big"><div class="l">견적가 (부가세 별도)</div><div class="v">711,511,000</div></div><div class="es-kv"><span>직접비</span><b>565,000,000</b></div><div class="es-kv"><span>작년 수주 직접비</span><b>548,000,000 <span style="color:#B42318">+3.1%</span></b></div><div class="es-kv"><span>품셈 기준 시 차이 (6" 3공종)</span><b>+6,011,500</b></div><div class="es-kv"><span>순공사원가</span><b>625,738,726</b></div><div class="es-sign"><div><b>작성</b>[공사 담당자]</div><div><b>검토</b>[영업팀장]</div><div><b>승인</b>[임원]</div></div></div><div class="es-card"><div class="es-ai"><b>AI</b><div>이 계열에서 실주한 해는 직접비가 전년보다 늘었습니다. 강관 단가(+6.2%)가 가장 큰 상승 요인이고, 배관 설치 6"만 표준품셈 기준으로 바꾸면 직접비가 1,572,500원 줄어듭니다.</div></div></div><div class="es-card"><div class="es-ch"><h2>체크리스트 4 / 6</h2></div><ul class="es-list"><li>BM 물량 검증 ✓</li><li>AVL 가격 요청 ✓</li><li>노무비 기준 결정 ✓</li><li>단가 확인 ✓</li><li>RT 비율 질의</li><li>야간 할증 질의</li></ul></div></div></div></div></template><template id="tpl-est-tank"><div class="es"><div class="es-top"><div><div class="es-crumb">Gate E · 프로젝트 › 견적서 · 예시 데이터</div><h1>탱크 제작 견적서 · 한빛케미칼 울산 저장탱크 4기</h1></div><div class="es-acts"><div class="es-kind" role="group" aria-label="견적 구분"><a href="#est/civil" class="">공사 견적서</a><a href="#est/tank" class="on">탱크 제작 견적서</a></div><a class="es-btn" href="#project">프로젝트로</a><span class="es-btn">회사 양식 출력 (xlsx · pdf)</span><a class="es-btn pri" href="#exec">견적 승인 요청</a></div></div><div class="es-card"><dl class="es-meta" style="margin:0"><div><dt>견적번호</dt><dd>QP-2026-0058 · R0</dd></div><div><dt>고객사</dt><dd>한빛케미칼 울산공장</dd></div><div><dt>공사명</dt><dd>저장탱크 4기 신설 (TK-301~304)</dd></div><div><dt>견적 구분</dt><dd>탱크 제작 · 외주 재구성</dd></div><div><dt>견적일 · 유효기간</dt><dd>2026-10-28 · 30일</dd></div><div><dt>공기</dt><dd>8개월</dd></div><div><dt>사양</dt><dd>CS(SS275) 2,500㎥ × 4기 · 고정 지붕형 · API 650</dd></div><div><dt>적용 AVL</dt><dd>한빛케미칼 v3 (10/14 고정)</dd></div></dl></div><div class="es-cols"><div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="es-card"><div class="es-ch"><h2>① 총괄표 (원가계산서)<span>요율은 예시 값 · 리스크·이윤율은 임원 결정</span></h2></div><div class="es-scroll"><table><thead><tr><th>비목</th><th>산출 기준</th><th class="n">요율</th><th class="n">금액 (원)</th></tr></thead><tbody><tr class=""><td>외주비</td><td class="src">AVL 업체 최적가 재구성</td><td class="n"></td><td class="n">913,500,000</td></tr><tr class=""><td>자사 직접비</td><td class="src">기초·감독·검사·가설</td><td class="n"></td><td class="n">180,100,000</td></tr><tr class="st"><td>원가 계</td><td class="src"></td><td class="n"></td><td class="n">1,093,600,000</td></tr><tr class=""><td>일반관리비</td><td class="src">원가 계 ×</td><td class="n">5%</td><td class="n">54,680,000</td></tr><tr class=""><td>리스크 반영</td><td class="src">원가 계 × (지체상금 상한 없음)</td><td class="n">3.5%</td><td class="n">38,276,000</td></tr><tr class=""><td>이윤</td><td class="src">(원가 계+일반관리비) ×</td><td class="n">7%</td><td class="n">80,379,600</td></tr><tr class="st"><td>총원가</td><td class="src"></td><td class="n"></td><td class="n">1,266,935,600</td></tr><tr class="tot"><td>견적가 (천원 미만 절사 · 부가세 별도)</td><td></td><td></td><td class="n">1,266,935,000</td></tr></tbody></table></div></div><div class="es-card"><div class="es-ch"><h2>② 패키지별 내역<span>외주 8개 · 자사 4개 · 노란 표시 = 회신 대기·추정 금액</span></h2></div><div class="es-scroll"><table><thead><tr><th>패키지</th><th>업체 / 규격</th><th>AVL</th><th class="n">금액 (원)</th><th>상태</th><th>비고</th><th class="n">비중</th></tr></thead><tbody><tr class="g"><td colspan="7">외주 패키지 · AVL 업체 최적가 재구성</td></tr><tr><td>판재 제작</td><td>B플랜트</td><td class="src">AVL</td><td class="n">398,000,000</td><td><span class="okt">확정</span></td><td class="src">3개사 중 최저</td><td class="n">36.4%</td></tr><tr><td>용접·조립</td><td>C엔지니어링</td><td class="src">AVL</td><td class="n">179,000,000</td><td><span class="warn">확인 필요</span></td><td class="src">판재와 다른 업체 · 분할 발주 확인</td><td class="n">16.4%</td></tr><tr><td>수압시험</td><td>B플랜트</td><td class="src">AVL</td><td class="n">21,000,000</td><td><span class="okt">확정</span></td><td class="src"></td><td class="n">1.9%</td></tr><tr><td>운반·설치</td><td>C엔지니어링</td><td class="src">AVL</td><td class="n">55,000,000</td><td><span class="okt">확정</span></td><td class="src"></td><td class="n">5.0%</td></tr><tr><td>펌프 (원심 8EA)</td><td>A펌프</td><td class="src">AVL</td><td class="n">96,000,000</td><td><span class="warn">회신 1/2</span></td><td class="src">G펌프 회신 대기</td><td class="n">8.8%</td></tr><tr><td>밸브류 1식</td><td>—</td><td class="src">AVL 3곳 요청</td><td class="n">58,400,000</td><td><span class="warn">추정</span></td><td class="src">회신 0/3 · 단가 마스터 추정</td><td class="n">5.3%</td></tr><tr><td>계장 (레벨·압력·온도)</td><td>[계장 업체]</td><td class="src">AVL</td><td class="n">42,300,000</td><td><span class="okt">확정</span></td><td class="src"></td><td class="n">3.9%</td></tr><tr><td>도장 (외부 3coat·내부 에폭시)</td><td>E도장</td><td class="src">AVL v3 신규</td><td class="n">63,800,000</td><td><span class="okt">확정</span></td><td class="src"></td><td class="n">5.8%</td></tr><tr class="st"><td colspan="3">외주비 소계</td><td class="n">913,500,000</td><td colspan="2"></td><td class="n">83.5%</td></tr><tr class="g"><td colspan="7">자사 직접비</td></tr><tr><td>기초 앵커·그라우팅</td><td>자사 시공</td><td class="src">자사</td><td class="n">18,600,000</td><td><span class="okt">확정</span></td><td class="src">단가 마스터</td><td class="n">1.7%</td></tr><tr><td>현장 감독·QC</td><td>2인 × 8개월 × 6,000,000</td><td class="src">자사</td><td class="n">96,000,000</td><td><span class="okt">확정</span></td><td class="src">사내 노무단가</td><td class="n">8.8%</td></tr><tr><td>시험·검사</td><td>RT 100%, 제3자 검사</td><td class="src">자사</td><td class="n">38,500,000</td><td><span class="okt">확정</span></td><td class="src">계약조건 제36조</td><td class="n">3.5%</td></tr><tr><td>가설·안전</td><td>운전 중 공장 작업</td><td class="src">자사</td><td class="n">27,000,000</td><td><span class="okt">확정</span></td><td class="src">계약조건 제34조</td><td class="n">2.5%</td></tr><tr class="st"><td colspan="3">자사 직접비 소계</td><td class="n">180,100,000</td><td colspan="2"></td><td class="n">16.5%</td></tr><tr class="tot"><td colspan="3">원가 계</td><td class="n">1,093,600,000</td><td colspan="2"></td><td class="n">100%</td></tr></tbody></table></div></div><div class="es-card"><div class="es-ch"><h2>③ 업체 견적 비교 · 탱크 본체<span>백만원 · 초록 = 선택 · D산업은 AVL 외라 비교만</span></h2></div><div class="es-scroll"><table><thead><tr><th>항목</th><th class="n">A중공업</th><th class="n">B플랜트</th><th class="n">C엔지니어링</th><th class="n">D산업 (AVL 외)</th><th class="n">선택가</th></tr></thead><tbody><tr><td>판재 제작</td><td class="n ">412</td><td class="n pick">398</td><td class="n ">425</td><td class="n out">380</td><td class="n"><b>398</b></td></tr><tr><td>용접·조립</td><td class="n ">186</td><td class="n ">201</td><td class="n pick">179</td><td class="n out">170</td><td class="n"><b>179</b></td></tr><tr><td>수압시험</td><td class="n ">24</td><td class="n pick">21</td><td class="n ">26</td><td class="n out">20</td><td class="n"><b>21</b></td></tr><tr><td>운반·설치</td><td class="n ">58</td><td class="n ">64</td><td class="n pick">55</td><td class="n out">50</td><td class="n"><b>55</b></td></tr><tr class="st"><td>합계</td><td class="n">680</td><td class="n">684</td><td class="n">685</td><td class="n out">620</td><td class="n">653</td></tr></tbody></table></div><div class="es-note">항목별 최적가 653 = 단일 업체 최저(A중공업 680)보다 27 낮음. 용접·조립 분할 발주 가능 여부 확인 후 확정.</div></div><div class="es-card"><div class="es-ch"><h2>④ 견적 조건 · 제외 · 리스크 반영</h2></div><ul class="es-list"><li>부가가치세 별도 · 견적 유효기간 30일 (외주 견적 최단 유효기간 60일 이내)</li><li>제외: 기초 콘크리트 타설, 탱크 내부 라이닝 추가 사양, 인허가 대행</li><li>지체상금 상한 없음 (계약일반조건 제23조) → 리스크율 3.5% 반영 · 10% 상한 질의 중</li><li>회신 대기·추정 금액 154,400,000원 (펌프 1곳, 밸브 3곳) · 회신 후 R1에서 확정</li><li>물량 오류 증가분 조정 불가 (제31조) → BM 물량 검증 완료</li></ul></div></div><div class="es-sum"><div class="es-card"><div class="es-big"><div class="l">견적가 (부가세 별도)</div><div class="v">1,266,935,000</div></div><div class="es-kv"><span>외주비</span><b>913,500,000</b></div><div class="es-kv"><span>자사 직접비</span><b>180,100,000</b></div><div class="es-kv"><span>회신 대기·추정</span><b style="color:#B54708">154,400,000</b></div><div class="es-kv"><span>최유사 견적</span><b>QP-2025-0033 · 수주</b></div><div class="es-sign"><div><b>작성</b>[탱크 담당자]</div><div><b>검토</b>[영업팀장]</div><div><b>승인</b>[임원]</div></div></div><div class="es-card"><div class="es-ai"><b>AI</b><div>펌프·밸브 회신이 오기 전이라 154,400,000원이 추정 금액입니다. 회신 기한(10/22·10/23) 이후 승인 요청을 권장합니다. 지체상금 상한이 확보되면 리스크율을 낮출 수 있습니다.</div></div></div></div></div></div></template><a id="gate" href="index.html" title="인트로로 돌아가기"><b>GATE E</b>통합안</a>
+<script>
+(function(){
+var TODAY='2026-10-15';
+var TY={req:'견적요청',site:'현장설명회',due:'제출 마감',tcm:'TCM·협상',won:'수주',lost:'실주'};
+var EV=[
+ {d:'2026-10-02',t:'won',title:'아산 소방수 저장조 수주',cust:'세진화학',id:'WO-2026-0031'},
+ {d:'2026-10-06',t:'lost',title:'시흥 물류창고 배관 실주',cust:'삼일건설',id:'QP-2026-0043'},
+ {d:'2026-10-08',t:'site',title:'온산 TA 배관 현설',cust:'S-OIL',id:'RV-2026-0151',p:1},
+ {d:'2026-10-08',t:'tcm',title:'광양 수처리 가격협상',cust:'한결엔지니어링',id:'QP-2026-0051'},
+ {d:'2026-10-14',t:'req',title:'여수 원료탱크 보수',cust:'동해정밀화학',id:'RV-2026-0144'},
+ {d:'2026-10-15',t:'req',title:'울산 저장탱크 4기',cust:'한빛케미칼',id:'RV-2026-0142'},
+ {d:'2026-10-15',t:'req',title:'평택 물류센터 기계설비',cust:'대성건설',id:'RV-2026-0143'},
+ {d:'2026-10-16',t:'due',title:'당진 LNG 배관 R2 마감',cust:'서해에너지',id:'QP-2026-0049'},
+ {d:'2026-10-17',t:'site',title:'평택 물류센터 현설',cust:'대성건설',id:'RV-2026-0143'},
+ {d:'2026-10-17',t:'tcm',title:'광양 수처리 2차 기술협의',cust:'한결엔지니어링',id:'QP-2026-0051'},
+ {d:'2026-10-20',t:'site',title:'울산 저장탱크 현설',cust:'한빛케미칼',id:'RV-2026-0142'},
+ {d:'2026-10-22',t:'site',title:'하동 저장조 교체 현설',cust:'남부발전 협력사',id:'RV-2026-0145'},
+ {d:'2026-10-24',t:'due',title:'온산 TA 배관 마감',cust:'S-OIL',id:'QP-2026-0063',p:1},
+ {d:'2026-10-27',t:'due',title:'여수 원료탱크 마감',cust:'동해정밀화학',id:'QP-2026-0059'},
+ {d:'2026-10-29',t:'due',title:'오송 유틸리티 배관 마감',cust:'미래바이오',id:'RV-2026-0146'},
+ {d:'2026-10-30',t:'due',title:'울산 저장탱크 마감',cust:'한빛케미칼',id:'RV-2026-0142'},
+ {d:'2026-10-07',t:'won',title:'[2025] 울산 폐수 저장조 → 수주',cust:'한빛케미칼',g:1},
+ {d:'2026-10-21',t:'site',title:'[2025] 당진 부두 배관 현설',cust:'서해에너지',g:1},
+ {d:'2026-10-28',t:'req',title:'[2025] 온산 유틸리티 배관 견적요청',cust:'S-OIL',g:1}
+];
+var CUST={
+ 'S-OIL':{kind:'정유 · 온산공장',req:101,part:74,won:23,trend:[6,8,7,9,11,10,12,14,13,11],wonY:[1,2,1,2,3,2,3,4,3,2],types:[48,27,26],main:'공사 현장설명회',
+  ser:[['온산 정기보수(TA) 배관','매년',10,[2019,2021,2023,2025]],['온산 저장탱크 도장 보수','격년',5,[2018,2022]],['온산 유틸리티 배관 증설','비정기',4,[2023]]],
+  heat:[[0,1,2,0,0,0,0,0,1,1,1,0],[1,1,2,1,0,0,0,0,1,1,0,1],[0,2,1,0,1,0,0,1,1,0,1,0],[1,1,2,1,0,1,0,0,1,1,0,1],[1,2,2,1,1,0,1,1,1,0,1,0],[0,1,2,1,1,1,0,1,1,1,0,1],[1,2,2,1,0,1,1,1,1,1,1,0],[1,2,2,1,1,1,1,1,2,0,1,1],[0,1,1,1,1,0,1,1,2,2,2,1],[1,1,0,2,1,1,1,1,1,2,0,0]]},
+ '한빛케미칼':{kind:'석유화학 · 울산공장',req:120,part:92,won:35,trend:[8,9,10,11,11,12,13,14,14,18],wonY:[2,2,3,3,3,4,4,5,4,5],types:[66,30,24],main:'탱크 견적요청',w:[6,8,10,9,8,7,7,8,10,11,9,7],
+  ser:[['울산 저장탱크 신설·증설','비정기',14,[2018,2021,2024,2025]],['울산 폐수 저장조','격년',6,[2020,2024]],['울산 탱크 정기 검사 보수','매년',9,[2019,2022,2023]]]},
+ '서해에너지':{kind:'에너지 · 당진',req:88,part:62,won:15,trend:[6,7,7,8,8,9,9,10,10,14],wonY:[1,1,1,1,2,1,2,1,2,3],types:[48,22,18],main:'배관 견적요청',w:[7,8,9,8,7,7,6,7,9,11,10,8],
+  ser:[['당진 LNG 배관','비정기',7,[2021,2023]],['당진 부두 배관 보수','매년',8,[2019,2022,2025]]]}
+};
+var YEARS=[2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
+var SER=[[2017,'실주',410],[2018,'실주',455],[2019,'수주',430],[2020,'불참',null],[2021,'수주',498],[2022,'실주',520],[2023,'수주',505],[2024,'실주',560],[2025,'수주',548],[2026,'작성 중',565]];
+var LABOR=[['배관 용접 6"','1,200 DI','33,600,000','27,744,000','−5,856,000'],['배관 설치','850 m','25,500,000','27,072,500','+1,572,500'],['비계 설치·해체','960 ㎡','12,960,000','11,232,000','−1,728,000']];
+var MATS=[['PIP-CS-06-S40','탄소강관 6" Sch40','m','68,500','+6.2%',[64.5,65.2,66.0,67.4,68.5]],['PLT-SS275-09','강판 SS275 9t','ton','1,420,000','−2.4%',[1455,1448,1436,1428,1420]],['VLV-GT-06-150','게이트밸브 6" 150#','EA','1,280,000','+4.0%',[1231,1245,1258,1270,1280]],['PNT-EP-3C','에폭시 도장재 3coat','㎡','8,600','0.0%',[8.6,8.6,8.6,8.6,8.6]]];
+var PROJ=[
+ ['검토',[['울산 저장탱크 4기','한빛케미칼','RV-2026-0142','참여 상신','10/30',0],['평택 물류센터 기계설비','대성건설','RV-2026-0143','검토중','11/06',0],['오송 유틸리티 배관','미래바이오','RV-2026-0146','접수','10/29',0]]],
+ ['견적',[['S-OIL 온산 TA 배관 2026','S-OIL','QP-2026-0063 · R0','견적 작성','10/24',1],['여수 원료탱크 보수','동해정밀화학','QP-2026-0059 · R0','견적 작성','10/27',0],['당진 LNG 인입배관','서해에너지','QP-2026-0049 · R2','승인요청','10/16',0]]],
+ ['협상',[['광양 수처리설비','한결엔지니어링','QP-2026-0051 · R3','TCM·협상중','—',0]]],
+ ['수주·종결',[['아산 소방수 저장조','세진화학','WO-2026-0031','수주 · 실행예산','—',0],['시흥 물류창고 배관','삼일건설','QP-2026-0043','실주','—',0]]]
+];
+var TASKS=[
+ {id:'mail',role:'영업지원',title:'메일 분류 확정',desc:'한빛케미칼 · 울산 저장탱크 4기 견적요청',due:'오늘'},
+ {id:'gonogo',role:'영업담당',title:'참여 결정 상신',desc:'울산 저장탱크 4기 · 현설 10/20 전',due:'D-5'},
+ {id:'rate',role:'견적담당',title:'견적 단가 확인',desc:'S-OIL 온산 TA 배관 · 많이 오른 3개 항목',due:'D-9'},
+ {id:'rfq',role:'견적담당',title:'업체 가격 요청',desc:'온산 TA 배관 · 밸브 패키지'},
+ {id:'approve',role:'임원',title:'견적 승인',desc:'서해에너지 당진 LNG 배관 R2',due:'D-1'},
+ {id:'result',role:'영업담당',title:'결과 등록',desc:'세진화학 아산 소방수 저장조'}
+];
+var AIQA=[['S-OIL은 1년에 몇 번, 주로 무엇을 요청하나요?','10년간 101건, 연 평균 10건입니다. 견적요청 48, 현장설명회 27, 정정·질의 26건이며 2~3월과 9월에 몰립니다. 참여 74건 중 23건 수주(31%).',['요청 이력 101건']],['온산 TA 배관에서 실주한 해의 공통점은?','실주한 2022·2024년은 직접비가 전년보다 늘었고(+4.4%, +10.9%), 수주한 2023·2025년은 줄었습니다. 2026 견적은 현재 +3.1%입니다.',['계열 이력 10건','견적서 9건']],['이번 견적에서 품셈 기준이 더 유리한 공종은?','배관 설치입니다. 내부 실적 인공이 품셈보다 많아, 이 공종만 품셈으로 바꾸면 1,572,500원 줄어듭니다.',['노무비 비교']]];
+var ROLES={
+ home:['홈 · 오늘','로그인하면 가장 먼저 보는 화면입니다. 내 역할의 오늘 할 일, 이번 주 일정, 결정 대기, AI가 감지한 변화를 한곳에 모읍니다. 할 일의 [처리]를 누르면 한 가지 업무만 보이는 화면으로 들어갑니다.','가져온 것: D 오늘 할 일 + C 주간 일정 + B 변화 감지'],
+ focus:['한 업무 처리','업무 하나를 질문 하나, 버튼 하나로 끝내는 화면입니다. 판단에 필요한 핵심 정보 3~4개와 AI 근거만 보여주고, 완료하면 시스템이 자동으로 처리한 내용을 알려준 뒤 다음 업무로 넘어갑니다.','가져온 것: D 한 화면 한 업무'],
+ calendar:['캘린더','지금 쓰는 엑셀 캘린더처럼 견적요청·현설·마감·TCM·결과를 월 단위로 봅니다. 일정을 누르면 오른쪽에 고객사 이력과 진행 상태가 나오고, 작년 같은 달 일정을 겹쳐 볼 수 있습니다.','가져온 것: C 영업 캘린더 + 작년 겹쳐보기'],
+ projects:['프로젝트','진행 중인 모든 건을 검토 · 견적 · 협상 · 수주·종결 단계로 묶어 상태, 마감, 담당을 봅니다. 수주 건은 초록으로 구분합니다. 행을 누르면 프로젝트 화면으로 들어갑니다.','가져온 것: A 파이프라인 (RV → QP → WO)'],
+ project:['프로젝트 상세','한 건의 진행 단계와 지금 해야 할 일 하나를 맨 위에 보여주고, 아래 탭에서 개요·문서·견적·협상을 봅니다. 오른쪽 이력 패널에는 같은 계열의 지난 결과와 고객사 수주율이 항상 붙어 있습니다.','가져온 것: A 단계 흐름 + D 지금 할 일 + B 이력 패널'],
+ analysis:['분석','고객사 요청 패턴(10년 히트맵·반복 계열), 내부 노무비와 표준품셈 비교, 자재 단가 추이를 탭으로 봅니다. 견적과 참여 판단의 근거가 되는 데이터를 모아 둔 곳입니다.','가져온 것: B 고객사 360·비용·자재 + C 10년 히트맵'],
+ 'est/civil':['상세 견적서 · 공사','고객사에 낼 공사 견적의 최종 구성을 한 화면에서 확인합니다. ① 총괄표로 직접비에서 견적가까지의 계산 과정을, ② 공종별 내역서로 품목별 재료·노무·경비와 단가 출처를, ③ 일위대가로 내부 실적과 표준품셈 단가 근거를, ④ 조건·제외·리스크를 봅니다. 오른쪽에서 견적가·작년 대비·결재선을 보고 승인을 요청합니다.','가져온 것: A 공종별 견적 + B 단가·노무비 이력 + D 확인 항목 강조'],
+ 'est/tank':['상세 견적서 · 탱크 제작','외주 업체 견적을 AVL 기준으로 재구성한 탱크 제작 견적의 최종 구성을 확인합니다. ① 총괄표, ② 패키지별 내역(업체·확정/추정 상태·비중), ③ 업체 견적 비교와 선택 근거, ④ 조건·리스크를 봅니다. 회신 대기·추정 금액이 얼마인지 따로 보여줘, 승인 시점을 판단할 수 있습니다.','가져온 것: A 외주견적 비교 + B AVL·자재 이력'],
+ exec:['경영','대표이사·임원이 올해 요청·참여·수주, 월별 추이, 고객사 변화를 보고, 결정 대기 건을 바로 승인·반려하는 화면입니다.','가져온 것: B 임원 대시보드 + D 빠른 결정']
+};
+var S={route:'home',role:'전체',done:{},f:{},sel:null,ghost:false,tab:'over',basis:'in',an:'cust',cust:'S-OIL',mat:0,dec:{},ai:false,chat:[]};
+
+function pad(n){return(n<10?'0':'')+n}
+function key(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function md(d){return +d.slice(5,7)+'/'+ +d.slice(8,10)}
+function tag(t,x){return '<span class="tag t-'+t+'">'+(x||TY[t]||t)+'</span>'}
+function toast(m){var t=document.getElementById('toast');t.innerHTML='<div class="toast" role="status">'+m+'</div>';clearTimeout(toast.h);toast.h=setTimeout(function(){t.innerHTML=''},2600)}
+function roleBox(k){var r=ROLES[k];return '<footer class="role" aria-label="이 화면의 역할"><span class="rk">이 화면의 역할</span><div class="rt"><b>'+r[0]+'</b>'+r[1]+'<div class="rf">'+r[2]+'</div></div></footer>'}
+function heatOf(c){var C=CUST[c];if(C.heat)return C.heat;var out=[];C.trend.forEach(function(tot,yi){var months=yi==9?10:12;var w=C.w.slice(0,months),sw=w.reduce(function(a,b){return a+b},0);var raw=w.map(function(x){return tot*x/sw});var fl=raw.map(Math.floor);var rem=tot-fl.reduce(function(a,b){return a+b},0);raw.map(function(x,i){return[x-fl[i],i]}).sort(function(a,b){return b[0]-a[0]}).slice(0,rem).forEach(function(p){fl[p[1]]++});while(fl.length<12)fl.push(0);out.push(fl)});C.heat=out;return out}
+function openTasks(){return TASKS.filter(function(t){return !S.done[t.id]&&(S.role=='전체'||t.role==S.role)})}
+
+function rail(){
+ var left=TASKS.filter(function(t){return !S.done[t.id]}).length,dl=2-Object.keys(S.dec).length;
+ var it=[['home','홈',left],['calendar','캘린더'],['projects','프로젝트'],['est/civil','상세 견적서'],['analysis','분석'],['exec','경영',dl>0?dl:0]];
+ return '<nav class="rail" aria-label="주 메뉴"><div class="logo"><i>영</i>영업·견적</div><a class="introbtn" href="index.html">← 인트로</a>'+
+  '<div class="lb">업무</div>'+it.slice(0,4).map(nv).join('')+'<div class="lb">판단</div>'+it.slice(4).map(nv).join('')+
+  '<button type="button" class="aib" data-act="ai">AI · 문서 검색</button></nav>';
+ function nv(x){var on=S.route==x[0]||(x[0]=='projects'&&S.route=='project')||(x[0]=='est/civil'&&S.route=='est/tank');return '<a class="nv'+(on?' on':'')+'" href="#'+x[0]+'">'+x[1]+(x[2]?'<span class="cnt">'+x[2]+'</span>':'')+'</a>'}
+}
+function page(inner,k){return '<div class="shell">'+rail()+'<div class="main"><div class="content">'+inner+'</div>'+roleBox(k)+'</div></div>'}
+
+/* ---- 홈 ---- */
+function vHome(){
+ var roles=['전체','영업지원','영업담당','견적담당','임원'];
+ var list=TASKS.filter(function(t){return S.role=='전체'||t.role==S.role});
+ var open=openTasks();
+ var start=new Date(2026,9,11),wk='';
+ for(var i=0;i<7;i++){var d=new Date(start);d.setDate(11+i);var k=key(d);var es=EV.filter(function(e){return e.d==k&&!e.g});wk+='<div class="wd'+(k==TODAY?' today':'')+'"><div class="d">'+['일','월','화','수','목','금','토'][i]+'</div><div class="n2">'+d.getDate()+'</div><div class="dots">'+es.map(function(e){return '<i style="background:var(--'+e.t+')" title="'+e.title+'"></i>'}).join('')+'</div></div>'}
+ var up=EV.filter(function(e){return !e.g&&e.d>=TODAY}).sort(function(a,b){return a.d<b.d?-1:1}).slice(0,5);
+ return '<div class="ph"><div><div class="s">10월 15일(목) · 예시 데이터</div><h1>오늘 할 일 '+open.length+'건</h1></div><div class="seg">'+roles.map(function(r){return '<button type="button" data-role="'+r+'" class="'+(S.role==r?'on':'')+'">'+r+'</button>'}).join('')+'</div></div>'+
+ '<div class="two"><section class="card"><div class="ch"><h2>할 일</h2>'+(open.length?'<a class="btn pri sm" href="#focus/'+open[0].id+'">순서대로 처리 ›</a>':'<span class="tag t-won">모두 완료</span>')+'</div>'+
+  list.map(function(t){var i=TASKS.indexOf(t),d=S.done[t.id];return '<div class="trow'+(d?' done':'')+'"><span class="n">'+(d?'✓':i+1)+'</span><div style="flex:1;min-width:0"><div class="tt">'+t.title+'</div><div class="ds">'+t.desc+' · '+t.role+'</div></div>'+(t.due&&!d?'<span class="due">'+t.due+'</span>':'')+(d?'':'<a class="btn sm" href="#focus/'+t.id+'">처리</a>')+'</div>'}).join('')+'</section>'+
+ '<div style="display:flex;flex-direction:column;gap:16px"><section class="card"><div class="ch"><h2>이번 주 일정</h2><a href="#calendar" style="font-size:13px">캘린더</a></div><div class="cb"><div class="week">'+wk+'</div><div style="margin-top:10px">'+up.map(function(e){return '<div class="ag"><b style="width:40px;flex:none">'+md(e.d)+'</b>'+tag(e.t)+'<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+e.title+'</span></div>'}).join('')+'</div></div></section>'+
+ '<section class="card"><div class="ch"><h2>AI가 감지한 변화</h2></div><div class="cb" style="font-size:13px;line-height:1.75"><div class="ag"><span class="ai">AI</span>당진 LNG 마감(10/16)이 아직 견적 승인 전입니다.</div><div class="ag"><span class="ai">AI</span>S-OIL TA 일정이 2월 → 10월로 바뀌었습니다.</div><div class="ag"><span class="ai">AI</span>동해정밀화학 요청이 예년의 절반 이하입니다.</div></div></section></div></div>';
+}
+
+/* ---- 한 업무 처리 ---- */
+function opt(n,v,l,r,on){return '<label class="opt'+(on?' on':'')+'"><input type="radio" name="'+n+'" value="'+v+'" data-f="'+n+'" '+(on?'checked':'')+'>'+l+(r?'<span class="r">'+r+'</span>':'')+'</label>'}
+function facts(rows){return '<dl class="facts">'+rows.map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>'}).join('')+'</dl>'}
+var FV={
+ mail:function(){var f=S.f.mt||'req';return{h:'<h1>이 메일을 견적요청으로 등록할까요?</h1><p class="lead">한빛케미칼 구매팀 · 울산공장 저장탱크 4기 신설 견적 요청</p>'+facts([['발주처','한빛케미칼(주)'],['구분','탱크'],['현장설명회','10/20 10:00'],['견적 마감','10/30 17:00']])+'<div class="aibox" style="margin-bottom:14px"><b>AI</b><div>10년 120건 요청, 35건 수주(참여 대비 38%). 새 계열로 등록합니다.</div></div>'+opt('mt','req','견적요청','AI 96%',f=='req')+opt('mt','site','현장설명회 안내','',f=='site')+opt('mt','no','영업 아님','',f=='no'),b:'확정하고 검토 ID 만들기',ok:['RV-2026-0142 생성 · [탱크 담당자] 배정','캘린더에 현설 10/20, 마감 10/30 등록','표준 폴더 생성 · 첨부 5개 원본 저장']}},
+ gonogo:function(){return{h:'<h1>울산 저장탱크 4기, 참여를 올릴까요?</h1><p class="lead">AI가 입찰 문서 5종과 유사견적 5건으로 보고서 초안을 만들었습니다.</p>'+facts([['AI 추천','참여'],['참여 요건','충족 · 동종 실적 2건'],['가장 비슷한 견적','QP-2025-0033 · 수주'],['주요 리스크','지체상금 상한 없음 외 1']])+'<label for="op" style="font-weight:700;font-size:13px">상신 의견</label><textarea id="op" style="width:100%;min-height:80px;margin-top:6px;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit">현설 전 참여 결정 요청드립니다.</textarea>',b:'참여 결정 상신',ok:['[영업팀장] → [임원] 결재 요청','승인되면 QP 생성 · AVL v3 고정']}},
+ rate:function(){var L=[['l1','강관 6" Sch40','68,500 원/m','64,500','+6.2%'],['l2','비계 설치·해체','11,700 원/㎡','11,300','+3.5%'],['l3','배관 용접 6"','23,120 원/DI','22,400','+3.2%']];return{h:'<h1>작년보다 많이 오른 3개 항목을 확인해 주세요</h1><p class="lead">S-OIL 온산 TA 배관 · 2025 수주 견적 단가와 비교</p><div class="lines">'+L.map(function(r){var v=S.f[r[0]]||'keep';return '<div class="line"><div><b>'+r[1]+'</b><div class="muted" style="font-size:13px">이번 '+r[2]+' · 작년 '+r[3]+' <span class="up">'+r[4]+'</span></div></div><div class="seg"><button type="button" data-seg="'+r[0]+'" data-v="keep" class="'+(v=='keep'?'on':'')+'">유지</button><button type="button" data-seg="'+r[0]+'" data-v="adj" class="'+(v=='adj'?'on':'')+'">조정</button></div></div>'}).join('')+'</div><div class="aibox"><b>AI</b><div>실주한 해는 직접비가 전년보다 늘었습니다. 지금 565백만(+3.1%)입니다.</div></div>',b:'확인 완료',ok:['단가 확인 3건 기록','견적 체크리스트 4/6']}},
+ rfq:function(){return{h:'<h1>밸브 가격을 어느 업체에 요청할까요?</h1><p class="lead">S-OIL AVL v2 기준 밸브 승인 업체</p>'+'<label class="opt on"><input type="checkbox" checked>[밸브 업체 A]<span class="r">최근 견적 09/05 · 유효</span></label><label class="opt on"><input type="checkbox" checked>[밸브 업체 B]<span class="r">재요청 필요</span></label><label class="opt"><input type="checkbox">[밸브 업체 C]<span class="r">첫 요청</span></label>',b:'선택한 업체에 요청 보내기',ok:['RFQ 발송 · 회신 기한 10/20','회신 견적은 비교표로 자동 정리']}},
+ approve:function(){var f=S.f.dec||'';return{h:'<h1>당진 LNG 배관 R2 견적을 승인할까요?</h1><p class="lead">정정공고 2차 반영 · 제출 마감 10/16</p>'+facts([['견적가','[금액]'],['리스크 / 마진','[ ]% / [ ]%'],['R1 대비','연장 +0.25km · RT 100%'],['체크리스트','22 / 22']])+opt('dec','ok','승인','',f=='ok')+opt('dec','cond','조건부 승인','',f=='cond')+opt('dec','no','반려 · R3로 수정','',f=='no'),b:'결정 저장',dis:!f,ok:['결재 이력 기록','견적서 v5 잠금 · 제출본 복사']}},
+ result:function(){var f=S.f.res||'';return{h:'<h1>아산 소방수 저장조, 결과가 나왔나요?</h1><p class="lead">세진화학 · QP-2026-0040 · R2</p>'+opt('res','won','수주','계약 10/02',f=='won')+opt('res','lost','실주','',f=='lost')+(f=='won'?'<div class="aibox" style="background:var(--won-w)"><b style="color:var(--won)">다음</b><div>WO-2026-0031을 만들고 실행예산 작성 업무를 배정합니다.</div></div>':''),b:'결과 등록',dis:!f,ok:f=='lost'?['실주 등록 · 실패요인 분석 업무 생성']:['WO-2026-0031 생성 · 수주 표시','실행예산 작성 업무 배정']}}
+};
+function vFocus(id){
+ var i=-1;TASKS.forEach(function(t,k){if(t.id==id)i=k});if(i<0){location.hash='home';return ''}
+ var t=TASKS[i],v=FV[id]();
+ var dots=TASKS.map(function(x,k){return '<i class="'+(k==i?'cur':(S.done[x.id]?'done':''))+'"></i>'}).join('');
+ var top='<div class="ftop"><a class="btn sm" href="#home">‹ 홈</a><div class="fdots">'+dots+'</div><a class="btn sm" href="index.html">인트로</a></div>';
+ var nx=null;for(var k=1;k<=TASKS.length;k++){var j=(i+k)%TASKS.length;if(!S.done[TASKS[j].id]){nx=TASKS[j];break}}
+ var body,bar;
+ if(S.done[id]){body='<div class="okc"><div class="ic"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h1>'+t.title+' 완료</h1><p class="lead" style="margin:0">'+t.desc+'</p><ul>'+S.done[id].map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div>';
+  bar='<a class="btn" href="#home">홈</a>'+(nx?'<a class="btn pri grow" href="#focus/'+nx.id+'">다음 업무 · '+nx.title+' ›</a>':'<a class="btn pri grow" href="#home">오늘 할 일 끝</a>')}
+ else{body='<div class="muted" style="font-size:13px"><span class="tag t-rv">'+t.role+'</span> '+(i+1)+' / '+TASKS.length+'</div>'+v.h;
+  bar='<a class="btn" href="'+(nx?'#focus/'+nx.id:'#home')+'">나중에</a><button class="btn pri grow" type="button" data-done="'+id+'" '+(v.dis?'disabled style="opacity:.4"':'')+'>'+v.b+'</button>'}
+ return top+'<div class="focus">'+body+'</div><div class="focus-role">'+roleBox('focus')+'</div><div class="fbar"><div class="in">'+bar+'</div></div>';
+}
+
+/* ---- 캘린더 ---- */
+function vCal(){
+ var evs=EV.filter(function(e){return !e.g||S.ghost});
+ var start=new Date(2026,8,27),cells='';
+ ['일','월','화','수','목','금','토'].forEach(function(d){cells+='<div class="dow">'+d+'</div>'});
+ for(var i=0;i<35;i++){var dt=new Date(start);dt.setDate(start.getDate()+i);var k=key(dt);var l=evs.filter(function(e){return e.d==k});
+  cells+='<div class="day'+(dt.getMonth()!=9?' out':'')+(k==TODAY?' today':'')+'"><span class="dn">'+dt.getDate()+'</span>'+l.slice(0,3).map(function(e){var ix=EV.indexOf(e);return '<button type="button" class="ev e-'+e.t+(e.g?' ghost':'')+(S.sel===ix?' sel':'')+'" data-ev="'+ix+'" title="'+e.title+'">'+e.title+'</button>'}).join('')+(l.length>3?'<span class="faint" style="font-size:11px">+'+(l.length-3)+'</span>':'')+'</div>'}
+ var side;
+ if(S.sel===null){side='<section class="card"><div class="ch"><h2>일정을 누르면 상세</h2></div><div class="cb muted" style="font-size:13px">고객사 이력, 진행 상태, 같은 계열의 지난 결과가 여기에 나옵니다.</div></section>'}
+ else{var e=EV[S.sel],C=CUST[e.cust];side='<section class="card"><div class="cb"><div style="display:flex;justify-content:space-between">'+tag(e.t)+'<button class="btn sm" type="button" data-ev="'+S.sel+'">닫기</button></div><h2 style="margin:8px 0 2px;font-size:18px">'+e.title+'</h2><div class="muted" style="font-size:13px">'+e.cust+' · '+md(e.d)+(e.id?' · '+e.id:'')+'</div></div><div class="cb" style="border-top:1px solid var(--line2)">'+(C?'<div class="kv"><span class="muted">10년 요청</span><b>'+C.req+'</b></div><div class="kv"><span class="muted">수주 / 참여</span><b>'+C.won+' / '+C.part+' ('+Math.round(C.won/C.part*100)+'%)</b></div><div class="kv"><span class="muted">주로</span><b>'+C.main+'</b></div>':'<div class="muted" style="font-size:13px">이력이 적은 고객사입니다.</div>')+'</div><div class="cb" style="border-top:1px solid var(--line2);display:flex;gap:8px;flex-wrap:wrap">'+(e.p?'<a class="btn pri" href="#project">프로젝트 열기</a>':'')+(C?'<button class="btn" type="button" data-cust="'+e.cust+'">고객사 분석</button>':'')+'</div></section>'}
+ return '<div class="ph"><div><h1>캘린더</h1><div class="s">2026년 10월 · 예시 데이터</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="chip'+(S.ghost?' on':'')+'" data-ghost="1">작년 10월 겹쳐보기</button><button class="btn pri" type="button" data-toast="일정 추가 (프로토타입)">일정 추가</button></div></div>'+
+ '<div class="two"><section class="card" style="overflow:hidden"><div class="grid">'+cells+'</div></section><div>'+side+'</div></div>';
+}
+
+/* ---- 프로젝트 목록 ---- */
+function vProjects(){
+ return '<div class="ph"><div><h1>프로젝트</h1><div class="s">검토(RV) → 견적(QP) → 수주(WO) · 예시 데이터</div></div><div class="seg"><button class="on" type="button">전체</button><button type="button">내 담당</button></div></div>'+
+ '<section class="card" style="overflow:hidden"><div class="scroll"><table><thead><tr><th>프로젝트</th><th>ID</th><th>상태</th><th>마감</th><th></th></tr></thead><tbody>'+
+ PROJ.map(function(g){return '<tr><td colspan="5" style="background:#FAFAFB;font-size:12px;font-weight:800;color:var(--sub)">'+g[0]+' · '+g[1].length+'</td></tr>'+g[1].map(function(r){var won=r[3].indexOf('수주')==0;return '<tr class="'+(won?'won':'')+'"><td><b>'+r[0]+'</b><div class="muted" style="font-size:12px">'+r[1]+'</div></td><td style="font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap">'+r[2]+'</td><td>'+(won?tag('won',r[3]):(r[3]=='실주'?tag('lost'):tag(r[2].indexOf('RV')==0?'rv':'qp',r[3])))+'</td><td>'+r[4]+'</td><td class="num">'+(r[5]?'<a class="btn sm pri" href="#project">열기</a>':'<button class="btn sm" type="button" data-toast="예시에서는 S-OIL 온산 TA 건만 열립니다">열기</button>')+'</td></tr>'}).join('')}).join('')+
+ '</tbody></table></div></section>';
+}
+
+/* ---- 프로젝트 상세 ---- */
+function serBars(h){h=h||110;return '<div class="bars" style="height:'+(h+20)+'px">'+SER.map(function(r){var v=r[2],c=r[1]=='수주'?'var(--won)':(r[1]=='작성 중'?'transparent':'#D4D4D8');return '<div class="bar"><span class="v">'+(v||'불참')+'</span>'+(v?'<div style="width:100%;max-width:26px;height:'+Math.round(v/565*h)+'px;background:'+c+';border-radius:4px 4px 0 0;'+(r[1]=='작성 중'?'border:2px dashed var(--acc)':'')+'"></div>':'')+'</div>'}).join('')+'</div><div class="lbls">'+SER.map(function(r){return '<span>'+String(r[0]).slice(2)+'</span>'}).join('')+'</div>'}
+function vProject(){
+ var tabs=[['over','개요'],['docs','문서'],['quote','견적'],['tcm','협상']],body='';
+ if(S.tab=='over')body='<div class="cb"><div class="kv"><span class="muted">고객사 · 계열</span><b>S-OIL · 온산 TA 배관 (10년차)</b></div><div class="kv"><span class="muted">현설 · 마감</span><b>10/08 · 10/24</b></div><div class="kv"><span class="muted">적용 AVL</span><b>S-OIL v2</b></div><div style="font-weight:700;margin:14px 0 4px">견적 체크리스트 3 / 6</div>'+
+  [['BM List 물량 검증',1,'문서 분석'],['AVL 업체 밸브·플랜지 가격 요청',1,'AVL'],['노무비 기준: 내부 실적',1,'비용 이력'],['RT 10% 유지 여부 질의',0,'지난해 TCM'],['야간 작업 할증 반영',0,'입찰안내서'],['견적 승인 상신',0,'결재']].map(function(c){return '<label class="chk"><input type="checkbox" '+(c[1]?'checked':'')+'>'+c[0]+'<span class="src">'+c[2]+'</span></label>'}).join('')+'</div>';
+ if(S.tab=='docs')body='<div class="cb"><div class="muted" style="font-size:12px;margin-bottom:8px">20_영업프로젝트 / 2026 / RV-2026-0151 · 표준 폴더 (읽기 전용 · 체크인으로 업로드)</div>'+[['입찰안내서.pdf','v1','원본'],['BM_List.xlsx','v2','10/13 수정'],['현설 회의록.docx','v1','10/08'],['QP-2026-0063_견적서_v3.xlsx','v3','작업 중 · [공사 담당자]']].map(function(d){return '<div class="kv"><span>'+d[0]+' <span class="faint">'+d[1]+'</span></span><span class="muted">'+d[2]+'</span></div>'}).join('')+'<div style="margin-top:12px;display:flex;gap:8px"><button class="btn sm" type="button" data-toast="내 작업 폴더로 가져왔습니다 (프로토타입)">체크아웃</button><button class="btn sm pri" type="button" data-toast="표준 이름으로 v4 저장 (프로토타입)">업로드 (체크인)</button></div></div>';
+ if(S.tab=='quote'){var inb=S.basis=='in';body='<div class="cb"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px"><b>주요 4개 공종</b><div class="seg"><button type="button" data-basis="in" class="'+(inb?'on':'')+'">내부 실적 노무비</button><button type="button" data-basis="pm" class="'+(!inb?'on':'')+'">표준품셈 노무비</button></div></div><div class="scroll"><table><thead><tr><th>공종</th><th class="num">금액</th><th class="num">작년 수주 단가 대비</th></tr></thead><tbody>'+
+  [['배관 용접 6"',inb?'27,744,000':'33,600,000','+3.2%'],['배관 설치',inb?'27,072,500':'25,500,000','+3.1%'],['비계 설치·해체',inb?'11,232,000':'12,960,000','+3.5%'],['탄소강관 6"','61,136,250','+6.2%']].map(function(r){return '<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td><td class="num up">'+r[2]+'</td></tr>'}).join('')+'<tr><td><b>소계</b></td><td class="num"><b>'+(inb?'127,184,750':'133,196,250')+'</b></td><td></td></tr></tbody></table></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn sm pri" href="#est/civil">상세 견적서 열기</a></div><div class="kv" style="margin-top:8px"><span class="muted">직접비 (전체)</span><b>'+(inb?'565.0':'571.0')+' 백만 · 작년 수주 548.0 대비 <span class="up">'+(inb?'+3.1%':'+4.2%')+'</span></b></div></div>'}
+ if(S.tab=='tcm')body='<div class="cb muted" style="font-size:13px">제출 후 열립니다. 지난해 TCM 메모: RT 비율 20% → 10% 조정 수용, 야간 할증은 별도 항목 요청.</div>';
+ return '<section class="card"><div class="cb" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-end"><div><div class="muted" style="font-size:13px"><a href="#projects">프로젝트</a> › S-OIL · 온산 TA 배관 계열 · 예시 데이터</div><h1 style="margin:2px 0 0;font-size:24px;font-weight:800">S-OIL 온산 TA 배관 2026</h1><div class="muted" style="font-size:13px">RV-2026-0151 → QP-2026-0063 · R0 · 마감 10/24 <b style="color:var(--due)">D-9</b></div></div><button class="btn" type="button" data-act="ai">이 건에 대해 묻기</button></div>'+
+ '<div class="steps"><div class="done"><div class="k">① 수신</div>10/08</div><div class="done"><div class="k">② 검토·참여</div>10/10 승인</div><div class="now"><div class="k">③ 견적·승인</div><b>견적 작성 중</b></div><div><div class="k">④ 제출·협상</div>—</div><div><div class="k">⑤ 결과</div>—</div></div></section>'+
+ '<div class="two"><div style="display:flex;flex-direction:column;gap:16px"><div class="now-card"><div style="flex:1;min-width:220px"><div class="k">지금 할 일</div><b>'+(S.done.rate?'업체 가격 요청 (밸브)':'작년보다 많이 오른 3개 항목 확인')+'</b></div><a class="btn" href="#focus/'+(S.done.rate?'rfq':'rate')+'">처리하기 ›</a></div>'+
+ '<section class="card"><div class="ch"><div class="seg">'+tabs.map(function(t){return '<button type="button" data-tab="'+t[0]+'" class="'+(S.tab==t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div></div>'+body+'</section></div>'+
+ '<aside style="display:flex;flex-direction:column;gap:16px"><section class="card"><div class="ch"><h2>이 계열의 10년</h2><span class="faint" style="font-size:12px">직접비 · 백만원</span></div><div class="cb">'+serBars()+'<div class="faint" style="font-size:12px;margin-top:6px">초록 = 수주 · 회색 = 실주 · 점선 = 작성 중</div></div><div class="cb" style="border-top:1px solid var(--line2)"><div class="aibox"><b>AI</b><div>실주한 해는 직접비가 전년보다 늘었습니다. 지금 +3.1%.</div></div></div></section>'+
+ '<section class="card"><div class="ch"><h2>S-OIL</h2><button class="btn sm" type="button" data-cust="S-OIL">고객사 분석</button></div><div class="cb"><div class="kv"><span class="muted">10년 요청</span><b>101</b></div><div class="kv"><span class="muted">수주 / 참여</span><b>23 / 74 (31%)</b></div><div class="kv"><span class="muted">요청이 몰리는 달</span><b>2~3월 · 9월</b></div></div></section></aside></div>';
+}
+
+/* ---- 분석 ---- */
+function vAnalysis(){
+ var seg='<div class="seg"><button type="button" data-an="cust" class="'+(S.an=='cust'?'on':'')+'">고객사 요청 패턴</button><button type="button" data-an="labor" class="'+(S.an=='labor'?'on':'')+'">노무비 · 품셈 비교</button><button type="button" data-an="mat" class="'+(S.an=='mat'?'on':'')+'">자재 단가</button></div>',b='';
+ if(S.an=='cust'){var c=S.cust,C=CUST[c],H=heatOf(c),mx=0;H.forEach(function(r){r.forEach(function(v){mx=Math.max(mx,v)})});
+  var rows='';for(var yi=9;yi>=0;yi--){rows+='<tr><td style="text-align:left;font-weight:700;font-size:12px">'+YEARS[yi]+'</td>'+H[yi].map(function(v,mi){var fut=yi==9&&mi>9,a=v?(0.2+0.8*v/mx):0;return '<td><div class="cell" style="background:'+(fut?'transparent':(v?'rgba(67,56,202,'+a.toFixed(2)+')':'#F2F2F4'))+';color:'+(a>0.55?'#fff':'#3F3F46')+'">'+(fut?'':(v||''))+'</div></td>'}).join('')+'<td class="num"><b>'+C.trend[yi]+'</b></td><td class="num"><span class="tag t-won">'+C.wonY[yi]+'</span></td></tr>'}
+  b='<div style="display:flex;gap:8px;flex-wrap:wrap">'+Object.keys(CUST).map(function(k){return '<button type="button" class="chip'+(k==c?' on':'')+'" data-cust="'+k+'">'+k+'</button>'}).join('')+'</div>'+
+  '<section class="card kpis"><div class="kpi"><div class="l">10년 요청</div><div class="v">'+C.req+'</div><div class="s">연 평균 '+(C.req/10).toFixed(1)+'건</div></div><div class="kpi"><div class="l">참여</div><div class="v">'+C.part+'</div><div class="s">'+Math.round(C.part/C.req*100)+'%</div></div><div class="kpi"><div class="l">수주</div><div class="v" style="color:var(--won)">'+C.won+'</div><div class="s">참여 대비 '+Math.round(C.won/C.part*100)+'%</div></div><div class="kpi"><div class="l">주요 요청</div><div class="v" style="font-size:16px;padding-top:6px">'+C.main+'</div></div></section>'+
+  '<div class="two"><section class="card" style="overflow:hidden"><div class="ch"><h2>연도 × 월 요청</h2><span class="faint" style="font-size:12px">진할수록 많음 · 초록 = 그 해 수주</span></div><div class="scroll" style="padding:8px"><table class="heat"><thead><tr><th></th>'+[1,2,3,4,5,6,7,8,9,10,11,12].map(function(m){return '<th style="font-size:11px">'+m+'월</th>'}).join('')+'<th>합계</th><th>수주</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>'+
+  '<section class="card"><div class="ch"><h2>반복 프로젝트 계열</h2></div><div class="cb">'+C.ser.map(function(s){return '<div style="padding:8px 0;border-bottom:1px solid var(--line2)"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+s[0]+'</b><span class="muted" style="font-size:12px">'+s[1]+' · '+s[2]+'회</span></div><div style="margin-top:4px">'+s[3].map(function(y){return '<span class="yrchip">'+y+' 수주</span>'}).join('')+'</div></div>'}).join('')+'</div></section></div>'}
+ if(S.an=='labor')b='<section class="card kpis"><div class="kpi"><div class="l">표준품셈 노무비</div><div class="v">72.06<span style="font-size:13px"> 백만</span></div></div><div class="kpi"><div class="l">내부 실적 노무비</div><div class="v">66.05<span style="font-size:13px"> 백만</span></div></div><div class="kpi"><div class="l">차이</div><div class="v dn">−8.3%</div><div class="s">−6,011,500원</div></div><div class="kpi"><div class="l">차이 구성</div><div style="font-weight:700;margin-top:6px">인공 −4,211,000</div><div style="font-weight:700">단가 −1,800,500</div></div></section>'+
+  '<section class="card" style="overflow:hidden"><div class="scroll"><table><thead><tr><th>공종</th><th class="num">물량</th><th class="num">품셈 노무비</th><th class="num">내부 노무비</th><th class="num">차이</th></tr></thead><tbody>'+LABOR.map(function(r){return '<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td><td class="num">'+r[2]+'</td><td class="num">'+r[3]+'</td><td class="num '+(r[4][0]=='+'?'up':'dn')+'">'+r[4]+'</td></tr>'}).join('')+'</tbody></table></div><div class="cb" style="border-top:1px solid var(--line2)"><div class="aibox"><b>AI</b><div>차이의 70%는 용접 생산성(실적 인공 0.085, 품셈 대비 0.85)입니다. 배관 설치는 품셈 기준이 더 유리합니다. 단가는 예시 값입니다.</div></div></div></section>';
+ if(S.an=='mat'){var m=MATS[S.mat],mx2=Math.max.apply(null,m[5]),mn=Math.min.apply(null,m[5]);
+  b='<div class="two"><section class="card" style="overflow:hidden"><div class="scroll"><table><thead><tr><th>자재 코드</th><th>품명 · 규격</th><th>단위</th><th class="num">최근 단가</th><th class="num">1년</th></tr></thead><tbody>'+MATS.map(function(r,i){return '<tr data-mat="'+i+'" style="cursor:pointer;'+(i==S.mat?'background:var(--acc-w)':'')+'"><td style="font-size:12px;font-weight:700">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="num">'+r[3]+'</td><td class="num '+(r[4][0]=='+'?'up':(r[4][0]=='−'?'dn':''))+'">'+r[4]+'</td></tr>'}).join('')+'</tbody></table></div></section>'+
+  '<section class="card"><div class="ch"><h2>'+m[1]+'</h2></div><div class="cb"><div class="bars" style="height:120px">'+m[5].map(function(v){var hh=mx2==mn?60:Math.round(30+(v-mn)/(mx2-mn)*70);return '<div class="bar"><span class="v">'+v+'</span><div style="width:100%;max-width:28px;height:'+hh+'px;background:#C7C4F5;border-radius:4px 4px 0 0"></div></div>'}).join('')+'</div><div class="lbls"><span>25.10</span><span>26.01</span><span>26.04</span><span>26.07</span><span>26.10</span></div><button class="btn" type="button" data-toast="AVL 업체에 가격 요청 (프로토타입)" style="width:100%;margin-top:12px">AVL 업체에 가격 요청</button></div></section></div>'}
+ return '<div class="ph"><div><h1>분석</h1><div class="s">견적·참여 판단의 근거 데이터 · 예시 데이터</div></div>'+seg+'</div>'+b;
+}
+
+/* ---- 경영 ---- */
+function vExec(){
+ var mo=[[25,28],[31,35],[38,41],[32,30],[24,26],[30,33],[27,29],[26,24],[28,31],[30,35]];
+ var dec=[['d1','견적','당진 LNG 배관 R2','D-1 · 체크리스트 22/22'],['d2','참여','울산 저장탱크 4기','AI 추천: 참여 · 리스크 2']];
+ return '<div class="ph"><div><h1>경영</h1><div class="s">2026년 1~10월 · 예시 데이터</div></div></div>'+
+ '<section class="card kpis"><div class="kpi"><div class="l">요청</div><div class="v">312</div><div class="s"><span class="dn">+7.2%</span> 작년 동기 291</div></div><div class="kpi"><div class="l">참여</div><div class="v">198</div><div class="s">63%</div></div><div class="kpi"><div class="l">수주</div><div class="v" style="color:var(--won)">61</div><div class="s">참여 대비 30.8%</div></div><div class="kpi"><div class="l">진행 중</div><div class="v">25</div><div class="s">검토 12 · 견적 10 · 협상 3</div></div></section>'+
+ '<div class="two"><section class="card"><div class="ch"><h2>월별 요청 · 올해 vs 작년</h2><span class="faint" style="font-size:12px">진한색 2026 · 연한색 2025</span></div><div class="cb"><div class="bars" style="height:160px;gap:12px">'+mo.map(function(x){return '<div class="bar" style="flex-direction:row;align-items:flex-end;justify-content:center;gap:3px"><div style="width:40%;max-width:14px;height:'+Math.round(x[0]*3.5)+'px;background:#D4D4D8;border-radius:3px 3px 0 0"></div><div style="width:40%;max-width:14px;height:'+Math.round(x[1]*3.5)+'px;background:var(--acc);border-radius:3px 3px 0 0"></div></div>'}).join('')+'</div><div class="lbls" style="gap:12px">'+[1,2,3,4,5,6,7,8,9,10].map(function(m){return '<span>'+m+'월</span>'}).join('')+'</div></div></section>'+
+ '<section class="card"><div class="ch"><h2>결정 대기</h2></div>'+dec.map(function(d){var v=S.dec[d[0]];return '<div class="cb" style="border-bottom:1px solid var(--line2)"><div style="display:flex;justify-content:space-between;gap:8px">'+tag(d[1]=='견적'?'qp':'rv',d[1])+(v?tag('won',v):'')+'</div><div style="font-weight:700;margin-top:6px">'+d[2]+'</div><div class="muted" style="font-size:12px">'+d[3]+'</div>'+(v?'':'<div style="display:flex;gap:6px;margin-top:10px"><button class="btn sm" type="button" data-dec="'+d[0]+'" data-v="반려" style="color:#B42318">반려</button><button class="btn sm" type="button" data-dec="'+d[0]+'" data-v="조건부">조건부</button><button class="btn sm pri" type="button" data-dec="'+d[0]+'" data-v="승인">승인</button><a class="btn sm" href="#focus/'+(d[0]=='d1'?'approve':'gonogo')+'">자세히</a></div>')+'</div>'}).join('')+
+ '<div class="cb"><div class="aibox"><b>AI</b><div>동해정밀화학 요청이 예년의 절반 이하, 대성건설 수주율은 3년 연속 상승입니다.</div></div></div></section></div>';
+}
+
+function aiPanel(){
+ var el=document.getElementById('aid');if(!S.ai){el.innerHTML='';return}
+ el.innerHTML='<aside class="aid" aria-label="AI 문서 검색"><div class="ch"><div><h2>AI · 문서 검색</h2><div class="faint" style="font-size:12px">권한: 담당 · 대외비는 검색하지 않음</div></div><button class="btn sm" type="button" data-act="ai">닫기</button></div><div class="bd">'+
+ (S.chat.length?S.chat.map(function(m){return '<div class="bub '+m[0]+'">'+m[1]+(m[2]?'<div>'+m[2].map(function(s){return '<span class="sr">'+s+'</span>'}).join('')+'</div>':'')+'</div>'}).join(''):'<div class="muted" style="font-size:13px">공용 드라이브 문서, 10년 요청 이력, 견적·비용 이력에서 찾아 근거와 함께 답합니다.</div>')+
+ '<div>'+AIQA.map(function(q,i){return '<button type="button" class="qchip" data-ask="'+i+'">'+q[0]+'</button>'}).join('')+'</div></div></aside>';
+}
+
+function render(){
+ var h=(location.hash||'#home').slice(1),app=document.getElementById('app');
+ if(h.indexOf('focus/')==0){S.route='focus';app.innerHTML=vFocus(h.slice(6));aiPanel();window.scrollTo(0,0);return}
+ if(h=='est/civil'||h=='est/tank'){S.route=h;app.innerHTML=page(document.getElementById('tpl-est-'+h.slice(4)).innerHTML,h);aiPanel();return}
+ S.route=['home','calendar','projects','project','analysis','exec'].indexOf(h)>=0?h:'home';
+ var v={home:vHome,calendar:vCal,projects:vProjects,project:vProject,analysis:vAnalysis,exec:vExec}[S.route]();
+ app.innerHTML=page(v,S.route);aiPanel();
+}
+document.addEventListener('click',function(e){
+ var el=e.target.closest('button,tr[data-mat]');if(!el)return;var g=function(a){return el.getAttribute(a)};
+ if(g('data-role')){S.role=g('data-role');render()}
+ else if(g('data-done')){var id=g('data-done');S.done[id]=FV[id]().ok;render()}
+ else if(g('data-seg')){S.f[g('data-seg')]=g('data-v');render()}
+ else if(g('data-ev')!==null&&g('data-ev')!==undefined&&el.hasAttribute('data-ev')){var i=+g('data-ev');S.sel=S.sel===i?null:i;render()}
+ else if(g('data-ghost')){S.ghost=!S.ghost;render()}
+ else if(g('data-cust')){S.cust=g('data-cust');S.an='cust';if(location.hash=='#analysis')render();else location.hash='analysis'}
+ else if(g('data-tab')){S.tab=g('data-tab');render()}
+ else if(g('data-basis')){S.basis=g('data-basis');render()}
+ else if(g('data-an')){S.an=g('data-an');render()}
+ else if(el.hasAttribute('data-mat')){S.mat=+g('data-mat');render()}
+ else if(g('data-dec')){S.dec[g('data-dec')]=g('data-v');render();toast(g('data-v')+' 처리했습니다')}
+ else if(g('data-act')=='ai'){S.ai=!S.ai;aiPanel()}
+ else if(g('data-ask')){var q=AIQA[+g('data-ask')];S.chat.push(['q',q[0]],['a',q[1],q[2]]);aiPanel()}
+ else if(g('data-toast')){toast(g('data-toast'))}
+ else if(el.closest('.seg')&&!el.attributes.length<2){var p=el.parentElement;Array.prototype.forEach.call(p.children,function(x){x.classList.remove('on')});el.classList.add('on')}
+});
+document.addEventListener('change',function(e){var el=e.target;if(el.hasAttribute('data-f')){S.f[el.getAttribute('data-f')]=el.value;render()}});
+window.addEventListener('hashchange',function(){render();window.scrollTo(0,0)});
+render();
+})();
+</script>
+</body>
+</html>
