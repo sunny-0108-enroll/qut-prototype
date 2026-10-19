@@ -32,6 +32,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
 .btn.pri:hover{background:#185836;color:#fff}
 
+/* ── gate switcher ── */
+.gates{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--surf);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin}
+.gates .lb{flex:none;font-size:12px;font-weight:600;color:var(--sub);margin-right:4px}
+.gl{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--surf);color:var(--ink);font-size:12.5px;font-weight:600;white-space:nowrap}
+.gl:hover{background:var(--bg);color:var(--ink);border-color:#C9CDD3}
+.gl small{font-weight:500;color:var(--sub)}
+.gl.on{background:#101828;border-color:#101828;color:#fff}
+.gl.on small{color:#C9D3E4}
+.gl.on::before{content:"↩";font-weight:700}
+
 /* ── formula bar ── */
 .fx{display:flex;align-items:stretch;background:var(--surf);border-bottom:1px solid var(--line);min-height:34px}
 .nbox{flex:none;width:92px;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--line);font-weight:600;font-variant-numeric:tabular-nums}
@@ -93,7 +103,7 @@ td.c a{color:#0563C1;text-decoration:underline}
   .zoom input{width:70px}
 }
 @media print{
-  .top,.fx,.bottom{display:none}
+  .top,.gates,.fx,.bottom{display:none}
   .app{height:auto}
   .gridwrap{overflow:visible}
   table.sh thead,th.rn{display:none}
@@ -112,6 +122,7 @@ td.c a{color:#0563C1;text-decoration:underline}
       <a class="btn pri" href="플랜트_EPC_입찰견적서_샘플.xlsx" download>⬇ <span>엑셀 다운로드</span></a>
     </div>
   </header>
+  <nav class="gates" id="gates" aria-label="게이트 화면으로 이동"></nav>
   <div class="fx">
     <div class="nbox" id="nbox">A1</div>
     <div class="fxl">fx</div>
@@ -148,6 +159,15 @@ var MODEL = {"sheets":[{"name":"표지","group":"cover","rows":26,"cols":3,"widt
   if(!/^[\w\-]+\.html(#[^<>"']*)?$/.test(back)) back = from && GATE[from] ? from + '.html' : (document.referrer && /\.html/.test(document.referrer) ? document.referrer : 'index.html');
   document.getElementById('back').href = back;
   document.getElementById('backlbl').textContent = (GATE[from] || (/gate-([a-e])/i.exec(back) ? 'Gate ' + /gate-([a-e])/i.exec(back)[1].toUpperCase() : '이전 화면')) + '로 돌아가기';
+
+  // gate switcher: 원래 열었던 화면은 그 위치(해시)로, 나머지는 각 게이트 첫 화면으로
+  var GLIST = [['index','인트로','전체 Gate 목록'],['gate-a','Gate A','업무 흐름형'],['gate-b','Gate B','데이터 허브'],['gate-c','Gate C','캘린더 중심'],['gate-d','Gate D','한 화면 한 업무'],['gate-e','Gate E','통합안']];
+  var origin = from || ((/(gate-[a-e]|index)\.html/.exec(back)||[])[1]) || '';
+  document.getElementById('gates').innerHTML = '<span class="lb">화면 이동</span>' + GLIST.map(function(g){
+    var on = g[0]===origin, href = on ? back : g[0]+'.html';
+    return '<a class="gl'+(on?' on':'')+'" href="'+esc(href)+'" title="'+(on?'열었던 화면으로 돌아가기':g[1]+' 화면으로 이동')+'">'+g[1]+' <small>'+g[2]+'</small></a>';
+  }).join('');
+  var gon = document.querySelector('.gl.on'); if(gon){ var gn=document.getElementById('gates'); gn.scrollLeft = gon.offsetLeft - 80; }
 
   function colName(n){var s='';while(n>0){var m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s}
   function addr(r,c){return colName(c)+r}
