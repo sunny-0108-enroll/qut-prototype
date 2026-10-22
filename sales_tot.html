@@ -4562,6 +4562,59 @@ VIEWS.flow.after = () => {
   const f = document.getElementById('dflow'); if (f) f.srcdoc = oflowAt('store');
 };
 
+/* ---------- 흐름도 새 창 보기: 가로를 화면 폭에 맞추고 세로 스크롤만 ---------- */
+const FIT_JS = `<style>.wrap{overflow:hidden!important}.col-h{transform:none!important}</style><script>(function(){function fit(){document.querySelectorAll('.wrap').forEach(function(w){var b=w.querySelector('.board');if(!b||!b.offsetWidth)return;b.style.transform='';var s=Math.min(1,(w.clientWidth-8)/b.offsetWidth);b.style.transformOrigin='0 0';b.style.transform='scale('+s+')';w.style.height=Math.ceil(b.offsetHeight*s+36)+'px';});}
+var t;new MutationObserver(function(){clearTimeout(t);t=setTimeout(fit,60);}).observe(document.body,{childList:true,subtree:true});addEventListener('resize',fit);setTimeout(fit,200);})();<\/script>`;
+const fitDoc = html => html.replace('</body>', FIT_JS + '</body>');
+function openWin(html, title) {
+  const w = window.open(URL.createObjectURL(new Blob([html], {type: 'text/html'})), '_blank');
+  if (!w) toast('팝업이 차단되었습니다 · 브라우저에서 팝업을 허용해 주세요');
+}
+/* 프로토타입 액터 레인(공사·탱크)은 같은 파일의 #flowfull 경로로 새 창 */
+COMMON.push('flowfull');
+VIEWS.flowfull = () => {
+  let k = 'civil'; try { k = new URLSearchParams(location.search).get('fk') || 'civil'; } catch (e) {}
+  FLOWKEY = FLOWS[k] ? k : 'civil'; const f = FLOWS[FLOWKEY];
+  return `<div class="fftop" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px"><h1 style="margin:0;font-size:20px">${f.title.replace('첨부 흐름도', '흐름도')}</h1><span class="muted" style="font-size:12.5px">화면 폭에 맞춰 축소 · 세로로만 스크롤</span><span style="flex:1"></span><button class="btn" type="button" onclick="window.close()">닫기</button></div>
+    <section class="panel" style="overflow:hidden"><div class="slwrap" id="ffw" style="overflow:hidden;padding:0"><div class="slin">${flowBoard(f)}</div></div></section>`;
+};
+VIEWS.flowfull.after = () => {
+  const f = FLOWS[FLOWKEY], w = document.getElementById('ffw'), inn = w && w.querySelector('.slin'); if (!inn) return;
+  document.querySelectorAll('.sl-c').forEach((c, i) => c.dataset.c = i % f.cols.length);
+  const fit = () => { inn.style.transform = ''; w.style.height = ''; drawEdges(f); const s = Math.min(1, w.clientWidth / inn.scrollWidth); inn.style.transformOrigin = '0 0'; inn.style.transform = `scale(${s})`; w.style.height = Math.ceil(inn.scrollHeight * s) + 'px'; };
+  requestAnimationFrame(fit); window.onresize = fit;
+};
+const _standalone2 = standalone;
+standalone = (h, body) => h === 'flowfull' ? `<main class="main" style="max-width:none;padding:16px 20px">${body}</main>` : _standalone2(h, body);
+const ffBtn = k => `<button class="btn rbtn" type="button" data-ffopen="${k}" style="min-height:28px;font-size:12.5px">⤢ 새 창으로 전체 보기</button>`;
+const _flowV3 = VIEWS.flow, _flowA3 = VIEWS.flow.after;
+VIEWS.flow = () => {
+  let h = _flowV3();
+  if (FLOWKEY === 'civil' || FLOWKEY === 'tank') h = h.replace(/(<section class="panel"><div class="ph"><h2>[\s\S]*?<\/h2>)(<span class="muted" style="font-size:12px">)/, `$1<span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${ffBtn(FLOWKEY)}$2`).replace(/(주황 테두리 = 흐름도 8단계에 없던 단계 추가|설명서 4\.3 탱크형 흐름 기준 · 외주업체 레인 추가)<\/span>/, '$1</span></span>');
+  if (FLOWKEY === 'data') h = h.replace('<span class="muted" style="font-size:12px">메일 → 일자별 정리', `${ffBtn('data')}<span class="muted" style="font-size:12px">메일 → 일자별 정리`);
+  return h;
+};
+VIEWS.flow.after = () => { _flowA3(); const f = document.getElementById('dflow'); if (f && FLOWKEY === 'data') f.srcdoc = fitDoc(oflowAt('store')); };
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-ffopen]'); if (!b) return; e.preventDefault(); e.stopPropagation();
+  const k = b.dataset.ffopen;
+  if (k === 'data' || k === 'orig') { openWin(fitDoc(oflowAt(k === 'data' ? 'store' : 'current')), '흐름도'); return; }
+  const w = window.open(location.pathname + '?fk=' + k + '#flowfull', '_blank'); if (!w) toast('팝업이 차단되었습니다 · 브라우저에서 팝업을 허용해 주세요');
+}, true);
+/* '흐름도 8단계' 팝업에도 새 창 버튼 */
+const _openOFlow = openOFlow;
+openOFlow = () => { _openOFlow(); const f = document.querySelector('.dw .dw-f'); if (f && !f.querySelector('[data-ffopen]')) f.insertAdjacentHTML('beforeend', ffBtn('orig')); const fr = document.querySelector('.dw iframe'); if (fr) fr.srcdoc = fitDoc(OFLOW_HTML); };
+
+/* ---------- 새 창 열림 아이콘 · '흐름도 8단계' 링크는 새 창으로 ---------- */
+const EXT_I = '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-left:3px"><path d="M9 2.5h4.5V7"/><path d="M13.5 2.5 7.5 8.5"/><path d="M12 9.5v3.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5H7"/></svg>';
+const _flowV4 = VIEWS.flow;
+VIEWS.flow = () => _flowV4()
+  .replace(/<button type="button" data-oflow title="원본 흐름도 보기"([^>]*)>흐름도 8단계<\/button>/, `<button type="button" data-ffopen="orig" title="원본 흐름도를 새 창으로 열기"$1>흐름도 8단계${EXT_I}</button>`)
+  .replace(/⤢ 새 창으로 전체 보기<\/button>/g, `새 창으로 전체 보기${EXT_I}</button>`);
+document.addEventListener('click', e => { const b = e.target.closest('.dw-f [data-ffopen]'); if (b && !b.querySelector('svg')) b.insertAdjacentHTML('beforeend', EXT_I); }, true);
+const _openOFlow2 = openOFlow;
+openOFlow = () => { _openOFlow2(); const b = document.querySelector('.dw .dw-f [data-ffopen]'); if (b) b.innerHTML = '새 창으로 전체 보기' + EXT_I; };
+
 render();
 })();
 </script>
