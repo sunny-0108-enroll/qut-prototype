@@ -365,6 +365,8 @@ nav .sep{width:1px;background:var(--border);margin:6px 8px 10px}
     <li>공사 견적 AI의 8단계 프로세스 흐름이다.</li>
     <li><b>AI 처리</b>(문서를 읽고 판단하거나 초안을 만듦)와 <b>시스템</b>(등록·저장·계산·이력처럼 정해진 규칙대로 처리)을 다른 레인으로 나눠, AI가 어디에 들어가는지 보이게 했다.</li>
     <li>'보류' 박스는 지금 프로세스에 없어도 되는 기능이라 상세 정리에서 뺀다.</li>
+    <li><b>결재선 (공사·탱크 공통)</b>: 담당 상신 → <b>영업임원 검토</b> → <b>대표 최종</b>. 영업임원이 승인하면 대표에게 자동 상신된다 (참여 결정 · 견적 승인 · 협상가 승인). 대표가 아닌 결재·상신은 의견 필수.</li>
+    <li><b>박스 ID 체계</b>: 이 흐름도의 박스 ID가 기준이다. 화면 프로토타입의 액터 레인 흐름도 같은 ID를 쓰고, 화면 단위로 더 잘게 나눈 업무는 <code>상위ID.번호</code>(예: SAL-ANL-01.1 현설 참석)로 표시한다.</li>
     <li><b>탱크 견적 트랙</b>: 대표가 참여를 결정하면 AI 에이전트가 내부 벤더사 목록에서 분야별 벤더를 골라 항목별 견적 요청을 자동으로 보내고, 받은 견적을 자동 취합·비교한다. 최적 견적금액과 벤더 후보군의 최종 결정은 탱크 견적담당자가 하고 견적서를 작성한다. 견적금액은 <b>임원 → 대표이사</b> 순으로 승인받는다 (주황 테두리 박스).</li>
     <li>예가를 낸 벤더는 <b>후보군</b>일 뿐이다. 수주 후 실제 수행사는 실행 단계에서 따로 정하며, 예가 벤더와 다를 수 있다.</li>
     <li>알림은 공통 기반 기능이라 박스로 그리지 않았다.</li>
@@ -383,7 +385,7 @@ const LANES = [
   {k:'ext', t:'발주처',        s:'외부 · 시스템 밖',     h:140, ext:true},
   {k:'sal', t:'영업',          s:'실사용자',            h:290},
   {k:'ceo', t:'대표',          s:'최종 승인자',          h:150},
-  {k:'exe', t:'임원',          s:'탱크 견적 1차 승인',    h:130},
+  {k:'exe', t:'영업임원',      s:'1차 검토 · 참여·견적·협상가', h:130},
   {k:'tnk', t:'탱크 견적담당자', s:'실사용자 · 탱크 공종',  h:160},
   {k:'vnd', t:'벤더사',        s:'외부 · 분야별 예가 견적', h:140, ext:true},
   {k:'aiv', t:'AI 에이전트',    s:'벤더 견적 자동화',      h:140},
@@ -407,7 +409,7 @@ const CUR = {
     {id:'E6',  code:'EXT-RES-01', lane:'ext', col:6, ty:'ext', t:'수주 결과 통보', s:'수주통보서·실주·유찰'},
 
     {id:'S1',  code:'SAL-RFQ-01', lane:'sal', col:0, dx:40, h:96, chg:1, t:'자료 확인·리뷰 결정', s:'일자별 폴더 확인<br>리뷰 / 제외 · 결재선 지정'},
-    {id:'S2',  code:'SAL-ANL-01', lane:'sal', col:1, ty:'dec', w:176, h:100, t:'분석 검토<br>(담당·임원)?'},
+    {id:'S2',  code:'SAL-ANL-01', lane:'sal', col:1, ty:'dec', w:176, h:100, t:'분석 검토<br>(담당)?'},
     {id:'X2', code:'SYS-DRP-01', lane:'sys', col:1, ty:'sys', dx:-70, w:150, h:84, t:'불참 처리 (자동)', s:'대표 불참 결정 시<br>인사이트 데이터 기록·종료'},
     {id:'S4',  code:'SAL-EST-01', lane:'sal', col:3, dx:-150, t:'산출 검토·견적서 작성', s:'조정 이력 · Rev.0'},
     {id:'S5',  code:'SAL-TBE-01', lane:'sal', col:4, chk:1, cp:'r', t:'제출·기술평가 대응', s:'제출·회의록·수용 목록'},
@@ -448,7 +450,10 @@ const CUR = {
     {id:'AT2', code:'AI-VND-02', lane:'aiv', col:2, ty:'ai', dx:145, w:140, h:90, chg:1, t:'수신 견적 자동 취합', s:'회신 메일 수신·분류<br>누락 벤더 자동 독촉'},
     {id:'T3', code:'TNK-SEL-01', lane:'tnk', col:3, dx:-5, w:160, h:90, chg:1, t:'최종 결정', s:'분야별 최적 견적금액<br>벤더 후보군 (복수) 확정'},
     {id:'T4', code:'TNK-EST-01', lane:'tnk', col:3, dx:190, w:150, h:90, chg:1, t:'탱크 견적서 작성', s:'견적금액 · Rev.0'},
-    {id:'EX1', code:'EXE-APR-01', lane:'exe', col:3, ty:'dec', dx:190, w:130, h:80, chg:1, t:'임원 승인?'},
+    {id:'EX1', code:'EXE-APR-02', lane:'exe', col:3, ty:'dec', dx:190, w:130, h:80, chg:1, t:'탱크 견적<br>임원 승인?'},
+    {id:'EXA', code:'EXE-ANL-01', lane:'exe', col:1, ty:'dec', dx:45, w:130, h:76, chg:1, t:'참여 검토?'},
+    {id:'EXC', code:'EXE-APR-01', lane:'exe', col:3, ty:'dec', dx:-150, w:176, h:92, chg:1, t:'견적 검토<br>(마진·리스크)?'},
+    {id:'EXN', code:'EXE-NEG-01', lane:'exe', col:5, ty:'dec', w:140, h:80, chg:1, t:'협상가 검토?'},
     {id:'C4t', code:'CEO-APR-02', lane:'ceo', col:3, ty:'dec', dx:190, w:160, h:84, chg:1, t:'탱크 견적<br>대표 승인?'},
     {id:'AT', code:'AI-TNK-01', lane:'aiv', col:3, ty:'ai', dx:-5, w:150, h:90, chg:1, t:'자동 비교·최적안', s:'항목 맞춤 비교표<br>최저가·조건 차이·최적안'},
     {id:'XT', code:'SYS-TNK-01', lane:'sys', col:3, ty:'sys', dx:190, w:150, h:84, chg:1, t:'예가·후보군 기록', s:'벤더별 예가 이력<br>수행사 확정 아님'},
@@ -465,7 +470,8 @@ const CUR = {
     ['A1','I2',   {m:'v', ox:25, st:'ref', lside:1, ly:90, l:'재분석 재료'}],
     ['I2','S2',   {m:'v', ox:-70, l:'분석 결과'}],
     ['S2','I2',   {m:'v', ox:-40, st:'back', rside:1, ly:80, l:'재분석'}],
-    ['S2','C2',   {m:'v', ox:22, lside:1, l:'상신'}],
+    ['S2','EXA',  {m:'gl', l:'상신'}],
+    ['EXA','C2',  {m:'v', ox:45, lside:1, l:'승인 → 자동 상신'}],
     ['C2','S2',   {m:'v', ox:52, l:'결정 전달'}],
     ['S2','I3a',  {m:'gr', l:'참여 시 세부 분석 요청'}],
     ['C2','T1',   {m:'gr', gox:14, l:'참여 결정 (탱크 포함 시)'}],
@@ -484,9 +490,10 @@ const CUR = {
     ['I3','S4',   {m:'gr', gox:8, l:'산출 결과', rside:1, ly:-150}],
     ['S4','I3',   {m:'grb', dy:-16, st:'back', l:'재산출 요청', lside:1, ly:-120}],
     /* 04 견적서·승인 */
-    ['S4','C4',   {m:'v', ox:-185, l:'승인 요청'}],
+    ['S4','EXC',  {m:'gl', l:'승인 요청'}],
+    ['EXC','C4',  {m:'v', ox:-150, lside:1, l:'승인 → 자동 상신'}],
     ['C4','S4',   {m:'v', ox:-115, l:'결정 전달', rside:1}],
-    ['I4','C4',   {m:'v', ox:-160, l:'요약', rside:1, ly:-60}],
+    ['I4','EXC',  {m:'v', ox:-160, l:'요약', rside:1, ly:-30}],
     ['S4','S5',   {m:'h', l:'제출'}],
     /* 04 탱크 견적서·승인 */
     ['T3','AT',   {m:'v', ox:-45, st:'back', l:'재비교 요청', lside:1}],
@@ -508,7 +515,8 @@ const CUR = {
     /* 06 가격 협상 */
     ['S5b','E5b', {m:'v', ox:-30, st:'ext', l:'최종 견적'}],
     ['E5b','S5b', {m:'v', ox:30, st:'ext', l:'협상 요청'}],
-    ['S5b','C5',  {m:'v', ox:60, l:'가격 변경 시'}],
+    ['S5b','EXN', {m:'gl', l:'가격 변경 시'}],
+    ['EXN','C5',  {m:'v', ox:0, lside:1, l:'승인 → 자동 상신'}],
     ['C5','S5b',  {m:'v', ox:10, l:'승인'}],
     ['C5','S5b',  {m:'v', ox:-30, st:'back', l:'반려', lside:1}],
     ['S5b','X6',  {m:'v', ox:-80, l:'기록'}],
@@ -720,7 +728,7 @@ const HUMAN_ACTORS = ['sal', 'tnk', 'exe', 'ceo', 'adm', 'usr'];
 const HUMAP = {
   'SAL-RFQ-01':'판단', 'SAL-ANL-01':'검토', 'CEO-ANL-01':'승인',
   'TNK-RFQ-01':'검토', 'ADM-VND-01':'관리', 'SAL-EST-01':'작성', 'CEO-APR-01':'승인',
-  'TNK-SEL-01':'최종 결정', 'TNK-EST-01':'작성', 'EXE-APR-01':'승인', 'CEO-APR-02':'승인',
+  'TNK-SEL-01':'최종 결정', 'TNK-EST-01':'작성', 'EXE-APR-01':'검토', 'EXE-APR-02':'승인', 'EXE-ANL-01':'검토', 'EXE-NEG-01':'검토', 'CEO-APR-02':'승인',
   'SAL-TBE-01':'대외 대응', 'SAL-NEG-01':'대외 대응', 'CEO-NEG-01':'승인', 'SAL-RES-01':'입력',
   'ADM-INS-02':'검토', 'ADM-PRJ-01':'관리', 'ADM-INS-01':'관리', 'ADM-DB-01':'관리',
 };
@@ -735,7 +743,7 @@ const ACTORS = [
   {k:'sal', t:'영업', s:'실사용자 · 견적 총괄'},
   {k:'tnk', t:'탱크 견적담당자', s:'실사용자 · 탱크 공종', tank:1},
   {k:'vnd', t:'벤더사', s:'외부 · 분야별 예가', ext:1, tank:1},
-  {k:'exe', t:'임원', s:'탱크 견적 1차 승인', tank:1},
+  {k:'exe', t:'영업임원', s:'1차 검토 · 참여·견적·협상가'},
   {k:'ceo', t:'대표', s:'최종 승인자'},
   {k:'ai',  t:'AI 에이전트', s:'분석·초안 + 파일서버 제어'},
   {k:'sys', t:'시스템', s:'ID·권한·이력'},
@@ -760,7 +768,8 @@ const STEPS = [
   /* 02 */
   {no:'2-1', st:1, a:'ai', ty:'ai', tr:'both', code:'AI-ANL-01', t:'초기 분석 (참여 판단)', s:'문서함 견적요청자료로 규모·지역·공기·큰 리스크', nx:'영업'},
   {no:'2-5', st:1, a:'nas', ty:'nas', tr:'both', code:'AI-ANL-01', t:'참여판단분석 Rev', s:'02_견적참고자료 · 재분석마다 Rev+1'},
-  {no:'2-2', st:1, a:'sal', ty:'dec', tr:'both', code:'SAL-ANL-01', t:'분석 검토 (담당·임원)', s:'부족하면 AI 재분석 요청', nx:'대표 상신'},
+  {no:'2-2', st:1, a:'sal', ty:'dec', tr:'both', code:'SAL-ANL-01', t:'분석 검토 (담당)', s:'부족하면 AI 재분석 요청 · 참여여부 보고서 상신', nx:'영업임원'},
+  {no:'2-2b', st:1, a:'exe', ty:'dec', tr:'both', code:'EXE-ANL-01', t:'참여 검토', s:'의견 필수 · 승인 시 대표에게 자동 상신<br>반려 → 영업 보완', nx:'대표 (자동 상신)'},
   {no:'2-3', st:1, a:'ceo', ty:'dec', tr:'both', code:'CEO-ANL-01', t:'참여 결정', s:'참여 → 영업·탱크 견적담당자<br>불참 → 자동 종료', nx:'영업 · 탱크 견적담당자'},
   {no:'2-4', st:1, a:'sys', ty:'sys', tr:'both', code:'SYS-DRP-01', t:'불참 처리 (자동)', s:'인사이트 데이터 기록 후 종료'},
   {no:'·', st:1, a:'adm', ty:'ref', tr:'both', code:'ADM-INS-01', t:'인사이트 데이터', s:'참고·배제·불참 이력 → 재분석·재산출 참고'},
@@ -776,14 +785,15 @@ const STEPS = [
   {no:'3-8', st:2, a:'nas', ty:'nas', tr:'both', code:'AI-ANL-02', t:'분석·산출 Rev', s:'02_견적참고자료 · 세부분석·물량·원가 Rev<br>탱크: 벤더별 요청서·회신 견적 원본'},
   {no:'·', st:2, a:'adm', ty:'ref', bd:'인터뷰 확인', code:'ADM-DB-01', t:'단가·기준 DB', s:'단가·공수·요율 → 물량·원가 산출 참고'},
   /* 04 일반 */
-  {no:'4-1', st:3, a:'sal', code:'SAL-EST-01', t:'산출 검토·견적서 작성', s:'조정 이력 · Rev.0, 재산출 요청 가능', nx:'대표 승인'},
-  {no:'4-2', st:3, a:'ai', ty:'ai', code:'AI-EST-01', t:'견적서 요약', s:'대표 검토용 한 장', nx:'대표'},
+  {no:'4-1', st:3, a:'sal', code:'SAL-EST-01', t:'산출 검토·견적서 작성', s:'조정 이력 · Rev.0, 재산출 요청 가능', nx:'영업임원 검토'},
+  {no:'4-2', st:3, a:'ai', ty:'ai', code:'AI-EST-01', t:'견적서 요약', s:'임원·대표 검토용 한 장', nx:'영업임원'},
+  {no:'4-2b', st:3, a:'exe', ty:'dec', code:'EXE-APR-01', t:'견적 검토 (마진·리스크율 결정)', s:'의견 필수 · 승인 시 대표에게 자동 상신<br>반려 → 영업 재작성', nx:'대표 (자동 상신)'},
   {no:'4-3', st:3, a:'ceo', ty:'dec', code:'CEO-APR-01', t:'견적 최종 승인', s:'결정 → 영업', nx:'영업 (제출)'},
   /* 04 탱크 */
   {no:'4-4', st:3, a:'ai', ty:'ai', tr:'tank', code:'AI-TNK-01', t:'견적 자동 비교·최적안', s:'형식 다른 견적서를 항목별로 맞춰 비교표 작성, 최저가·조건 차이·최적 조합 추천', nx:'탱크 견적담당자 (결정)'},
   {no:'4-5', st:3, a:'tnk', tr:'tank', code:'TNK-SEL-01', t:'최종 결정: 최적 금액·후보군', s:'AI 비교안을 보고 분야별 최적 견적금액과 벤더 후보군(복수) 확정, 필요 시 재비교 요청'},
   {no:'4-6', st:3, a:'tnk', tr:'tank', code:'TNK-EST-01', t:'탱크 견적서 작성', s:'견적금액 · Rev.0', nx:'임원 승인'},
-  {no:'4-7', st:3, a:'exe', ty:'dec', tr:'tank', code:'EXE-APR-01', t:'임원 승인', s:'반려 → 탱크 견적서 재작성', nx:'대표 상신'},
+  {no:'4-7', st:3, a:'exe', ty:'dec', tr:'tank', code:'EXE-APR-02', t:'탱크 견적 임원 승인', s:'의견 필수 · 반려 → 탱크 견적서 재작성', nx:'대표 (자동 상신)'},
   {no:'4-8', st:3, a:'ceo', ty:'dec', tr:'tank', code:'CEO-APR-02', t:'탱크 견적 대표 승인', s:'반려 → 탱크 견적담당자', nx:'영업 (제출)'},
   {no:'4-9', st:3, a:'sys', ty:'sys', tr:'tank', code:'SYS-TNK-01', t:'예가·후보군 기록', s:'벤더별 예가 이력, 승인 견적·후보군 저장<br>수행사 확정 아님'},
   {no:'4-10', st:3, a:'nas', ty:'nas', tr:'both', code:'SAL-EST-01', t:'견적서 Rev', s:'03_견적작업 · 견적서 Rev0~ · 승인본 표시<br>탱크: 비교표·탱크 견적서 Rev'},
@@ -796,7 +806,8 @@ const STEPS = [
   {no:'5-4', st:4, a:'nas', ty:'nas', tr:'both', code:'SAL-TBE-01', t:'최종 제출본·부가서류', s:'04_제출자료 · 제출 시 잠금<br>기술평가 회의록 Rev'},
   /* 06 */
   {no:'6-1', st:5, a:'ext', ty:'ext', tr:'both', code:'EXT-NEG-01', t:'가격 협상 요청', s:'NEGO', nx:'영업'},
-  {no:'6-2', st:5, a:'sal', tr:'both', bd:'인터뷰 확인', code:'SAL-NEG-01', t:'협상 대응', s:'Rev 갱신·최종 견적, 가격 변경 시 대표 승인', nx:'대표'},
+  {no:'6-2', st:5, a:'sal', tr:'both', bd:'인터뷰 확인', code:'SAL-NEG-01', t:'협상 대응', s:'Rev 갱신·최종 견적, 가격 변경 시 임원 → 대표 승인', nx:'대표'},
+  {no:'6-2b', st:5, a:'exe', ty:'dec', tr:'both', code:'EXE-NEG-01', t:'협상가 검토', s:'의견 필수 · 승인 시 대표에게 자동 상신', nx:'대표 (자동 상신)'},
   {no:'6-3', st:5, a:'ceo', ty:'dec', tr:'both', bd:'인터뷰 확인', code:'CEO-NEG-01', t:'협상가 승인', s:'승인 / 반려 → 영업'},
   {no:'6-4', st:5, a:'sys', ty:'sys', tr:'both', code:'SYS-NEG-01', t:'협상 Rev 이력', s:'가격 흐름 기록'},
   {no:'?', st:5, a:'tnk', tr:'tank', bd:'인터뷰 확인', code:'TNK-EST-01', hu:'작성', t:'탱크 가격 조정', s:'협상 시 탱크 금액 조정과 임원 재승인 필요 여부'},
@@ -1069,7 +1080,7 @@ document.addEventListener('click', e => {
 window.addEventListener('hashchange', () => go(location.hash));
 go(location.hash);
 </script>
-<script>window.__QCFG={"M": {"EXT-RFQ-01": ["mail", "sup", "메일 분류함"], "AI-RFQ-01": ["mail", "sup", "메일 분류함"], "AI-PRJ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "SYS-PRJ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "SAL-RFQ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "AI-ANL-01": ["bidchk", "estC", "입찰 체크리스트 (초기 판단)"], "SAL-ANL-01": ["gonogo", "estC", "참여여부 보고서"], "CEO-ANL-01": ["appr", "ceo", "승인함"], "SYS-DRP-01": ["lost", "estC", "실주·불참 분석"], "AI-ANL-02": ["anl", "estC", "문서 분석 (위험·독소·비용)"], "AI-QTY-01": ["cqty", "estC", "물량산출 (기준서 Rev.6)"], "ADM-DB-01": ["price", "admin", "단가·노임 시세"], "ADM-VND-01": ["vendor", "admin", "협력업체 목록·지정등급"], "ADM-PRJ-01": ["users", "admin", "사용자·권한·결재선"], "ADM-INS-01": ["lib", "admin", "분석 문서 라이브러리"], "ADM-INS-02": ["lost", "exec", "실주·불참 분석"], "SAL-EST-01": ["cest", "estC", "상세 견적서 · 마진/리스크"], "AI-EST-01": ["cest", "estC", "상세 견적서 · 마진/리스크"], "CEO-APR-01": ["appr", "ceo", "승인함"], "TNK-RFQ-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "VND-QTE-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-VND-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-VND-02": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-TNK-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "TNK-SEL-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "TNK-EST-01": ["test", "estT", "탱크 견적서 · 마진/리스크"], "SYS-TNK-01": ["test", "estT", "탱크 견적서 · 마진/리스크"], "EXE-APR-01": ["appr", "exec", "승인함"], "CEO-APR-02": ["appr", "ceo", "승인함"], "SAL-TBE-01": ["submit", "estC", "제출 관리"], "EXT-TBE-01": ["tcm", "estC", "TCM 기록"], "AI-TBE-01": ["tcm", "estC", "TCM 기록"], "SYS-TBE-01": ["tcm", "estC", "TCM 기록"], "EXT-NEG-01": ["nego", "estT", "가격 협상·리비전"], "SAL-NEG-01": ["nego", "estT", "가격 협상·리비전"], "SYS-NEG-01": ["nego", "estT", "가격 협상·리비전"], "CEO-NEG-01": ["appr", "ceo", "승인함"], "EXT-RES-01": ["won", "estC", "수주 → WO·실행예산·코드"], "SAL-RES-01": ["won", "estC", "수주 → WO·실행예산·코드"], "SYS-RES-01": ["pipe", "exec", "프로젝트 현황 (RV·QP·WO)"], "AI-INS-01": ["lost", "exec", "실주·불참 분석"], "SYS-HND-01": ["won", "estC", "수주 → WO·실행예산·코드"], "NXT-BUD-01": ["won", "exec", "수주 → WO·실행예산·코드"]}, "SM": {"st-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "st-02": ["gonogo", "estC", "참여여부 보고서"], "st-03": ["cqty", "estC", "물량산출 (기준서 Rev.6)"], "st-04": ["cest", "estC", "상세 견적서 · 마진/리스크"], "st-05": ["tcm", "estC", "TCM 기록"], "st-06": ["nego", "estT", "가격 협상·리비전"], "st-07": ["won", "estC", "수주 → WO·실행예산·코드"], "st-08": ["won", "estC", "수주 → WO·실행예산·코드"]}, "design": "estimate-ai-design.html", "review": "estimate-ai-review.html", "proto": "sales_tot.html"};</script><script>(function(){
+<script>window.__QCFG={"M": {"EXT-RFQ-01": ["mail", "sup", "메일 분류함"], "AI-RFQ-01": ["mail", "sup", "메일 분류함"], "AI-PRJ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "SYS-PRJ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "SAL-RFQ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "AI-ANL-01": ["bidchk", "estC", "입찰 체크리스트 (초기 판단)"], "SAL-ANL-01": ["gonogo", "estC", "참여여부 보고서"], "CEO-ANL-01": ["appr", "ceo", "승인함"], "SYS-DRP-01": ["lost", "estC", "실주·불참 분석"], "AI-ANL-02": ["anl", "estC", "문서 분석 (위험·독소·비용)"], "AI-QTY-01": ["cqty", "estC", "물량산출 (기준서 Rev.6)"], "ADM-DB-01": ["price", "admin", "단가·노임 시세"], "ADM-VND-01": ["vendor", "admin", "협력업체 목록·지정등급"], "ADM-PRJ-01": ["users", "admin", "사용자·권한·결재선"], "ADM-INS-01": ["lib", "admin", "분석 문서 라이브러리"], "ADM-INS-02": ["lost", "exec", "실주·불참 분석"], "SAL-EST-01": ["cest", "estC", "상세 견적서 · 마진/리스크"], "AI-EST-01": ["cest", "estC", "상세 견적서 · 마진/리스크"], "CEO-APR-01": ["appr", "ceo", "승인함"], "TNK-RFQ-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "VND-QTE-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-VND-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-VND-02": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-TNK-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "TNK-SEL-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "TNK-EST-01": ["test", "estT", "탱크 견적서 · 마진/리스크"], "SYS-TNK-01": ["test", "estT", "탱크 견적서 · 마진/리스크"], "EXE-APR-01": ["appr", "exec", "승인함"], "EXE-APR-02": ["appr", "exec", "승인함"], "EXE-ANL-01": ["appr", "exec", "승인함"], "EXE-NEG-01": ["appr", "exec", "승인함"], "CEO-APR-02": ["appr", "ceo", "승인함"], "SAL-TBE-01": ["submit", "estC", "제출 관리"], "EXT-TBE-01": ["tcm", "estC", "TCM 기록"], "AI-TBE-01": ["tcm", "estC", "TCM 기록"], "SYS-TBE-01": ["tcm", "estC", "TCM 기록"], "EXT-NEG-01": ["nego", "estT", "가격 협상·리비전"], "SAL-NEG-01": ["nego", "estT", "가격 협상·리비전"], "SYS-NEG-01": ["nego", "estT", "가격 협상·리비전"], "CEO-NEG-01": ["appr", "ceo", "승인함"], "EXT-RES-01": ["won", "estC", "수주 → WO·실행예산·코드"], "SAL-RES-01": ["won", "estC", "수주 → WO·실행예산·코드"], "SYS-RES-01": ["pipe", "exec", "프로젝트 현황 (RV·QP·WO)"], "AI-INS-01": ["lost", "exec", "실주·불참 분석"], "SYS-HND-01": ["won", "estC", "수주 → WO·실행예산·코드"], "NXT-BUD-01": ["won", "exec", "수주 → WO·실행예산·코드"]}, "SM": {"st-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "st-02": ["gonogo", "estC", "참여여부 보고서"], "st-03": ["cqty", "estC", "물량산출 (기준서 Rev.6)"], "st-04": ["cest", "estC", "상세 견적서 · 마진/리스크"], "st-05": ["tcm", "estC", "TCM 기록"], "st-06": ["nego", "estT", "가격 협상·리비전"], "st-07": ["won", "estC", "수주 → WO·실행예산·코드"], "st-08": ["won", "estC", "수주 → WO·실행예산·코드"]}, "design": "estimate-ai-design.html", "review": "estimate-ai-review.html", "proto": "sales_tot.html"};</script><script>(function(){
 /* 박스 선택 → 우측 패널 (박스 정보 + 화면 이동 · 상세 설계 · 검토 자료 버튼) */
 var C=window.__QCFG||{}, M=C.M||{}, SM=C.SM||{};
 var css=document.createElement('style');
