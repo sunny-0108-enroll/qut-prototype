@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>영업·견적 통합 프로토타입</title>
+<title>영업·견적 통합 프로토타입</title><script>window.__QS=location.search;</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
 <style>
@@ -4538,7 +4538,7 @@ function openOFlow() {
   openPanel('공사 견적 AI · 프로세스 흐름도 (8단계)', '원본 흐름도 · 액터별 통합 흐름 / 파일·문서 흐름 / 저장소별 데이터 흐름 / 프로세스 흐름도 탭', `<iframe title="원본 흐름도" style="width:100%;height:calc(100vh - 150px);border:1px solid var(--line);border-radius:8px;background:#fff"></iframe>`,
     `<span class="muted" style="font-size:12px">흐름도 안의 탭으로 보기 방식을 바꿀 수 있습니다</span><span style="flex:1"></span><button class="btn" type="button" data-oflowdl>⤓ 흐름도 파일 받기</button>`);
   const dw = document.querySelector('.dw'); if (dw) dw.classList.add('wide');
-  const f = dw && dw.querySelector('iframe'); if (f) f.srcdoc = OFLOW_HTML;
+  const f = dw && dw.querySelector('iframe'); if (f) f.srcdoc = oflowAt('current', typeof curCode === 'function' ? curCode() : '');
 }
 document.addEventListener('click', e => {
   if (e.target.closest('[data-oflow]')) { e.preventDefault(); e.stopPropagation(); openOFlow(); return; }
@@ -4549,7 +4549,7 @@ VIEWS.flow = () => _flowV().replace('공사 견적 흐름 (첨부 흐름도 8단
 VIEWS.flow.after = _flowA;
 
 /* ---------- 전체 프로세스 흐름에 '데이터 흐름 (파일서버 · 구글 드라이브)' 탭 ---------- */
-const oflowAt = tab => OFLOW_HTML.replace("go(location.hash || '#current');", `go(location.hash || '#${tab}');`);
+const oflowAt = (tab, here) => oflowNav(tab, here);
 const _flowV2 = VIEWS.flow, _flowA2 = VIEWS.flow.after;
 const FL_TABS = "seg('fl', [['all', '전체 (공통 → 분기)'], ['civil', '공사 견적 · 액터 레인'], ['tank', '탱크 견적 · 액터 레인']], FLOWKEY)";
 VIEWS.flow = () => {
@@ -4570,7 +4570,7 @@ const FIT_JS = `<style>.wrap{overflow:hidden!important}.col-h{transform:none!imp
 var t;new MutationObserver(function(){clearTimeout(t);t=setTimeout(fit,60);}).observe(document.body,{childList:true,subtree:true});addEventListener('resize',fit);setTimeout(fit,200);})();<\/script>`;
 const fitDoc = html => html.replace('</body>', FIT_JS + '</body>');
 function openWin(html, title) {
-  const w = window.open(URL.createObjectURL(new Blob([html], {type: 'text/html'})), '_blank');
+  const w = window.open(URL.createObjectURL(new Blob([html], {type: 'text/html'})), 'qflow');
   if (!w) toast('팝업이 차단되었습니다 · 브라우저에서 팝업을 허용해 주세요');
 }
 /* 프로토타입 액터 레인(공사·탱크)은 같은 파일의 #flowfull 경로로 새 창 */
@@ -4606,14 +4606,15 @@ document.addEventListener('click', e => {
 }, true);
 /* '흐름도 8단계' 팝업에도 새 창 버튼 */
 const _openOFlow = openOFlow;
-openOFlow = () => { _openOFlow(); const f = document.querySelector('.dw .dw-f'); if (f && !f.querySelector('[data-ffopen]')) f.insertAdjacentHTML('beforeend', ffBtn('orig')); const fr = document.querySelector('.dw iframe'); if (fr) fr.srcdoc = fitDoc(OFLOW_HTML); };
+openOFlow = () => { _openOFlow(); const f = document.querySelector('.dw .dw-f'); if (f && !f.querySelector('[data-ffopen]')) f.insertAdjacentHTML('beforeend', ffBtn('orig')); const fr = document.querySelector('.dw iframe'); if (fr) fr.srcdoc = fitDoc(oflowAt('current', curCode())); };
 
 /* ---------- 새 창 열림 아이콘 · '흐름도 8단계' 링크는 새 창으로 ---------- */
 const EXT_I = '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-left:3px"><path d="M9 2.5h4.5V7"/><path d="M13.5 2.5 7.5 8.5"/><path d="M12 9.5v3.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5H7"/></svg>';
-const _flowV4 = VIEWS.flow;
+const _flowV4 = VIEWS.flow, _flowA4 = VIEWS.flow.after;
 VIEWS.flow = () => _flowV4()
   .replace(/<button type="button" data-oflow title="원본 흐름도 보기"([^>]*)>흐름도 8단계<\/button>/, `<button type="button" data-ffopen="orig" title="원본 흐름도를 새 창으로 열기"$1>흐름도 8단계${EXT_I}</button>`)
   .replace(/⤢ 새 창으로 전체 보기<\/button>/g, `새 창으로 전체 보기${EXT_I}</button>`);
+VIEWS.flow.after = _flowA4;
 document.addEventListener('click', e => { const b = e.target.closest('.dw-f [data-ffopen]'); if (b && !b.querySelector('svg')) b.insertAdjacentHTML('beforeend', EXT_I); }, true);
 const _openOFlow2 = openOFlow;
 openOFlow = () => { _openOFlow2(); const b = document.querySelector('.dw .dw-f [data-ffopen]'); if (b) b.innerHTML = '새 창으로 전체 보기' + EXT_I; };
@@ -4704,34 +4705,7 @@ document.addEventListener('click', e => {
   });
   saveSoon(); setTimeout(() => { closeDrawer && closeDrawer(); if (CUR === 'pfolder') render(); }, 400);
 });
-/* 승인함: 결과 기록 · 진행 단계 반영 · 처리 이력 */
-window.addEventListener('click', e => {
-  const b = e.target.closest('#apd .acts button'); if (!b || b.classList.contains('off')) return;
-  e.stopImmediatePropagation(); e.preventDefault();
-  const lab = btnLabel(b), a = APPR.find(x => x.k === APSEL), ap = document.getElementById('apc'), op = ap ? ap.value.trim() : '';
-  if (ROLE !== 'ceo' && !op) { ap.focus(); ap.style.borderColor = 'var(--bad)'; toast('의견을 입력하세요 · 대표이사가 아닌 결재는 의견 필수'); return; }
-  const line = a.type === '실행예산 승인' ? ['담당 상신', '영업임원 전결'] : LINE;
-  const res = /반려/.test(lab) ? '반려' : /조건부/.test(lab) ? '조건부 승인' : /검토 완료/.test(lab) ? '검토 완료' : '승인';
-  const R0 = ST8.apres[a.k] || {hist: []};
-  R0.hist.push({res, by: ROLES[ROLE].n, op, at: new Date().toISOString().slice(5, 16).replace('T', ' ')});
-  R0.state = res === '반려' ? '반려' : (res === '검토 완료' ? 'next' : (ROLE === 'ceo' || line.length === 2 ? '완료' : 'next'));
-  if (R0.state === 'next') a.step = Math.min(line.length - 1, (a.step || 1) + 1); if (R0.state === '완료') a.step = line.length;
-  ST8.apres[a.k] = R0; saveSoon(); toast(b.dataset.toast || '처리했습니다'); render();
-}, true);
-const _apd5 = apDetail;
-apDetail = k => {
-  const R0 = ST8.apres[k], a = APPR.find(x => x.k === k); if (R0 && a && R0.state !== '반려') a.step = R0.state === '완료' ? 99 : Math.max(a.step || 1, 2);
-  let h = _apd5(k);
-  if (!R0) return h;
-  const hist = `<div><b style="font-size:13px">결재 이력</b>${R0.hist.map(x => `<div style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--line2)"><span class="src" style="flex:none">${x.at}</span>${pill(x.res, x.res === '반려' ? 'p-bad' : x.res === '승인' ? 'p-ok' : 'p-qp')}<span><b>${x.by}</b>${x.op ? ' · ' + x.op : ''}</span></div>`).join('')}</div>`;
-  h = h.replace('<div><b style="font-size:13px">결재선</b>', hist + '<div><b style="font-size:13px">결재선</b>');
-  const myTurn = R0.state === 'next' ? ROLE === 'ceo' : false;
-  if (R0.state === '완료' || R0.state === '반려' || (R0.state === 'next' && !myTurn)) h = h.replace(/<div class="acts">[\s\S]*$/, `<div class="acts" style="justify-content:flex-start">${pill(R0.state === '완료' ? '결재 완료' : R0.state === '반려' ? '반려 · 새 리비전 대기' : '대표이사 결재 대기', R0.state === '완료' ? 'p-ok' : R0.state === '반려' ? 'p-bad' : 'p-qp')}</div>`).replace(/<div class="f"><label for="apc">[\s\S]*?<\/textarea><\/div>/, '');
-  return h;
-};
-const _apprV = VIEWS.appr, _apprA = VIEWS.appr.after;
-VIEWS.appr = () => _apprV().replace(/(<div class="row[^"]*" data-ap="(a\d)">[\s\S]*?)(<\/div><div class="muted")/g, (m0, a1, k, a3) => { const R0 = ST8.apres[k]; return R0 ? a1.replace(/(<\/b>)/, `$1 ${pill(R0.state === '완료' ? '완료' : R0.state === '반려' ? '반려' : '대표 대기', R0.state === '완료' ? 'p-ok' : R0.state === '반려' ? 'p-bad' : 'p-warn')}`) + a3 : m0; });
-VIEWS.appr.after = _apprA;
+/* 승인함 처리는 pflow.js (프로젝트 진행 엔진) */
 /* 초기화 · 안내 */
 const _viewLogin2 = viewLogin;
 viewLogin = () => _viewLogin2().replace('<div class="note">‘내용 보기’', `<div class="note" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">처리한 내용(분류·결정·승인·체크아웃 등)은 이 브라우저에 저장됩니다.<button type="button" class="btn rbtn" data-streset style="min-height:28px">데이터 초기화</button></div>
@@ -4799,6 +4773,529 @@ function paintHdr() {
 document.addEventListener('click', e => { if (!e.target.closest('[data-hnav]')) return; const b = document.createElement('button'); b.setAttribute('data-navmini', ''); b.style.display = 'none'; document.body.appendChild(b); b.click(); b.remove(); paintHdr(); });
 document.addEventListener('navmini', paintHdr);
 let HDR_T = 0; new MutationObserver(() => { clearTimeout(HDR_T); HDR_T = setTimeout(paintHdr, 30); }).observe(document.getElementById('app'), {childList: true, subtree: true});
+
+/* ===================== 프로젝트 진행 엔진 ─ 결재 흐름(담당 상신 → 영업임원 → 대표이사 자동 상신 → 승인)에 따라 데이터가 진행 ===================== */
+const PJ_KN = {part: '참여 결정', est: '견적 승인', neg: '협상가 승인', bud: '실행예산 승인'};
+const PJ_LN = k => k === 'bud' ? ['exec'] : ['exec', 'ceo'];
+const PJ_RN = r => r === 'exec' ? '영업임원' : r === 'ceo' ? '대표이사' : ROLES[r] ? ROLES[r].n : r;
+const PJ_STEPS = ['접수·리뷰', '참여 결정', '물량·원가', '견적서·승인', '제출·기술평가', '가격 협상', '수주 결과', '인계'];
+const PJ_DEF = [
+  {id: 'c', row: 0, own: 'estC', qp: 'QP-2026-0011', wo: 'WO-2026-0007', base: [10210000000, 10488000000], seed: 'review anl req ok ok est req ok ok submit tbe est req'},
+  {id: 't', row: 1, own: 'estT', qp: 'QP-2025-0102', wo: 'WO-2025-0044', base: [1210000000, 1290000000, 1480000000], seed: 'review anl req ok ok est req ok ok submit tbe est req ok ok submit nego est req ok'},
+  {id: 'p', row: 2, own: 'estP', qp: 'QP-2026-0054', wo: 'WO-2026-0012', base: [860000000], seed: 'review anl req'},
+  {id: 'ctk', row: 3, own: 'estT', qp: 'QP-2026-0062', wo: 'WO-2026-0013', base: [4200000000], seed: 'review anl req ok'},
+  {id: 'shg', row: 4, own: 'estP', qp: 'QP-2026-0063', wo: 'WO-2026-0014', base: [540000000], seed: 'review anl'},
+  {id: 'ski', row: 5, own: 'estC', qp: 'QP-2026-0064', wo: 'WO-2026-0015', base: [3100000000], seed: ''},
+  {id: 'jil', row: 6, own: 'estT', qp: 'QP-2025-0088', wo: 'WO-2025-0031', base: [2350000000, 2310000000], seed: 'review anl req ok ok est req ok ok submit tbe est req ok ok submit win req'},
+  {id: 'hds', row: 7, own: 'estT', qp: 'QP-2025-0079', wo: '—', base: [970000000], seed: 'review anl req ok ok est req ok ok submit lose'},
+  {id: 'chp', row: 8, own: 'estT', qp: '—', wo: '—', base: [], seed: 'review anl req ok drop'},
+];
+const PJ_D = Object.fromEntries(PJ_DEF.map(d => [d.id, d]));
+const PJS = {};
+const pjNew = () => ({rv: false, rej: null, anl: 0, part: false, drop: false, partRej: false, revs: [], wait: null, result: null, bud: false, log: [], done: []});
+const pjCur = id => { const R0 = PJS[id].revs; return R0[R0.length - 1] || null; };
+const pjNow = () => { const d = new Date(); return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${d.toTimeString().slice(0, 5)}`; };
+const pjType = id => PIPE[PJ_D[id].row][2];
+const pjName = id => PIPE[PJ_D[id].row][3];
+const pjTank = id => pjType(id) === '탱크';
+const pjVisible = id => PIPE_F().includes(fOf(pjType(id)));
+const pjIsOwner = id => !!ROLE && ALIAS(ROLE) === ALIAS(PJ_D[id].own) && pjVisible(id);
+/* 작업 단계 (리비전 안에서 순서대로) : [이름, 화면, 주체, 짧은 이름] */
+const STP = {
+  review: ['리뷰 결정 → RV 발급·담당 배정', 'intake', 'H', '리뷰 결정'],
+  anl: ['AI 초기 분석 확인 · 입찰 체크리스트 1차 판단', 'bidchk', 'AI', '초기 분석'],
+  chk: ['견적 체크리스트 확인 (질의·조건)', 'ccheck', 'H', '체크리스트'],
+  qty: ['물량산출 확정 (기준서 Rev.6)', 'cqty', 'H', '물량산출'],
+  cost: ['노무·장비·경비 단가 확정', 'ccost', 'H', '단가'],
+  spec: ['사양·물량 검토', 'tspec', 'H', '사양 검토'],
+  vtgt: ['벤더 요청 대상 확인 → AI 자동 발송', 'tauto', 'H', '벤더 요청'],
+  vrep: ['벤더 회신 마감 · AI 자동 비교', 'tauto', 'AI', '회신·비교'],
+  vsel: ['최종 결정 (패키지별 업체·금액)', 'tauto', 'H', '최종 결정'],
+  est: ['견적서 작성 · 마진/리스크 확정', '', 'H', '견적서'],
+};
+const pjSteps = (id, kind) => kind === '가격 협상' ? ['est'] : pjTank(id) ? (kind === '최초 제출' ? ['spec', 'vtgt', 'vrep', 'vsel', 'est'] : ['vrep', 'vsel', 'est']) : (kind === '최초 제출' ? ['chk', 'qty', 'cost', 'est'] : ['qty', 'est']);
+const pjRev = (id, n, kind) => ({n, kind, status: '작성 중', est: null, steps: pjSteps(id, kind), dn: []});
+const pjNextStep = r => (r.steps || ['est']).find(k => !(r.dn || []).includes(k) && !(k === 'est' && r.est));
+const stView = (id, r, k) => k === 'est' ? (r.kind === '가격 협상' ? 'nego' : pjTank(id) ? 'test' : 'cest') : STP[k][1];
+const stLabel = (r, k) => k === 'est' && r.kind === '가격 협상' ? '협상 금액 반영 (발주처 요청 · 할인·조건 조정)' : k === 'est' && r.kind === '기술평가 반영' ? '견적서 재작성 (기술평가 반영)' : STP[k][0];
+const roleIs = rl => !!ROLE && !!rl && (ROLE === rl || ALIAS(ROLE) === ALIAS(rl));
+const pjP = id => id === 'c' ? PC : id === 't' ? PT : id === 'p' ? PP : {name: pjName(id), client: PIPE[PJ_D[id].row][4], type: pjType(id)};
+
+function pjAct(id, a, by, op, live) {
+  const D = PJ_D[id], s = PJS[id], r = pjCur(id), at = live ? pjNow() : '';
+  const L = (t, o) => s.log.unshift({at, by: PJ_RN(by), t, op: o || ''});
+  const H = res => ({res, by: PJ_RN(by), op: op || '', at});
+  if (a === 'review') { s.rv = true; L(`리뷰 결정 → ${PIPE[D.row][0]} 발급 · 담당 ${ROLES[D.own].n} 배정 · 문서함 이동`); }
+  if (['chk', 'qty', 'cost', 'spec', 'vtgt', 'vrep', 'vsel'].includes(a)) {
+    r.dn = r.dn || []; if (!r.dn.includes(a)) r.dn.push(a);
+    L(a === 'vtgt' ? `R${r.n} 벤더 요청 대상 확정 → AI가 승인벤더에 패키지별 견적 요청 자동 발송` : a === 'vrep' ? `R${r.n} 벤더 회신 마감 → AI 취합·정규화·자동 비교 (항목별 최저 재구성안)` : `R${r.n} ${STP[a][0]} 완료`);
+  }
+  if (a === 'anl') { s.anl++; L(`AI 초기 분석 ${s.anl}차 생성 · 참여 판단 자료 (위험·독소·비용)`); }
+  if (a === 'req') {
+    const kind = !s.part ? 'part' : s.result === 'win' ? 'bud' : r.kind === '가격 협상' ? 'neg' : 'est', turn = PJ_LN(kind)[0];
+    s.wait = {kind, turn, rev: kind === 'part' ? null : r.n, hist: [H('상신')]};
+    if (r && kind !== 'bud') r.status = '승인 대기';
+    s.partRej = false; s.rej = null; L(`${kind === 'part' ? '' : kind === 'bud' ? '' : `R${r.n} `}${PJ_KN[kind]} 상신 → ${PJ_RN(turn)}`, op);
+  }
+  if (a === 'ok' || a === 'cond') {
+    const w = s.wait, ln = PJ_LN(w.kind), i = ln.indexOf(w.turn);
+    w.hist.push(H(a === 'cond' ? '조건부 승인' : '승인'));
+    if (i < ln.length - 1) { w.turn = ln[i + 1]; L(`${PJ_KN[w.kind]} · ${PJ_RN(ln[i])} 승인 → ${PJ_RN(w.turn)}에게 자동 상신`, op); }
+    else {
+      s.wait = null; s.done.unshift({kind: w.kind, rev: w.rev, hist: w.hist, at});
+      if (w.kind === 'part') { s.part = true; s.revs.push(pjRev(id, 0, '최초 제출')); L(`대표이사 참여 승인 → ${D.qp} R0 견적 작성 시작 (적용 AVL 버전 고정)`, op); }
+      else if (w.kind === 'bud') { s.bud = true; L(`영업임원 전결 → 실행예산 확정 · 실행 코드 발번 (${D.wo})`, op); }
+      else { r.status = '승인'; L(`R${r.n} ${PJ_KN[w.kind]} 최종 승인 (${PJ_RN(by)}) → 제출 가능 · 결재본 잠금`, op); }
+    }
+  }
+  if (a === 'reject' || a === 'drop') {
+    const w = s.wait; s.wait = null; w.hist.push(H(a === 'drop' ? '불참 결정' : '반려')); s.done.unshift({kind: w.kind, rev: w.rev, hist: w.hist, at});
+    if (a === 'drop') { s.drop = true; L('대표이사 불참 결정 → 불참 종결 (자료는 문서함 보관 · 실주·불참 분석으로)', op); }
+    else { s.rej = {kind: w.kind, by: PJ_RN(by), op: op || '', at}; if (w.kind === 'part') s.partRej = true; else if (r && w.kind !== 'bud') r.status = '작성 중'; L(`${PJ_KN[w.kind]} 반려 (${PJ_RN(by)}) → 담당자 보완 후 재상신`, op); }
+  }
+  if (a === 'recall') { const w = s.wait; s.wait = null; if (r && (w.kind === 'est' || w.kind === 'neg')) r.status = '작성 중'; L(`${PJ_KN[w.kind]} 상신 취소 (아직 결재 전) → 작성 중`); }
+  if (a === 'est') {
+    const prev = s.revs[s.revs.length - 2];
+    r.est = D.base[r.n] || (prev && prev.est ? Math.round(prev.est * (r.kind === '가격 협상' ? 0.97 : 1.015) / 1e6) * 1e6 : 1000000000);
+    r.dn = (r.steps || []).slice();
+    if (r.kind === '가격 협상' && !D.base[r.n]) r.note = '발주처 총액 3% 인하 요청 반영 (할인·조건 조정)';
+    L(r.kind === '가격 협상' ? `R${r.n} 협상 금액 반영 ${eok(r.est)}${prev && prev.est ? ` (직전 R${prev.n} 대비 ${r.est >= prev.est ? '+' : '−'}${eok(Math.abs(r.est - prev.est))})` : ''}` : `R${r.n} 견적서 작성 ${eok(r.est)} (AI 초안 → 담당 확정)`);
+  }
+  if (a === 'submit') { r.status = '제출 완료'; L(`R${r.n} 제출 완료 · 제출본 잠금`); }
+  if (a === 'tbe') { s.revs.push(pjRev(id, r.n + 1, '기술평가 반영')); L(`TCM·기술평가 결과 반영 → R${r.n + 1} 작성 시작`); }
+  if (a === 'nego') { s.revs.push(pjRev(id, r.n + 1, '가격 협상')); L(`발주처 가격 협상 요청 기록 → R${r.n + 1} 협상 리비전 작성 시작`); }
+  if (a === 'win') { s.result = 'win'; L(`수주 통보 기록 (R${r.n} ${eok(r.est || 0)}) → ${D.wo} 생성 · 실행예산 작성`); }
+  if (a === 'lose') { s.result = 'lose'; L(`실주 통보 기록 (R${r.n}) → 실주 분석으로`); }
+}
+function pjSeed() {
+  PJ_DEF.forEach(D => {
+    PJS[D.id] = pjNew();
+    D.seed.split(' ').filter(Boolean).forEach(a => { const s = PJS[D.id]; const by = ['ok', 'reject', 'drop'].includes(a) ? (s.wait ? s.wait.turn : 'ceo') : ['submit', 'tbe', 'nego', 'win', 'lose', 'review'].includes(a) ? 'sup' : D.own; pjAct(D.id, a, by, a === 'req' ? '예시 데이터' : '', false); });
+  });
+}
+function pjStatus(id) {
+  const s = PJS[id], r = pjCur(id), D = PJ_D[id], tank = pjTank(id);
+  if (s.drop) return ['불참 종결', '', 'lost'];
+  if (s.result === 'lose') return ['실주', 'p-bad', 'lost'];
+  if (s.result === 'win') return s.wait ? [`수주 → ${D.wo} · 실행예산 승인 대기 · ${PJ_RN(s.wait.turn)}`, 'p-warn', 'appr'] : [`수주 → ${D.wo}${s.bud ? ' · 실행예산 확정' : ' · 실행예산 작성'}`, 'p-wo', 'won'];
+  if (s.wait) {
+    const k = s.wait.kind, t = PJ_RN(s.wait.turn);
+    if (k === 'part') return [`참여 결정 대기 · ${t}`, 'p-warn', 'appr'];
+    if (k === 'est') return [`견적 승인 대기 · ${t} (R${r.n})`, 'p-warn', 'appr'];
+    return [`TCM·협상 · R${r.n} 협상가 승인 대기 · ${t}`, 'p-warn', 'appr'];
+  }
+  if (!s.rv) return ['접수 · 리뷰 결정 대기 (영업지원)', 'p-rv', 'intake'];
+  if (!r) return s.anl ? [s.partRej ? '참여 반려 · 보완 후 재상신' : '검토중 · 참여 상신 전', s.partRej ? 'p-bad' : 'p-rv', 'gonogo'] : ['검토중 · AI 초기 분석 확인 대기', 'p-rv', 'bidchk'];
+  if (r.status === '작성 중') {
+    const k = pjNextStep(r), L0 = r.steps || ['est'], i = k ? L0.indexOf(k) : L0.length, rj = s.rej && s.rej.kind !== 'part';
+    if (r.kind === '가격 협상') return [`TCM·협상 · R${r.n} 협상 리비전 ${k ? '작성' : rj ? '반려 보완' : '승인 요청 전'}`, rj ? 'p-bad' : 'p-qp', 'nego'];
+    return [`견적 작성 R${r.n} · ${k ? `${STP[k][3]} (${i + 1}/${L0.length})` : rj ? '반려 보완 후 재상신' : '승인 요청 전'}`, rj && !k ? 'p-bad' : 'p-qp', stView(id, r, k || 'est')];
+  }
+  if (r.status === '승인') return [`${r.kind === '가격 협상' ? 'TCM·협상 · 협상가' : '견적'} 승인 완료 · R${r.n} 제출 대기`, 'p-ok', 'submit'];
+  return [`TCM·협상중 · R${r.n} 제출`, 'p-qp', 'tcm'];
+}
+function pjStage(id) {
+  const s = PJS[id], r = pjCur(id);
+  if (s.drop) return 1; if (s.result === 'lose') return 6; if (s.result === 'win') return s.bud ? 7 : 6;
+  if (!r) return s.rv ? 1 : 0; if (r.kind === '가격 협상') return 5; if (r.status === '제출 완료' || r.n > 0) return 4; return r.est ? 3 : 2;
+}
+/* 프로세스 흐름도(8단계)에서 이 프로젝트가 있는 박스 */
+function pjCode(id) {
+  const s = PJS[id], r = pjCur(id), tank = pjTank(id);
+  if (s.drop) return 'SYS-DRP-01'; if (s.result === 'lose') return 'SAL-RES-01'; if (s.result === 'win') return s.wait || !s.bud ? 'NXT-BUD-01' : 'SYS-HND-01';
+  if (s.wait) { const k = s.wait.kind, ex = s.wait.turn === 'exec'; return k === 'part' ? (ex ? 'SAL-ANL-01' : 'CEO-ANL-01') : k === 'neg' ? 'CEO-NEG-01' : tank ? (ex ? 'EXE-APR-01' : 'CEO-APR-02') : 'CEO-APR-01'; }
+  if (!s.rv) return 'SAL-RFQ-01';
+  if (!r) return s.anl ? 'SAL-ANL-01' : 'AI-ANL-01';
+  if (r.status === '작성 중') { if (r.kind === '가격 협상') return 'SAL-NEG-01'; const k = pjNextStep(r) || 'est'; return {chk: 'AI-ANL-02', spec: 'AI-ANL-02', qty: 'AI-QTY-01', cost: 'AI-QTY-01', vtgt: 'TNK-RFQ-01', vrep: 'AI-VND-02', vsel: 'TNK-SEL-01'}[k] || (tank ? 'TNK-EST-01' : 'SAL-EST-01'); }
+  return r.status === '승인' ? 'SAL-TBE-01' : 'SYS-TBE-01';
+}
+/* 프로젝트 현황(PIPE) 반영 */
+function pjSync() {
+  PJ_DEF.forEach(D => {
+    const s = PJS[D.id], r = pjCur(D.id), row = PIPE[D.row], [st, cls, v] = pjStatus(D.id);
+    const last = s.revs.filter(x => x.est).pop();
+    row[1] = s.part ? `${D.qp} R${r.n}` : '—'; row[5] = st; row[6] = cls; row[7] = s.part && last ? last.est : null; row[8] = v;
+  });
+  pjSyncAppr();
+}
+/* 승인함 문서: 엔진의 결재 대기·처리 완료에서 생성 (예시 건은 기존 한 장 요약 유지) */
+const AP_BASE = Object.fromEntries(APPR.map(a => [a.k, Object.assign({}, a)]));
+AP_BASE.a5 = {k: 'a5', type: '참여 결정', code: 'CEO-ANL-01', amt: null, step: 2, id: 'RV-2026-0251',
+  sum: 'AI 참여 권고 · 탱크 23기 (Dome Roof 14 · Cone Roof 9) · 공기 10개월 · 발주처 3사 공동 발주',
+  risk: ['공내역서 추가 SPEC (07/03) 물량 미반영', 'Coating 사양이 발주처별로 다름 — 단가 3안 필요'], cmp: '유사 규모 탱크 2건 (2024 수주 1 · 실주 1) · 톤당 단가 과거 범위 안'};
+const AP_RICH = {'c|est|1': 'a1', 't|neg|2': 'a2', 'p|part|': 'a3', 'jil|bud|1': 'a4', 'ctk|part|': 'a5'};
+const apCode = (id, w) => w.kind === 'part' ? 'CEO-ANL-01' : w.kind === 'neg' ? 'CEO-NEG-01' : w.kind === 'bud' ? 'NXT-BUD-01' : pjTank(id) ? (w.turn === 'exec' ? 'EXE-APR-01' : 'CEO-APR-02') : 'CEO-APR-01';
+function apItem(D, w, done, i) {
+  const s = PJS[D.id], key = `${D.id}|${w.kind}|${w.rev == null ? '' : w.rev}`, rk = AP_RICH[key], row = PIPE[D.row];
+  const rv = w.rev == null ? null : s.revs.find(x => x.n === w.rev), pv = w.rev ? s.revs.find(x => x.n === w.rev - 1) : null;
+  const gen = {
+    sum: w.kind === 'part' ? `AI 참여 권고 · ${row[2]} · 초기 분석 ${s.anl}차 · 발주처 ${row[4]}` : w.kind === 'bud' ? `수주 R${pjCur(D.id).n} 기준 실행예산 · 업체 확정가 반영` : `R${w.rev} 견적가 ${rv && rv.est ? eok(rv.est) : '—'}${pv && pv.est && rv && rv.est ? ` · 직전 R${pv.n} 대비 ${rv.est >= pv.est ? '+' : '−'}${eok(Math.abs(rv.est - pv.est))}` : ''}${rv && rv.note ? ' · ' + rv.note : ''}`,
+    risk: ['AI가 미결 리스크를 찾지 못했습니다 (예시)'], cmp: '유사견적 비교 화면 참조 (예시)'};
+  const b = rk ? AP_BASE[rk] : gen;
+  return Object.assign({}, b, {k: done ? `d-${D.id}-${w.kind}-${w.rev == null ? 'x' : w.rev}-${i}` : (rk || `${D.id}-${w.kind}-${w.rev == null ? 'x' : w.rev}`), pid: D.id, done, wait: w,
+    type: PJ_KN[w.kind], code: done ? (b.code || apCode(D.id, w)) : apCode(D.id, w), p: pjP(D.id), amt: rv && rv.est ? rv.est : (b.amt || null),
+    id: w.kind === 'part' ? row[0] : w.kind === 'bud' ? D.wo : `${D.qp} R${w.rev}`, step: done ? 99 : PJ_LN(w.kind).indexOf(w.turn) + 1});
+}
+function pjSyncAppr() {
+  const L = [];
+  PJ_DEF.forEach(D => { const s = PJS[D.id]; if (s.wait) L.push(apItem(D, s.wait, false, 0)); });
+  PJ_DEF.forEach(D => PJS[D.id].done.slice(0, 2).forEach((d, i) => L.push(apItem(D, d, true, i))));
+  APPR.splice(0, APPR.length, ...L);
+}
+/* 저장 · 복원 (기존 상태 저장에 포함) */
+const _snapPJ = snapshot;
+snapshot = () => Object.assign(_snapPJ(), {pj: PJS, pjv: 2});
+(function () {
+  let S0 = null; try { S0 = JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch (e) {}
+  if (S0 && S0.pj && S0.pjv === 2 && PJ_DEF.every(D => S0.pj[D.id])) Object.assign(PJS, S0.pj); else pjSeed();
+  pjSync();
+})();
+
+/* ---------- 승인함: 내 차례 · 진행 중 · 처리 완료 ---------- */
+const _apprPJA = VIEWS.appr.after;
+const apStPill = a => a.done ? (r => pill(r, r === '반려' || r === '불참 결정' ? 'p-bad' : 'p-ok'))(a.wait.hist[a.wait.hist.length - 1].res) : a.wait.turn === ROLE ? pill('내 차례', 'p-warn') : pill(`${PJ_RN(a.wait.turn)} 차례`, '');
+VIEWS.appr = () => {
+  pjSync();
+  const vis = APPR.filter(a => pjVisible(a.pid)), mine = vis.filter(a => !a.done && a.wait.turn === ROLE), oth = vis.filter(a => !a.done && a.wait.turn !== ROLE), dn = vis.filter(a => a.done);
+  if (!vis.some(a => a.k === APSEL)) APSEL = (mine[0] || oth[0] || dn[0] || {}).k || null;
+  const row = a => `<div class="row ${a.k === APSEL ? 'on' : ''}" data-ap="${a.k}"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-weight:600">${a.p.name}</b>${pill(a.type, 'p-qp')}</div><div class="muted" style="font-size:12px;margin-top:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="id">${a.id}</span>${a.amt ? `<span>${eok(a.amt)}</span>` : ''}${apStPill(a)}</div></div>`;
+  const grp = (t, L) => L.length ? `<div class="aphd">${t}<span>${L.length}</span></div>${L.map(row).join('')}` : '';
+  return pgTop('승인함', '담당 상신 → 영업임원 검토 → 대표이사 최종 (영업임원이 승인하면 대표이사에게 자동 상신) · 실행예산은 영업임원 전결', '') +
+    `<div class="cols"><section class="panel aplist" style="overflow:hidden">${grp(ROLE === 'exec' || ROLE === 'ceo' ? '내 차례' : '내 차례 (없음)', mine)}${grp(ROLE === 'exec' || ROLE === 'ceo' ? '다른 결재자 차례' : '내가 볼 수 있는 결재 진행', oth)}${grp('처리 완료 (최근)', dn)}${vis.length ? '' : '<div class="pb muted">결재 문서가 없습니다</div>'}</section>
+    <section class="panel w2" id="apd">${APSEL ? apDetail(APSEL) : '<div class="pb muted">결재 문서를 선택하세요</div>'}</section></div>` +
+    roleFoot('승인함', '참여 결정 · 견적 승인 · 협상가 승인 · 실행예산 승인을 한곳에서 처리합니다. 영업임원이 승인하면 대표이사에게 자동 상신되고, 대표이사가 최종 승인하면 프로젝트가 다음 단계로 넘어갑니다 (참여 승인 → QP R0 생성 · 견적 승인 → 제출 가능 · 반려 → 담당자 보완 후 재상신). 처리 결과는 프로젝트 현황·폴더·오늘 할 일에 바로 반영됩니다.', [['영업임원', 'p-rv'], ['대표이사', 'p-rv']]);
+};
+VIEWS.appr.after = _apprPJA;
+document.head.insertAdjacentHTML('beforeend', `<style>
+.aplist .aphd{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px;font-size:12px;font-weight:800;color:var(--muted);border-top:1px solid var(--line2)}
+.aplist .aphd:first-child{border-top:0}
+.aplist .aphd span{font-weight:700;background:var(--chip);border-radius:10px;padding:0 7px}
+.pjbar{display:flex;gap:3px;flex-wrap:wrap}
+.pjbar span{flex:1 1 0;min-width:52px;text-align:center;font-size:11px;line-height:1.3;padding:5px 2px;border-radius:6px;background:var(--chip);color:var(--muted)}
+.pjbar span.d{background:var(--accent-soft);color:var(--accent)}
+.pjbar span.c{background:var(--accent);color:#fff;font-weight:700}
+.pjlog{list-style:none;margin:0;padding:0}
+.pjlog li{display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line2);font-size:12.5px;line-height:1.5}
+.pjlog .src{flex:none;min-width:74px}
+.pjchip{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}
+.qbtn{display:inline-flex;align-items:center;gap:5px}
+</style>`);
+const pjBar = id => { const c = pjStage(id); return `<div class="pjbar" title="프로젝트 진행 8단계">${PJ_STEPS.map((t, i) => `<span class="${i < c ? 'd' : i === c ? 'c' : ''}">${String(i + 1).padStart(2, '0')} ${t}</span>`).join('')}</div>`; };
+const pjHistHTML = H => `<div><b style="font-size:13px">결재 이력</b>${H.map(x => `<div style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--line2)"><span class="src" style="flex:none">${x.at || '기록'}</span>${pill(x.res, x.res === '반려' || x.res === '불참 결정' ? 'p-bad' : x.res === '상신' ? 'p-rv' : 'p-ok')}<span><b>${x.by}</b>${x.op ? ' · ' + x.op : ''}</span></div>`).join('')}</div>`;
+const _apd5 = apDetail;
+apDetail = k => {
+  const a = APPR.find(x => x.k === k); if (!a) return '<div class="pb muted" style="padding:24px">결재 문서를 선택하세요</div>';
+  const w = a.wait; let h = _apd5(k);
+  h = h.replace('<div><b style="font-size:13px">결재선</b>', pjHistHTML(w.hist) + '<div><b style="font-size:13px">결재선</b>');
+  h = h.replace(/(<h2 [^>]*>[\s\S]*?<\/h2><div class="sub">[\s\S]*?<\/div>)/, `$1<div style="margin-top:8px">${pjBar(a.pid)}</div>`);
+  const my = !a.done && w.turn === ROLE;
+  if (!my) {
+    const rc = !a.done && pjIsOwner(a.pid) && w.hist.length === 1;
+    const st = a.done ? apStPill(a) : pill(`${PJ_RN(w.turn)} 결재 대기`, 'p-warn');
+    h = h.replace(/<div class="f"><label for="apc">[\s\S]*?<\/textarea><\/div>/, '')
+      .replace(/<div class="acts">[\s\S]*$/, `<div class="acts" style="justify-content:flex-start;align-items:center">${st}${rc ? `<button class="btn" type="button" data-pjact="recall" data-pj="${a.pid}">상신 취소</button>` : ''}<span style="flex:1"></span><button class="btn rbtn" type="button" data-pjopen="${a.pid}">프로젝트 진행 보기</button></div>`);
+  } else if (ROLE === 'ceo' && w.kind === 'part') h = h.replace('<div class="acts">', '<div class="acts"><button class="btn danger" type="button" data-apdrop>불참 결정</button>');
+  return h;
+};
+/* 결재 처리 → 엔진 진행 */
+window.addEventListener('click', e => {
+  const b = e.target.closest('#apd .acts button'); if (!b || b.classList.contains('off') || b.matches('[data-pjopen],[data-pjact]')) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  const a = APPR.find(x => x.k === APSEL); if (!a || a.done || a.wait.turn !== ROLE) return;
+  const lab = btnLabel(b), ap = document.getElementById('apc'), op = ap ? ap.value.trim() : '';
+  if (ROLE !== 'ceo' && !op) { ap.focus(); ap.style.borderColor = 'var(--bad)'; ap.placeholder = '의견을 입력해야 다음 결재자에게 넘어갑니다 (필수)'; toast('의견을 입력하세요 · 대표이사가 아닌 결재는 의견 필수'); return; }
+  const act = b.hasAttribute('data-apdrop') ? 'drop' : /반려/.test(lab) ? 'reject' : /조건부/.test(lab) ? 'cond' : 'ok';
+  const id = a.pid, kind = a.wait.kind, ln = PJ_LN(kind), last = ln.indexOf(ROLE) === ln.length - 1;
+  pjAct(id, act, ROLE, op, true); pjSync(); saveSoon();
+  const D = PJ_D[id], r = pjCur(id);
+  toast(act === 'drop' ? `불참 결정 · ${pjName(id)} 불참 종결` : act === 'reject' ? `반려 · 담당자(${ROLES[D.own].n})에게 보완 요청` : !last ? `승인 → 대표이사에게 자동 상신했습니다` : kind === 'part' ? `참여 승인 · ${D.qp} R0 생성 → 견적 작성 단계로` : kind === 'bud' ? `실행예산 확정 · 실행 코드 발번` : `최종 승인 · R${r.n} 제출 가능 (결재본 잠금)`);
+  setWork(id);
+  const nx = APPR.find(x => !x.done && x.wait.turn === ROLE && pjVisible(x.pid)); APSEL = nx ? nx.k : (APPR.find(x => x.pid === id) || {}).k;
+  render();
+}, true);
+
+/* ---------- 프로젝트 진행 패널 (현황 행 · 화면 상단 · 승인함에서 열기) ---------- */
+/* 다음 할 일: 누가 · 어느 화면에서 · 무엇을 */
+function pjNext(id) {
+  const s = PJS[id], r = pjCur(id), D = PJ_D[id], own = D.own;
+  if (s.drop || s.result === 'lose') return null;
+  if (s.wait) return {role: s.wait.turn, view: 'appr', label: `${PJ_KN[s.wait.kind]} 결재${s.wait.kind === 'bud' ? ' (전결)' : ''}`, acts: []};
+  if (s.result === 'win') return s.bud ? null : {role: own, view: 'won', label: '실행예산 작성 → 승인 요청', acts: [['req', '실행예산 승인 요청', 'pri']]};
+  if (!s.rv) return {role: 'sup', view: 'intake', label: STP.review[0], acts: [['review', STP.review[0], 'pri']]};
+  if (!r) {
+    if (!s.anl) return {role: own, view: 'bidchk', label: STP.anl[0], acts: [['anl', 'AI 초기 분석 확인 완료', 'ai-b']]};
+    return {role: own, view: 'gonogo', label: s.partRej ? '참여여부 보고서 보완 → 재상신' : '참여여부 보고서 상신', acts: [['req', s.partRej ? '보완 후 참여 결정 재상신' : '참여 결정 상신', 'pri'], ['anl', 'AI 재분석', '']]};
+  }
+  if (r.status === '작성 중') {
+    const k = pjNextStep(r);
+    if (k) return {role: own, view: stView(id, r, k), label: stLabel(r, k), step: k, acts: [[k, `${stLabel(r, k)} 완료`, STP[k][2] === 'AI' ? 'ai-b' : 'pri']]};
+    const ng = r.kind === '가격 협상';
+    return {role: own, view: stView(id, r, 'est'), label: ng ? '협상가 승인 요청' : '견적 승인 요청', acts: [['req', ng ? '협상가 승인 요청' : '견적 승인 요청', 'pri'], ['est', ng ? '협상 금액 다시 반영' : '견적서 다시 작성', '']]};
+  }
+  if (r.status === '승인') return {role: 'sup', alt: own, view: 'submit', label: '제출 패키지 편철 → 제출 완료 기록', acts: [['submit', '제출 완료 기록', 'pri']]};
+  return {role: own, alt: 'sup', view: 'tcm', label: 'TCM·기술평가 / 가격 협상 / 결과 통보 기록', acts: [['tbe', 'TCM·기술평가 반영 → 새 리비전', ''], ['nego', '가격 협상 요청 기록 → 새 리비전', ''], ['win', '수주 통보 기록', 'pri'], ['lose', '실주 통보 기록', 'danger']]};
+}
+const pjMine = id => { const n = pjNext(id); return !!n && pjVisible(id) && (roleIs(n.role) || roleIs(n.alt)); };
+function pjActs(id) {
+  const s = PJS[id];
+  if (s.wait) return pjIsOwner(id) && s.wait.hist.length === 1 ? [['recall', '상신 취소', '']] : [];
+  return pjMine(id) ? pjNext(id).acts : [];
+}
+function pjOpen(id) {
+  pjSync();
+  const D = PJ_D[id], s = PJS[id], row = PIPE[D.row], r = pjCur(id), [st, cls, v] = pjStatus(id), A = pjActs(id), needOp = A.some(x => x[0] === 'req') && ROLE !== 'ceo';
+  const w = s.wait, ln = w ? PJ_LN(w.kind) : null;
+  const waitBox = w ? `<div class="panel" style="padding:12px 14px;margin-top:12px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:13px">결재 진행 · ${PJ_KN[w.kind]}${w.rev != null ? ` (R${w.rev})` : ''}</b>${w.turn === ROLE ? `<a class="btn pri" href="#appr" data-nav data-apgo="${id}" style="min-height:28px;font-size:12.5px">승인함에서 결재 →</a>` : ''}</div>
+    <div class="steps" style="margin-top:8px"><div class="st done"><b>담당 상신</b>완료</div>${ln.map(t => { const i = ln.indexOf(t), c = ln.indexOf(w.turn); return `<div class="st ${i < c ? 'done' : i === c ? 'cur' : ''}"><b>${PJ_RN(t)}${w.kind === 'bud' ? ' 전결' : ''}</b>${i < c ? '완료' : i === c ? '대기' : ''}</div>`; }).join('')}</div>${pjHistHTML(w.hist)}</div>` : '';
+  const actBox = A.length ? `<div class="panel" style="padding:12px 14px;margin-top:12px"><b style="font-size:13px">${HT}지금 할 수 있는 일 · ${ROLES[ROLE].n}</b>
+      ${needOp ? `<div class="f" style="margin-top:8px"><label for="pjop" style="font-size:12.5px">상신 의견 <span style="color:var(--bad)">*필수</span></label><textarea id="pjop" rows="3" placeholder="예: 리스크 반영율 0% 유지 · Q-03 회신 후 재검토"></textarea></div>` : ''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${A.map(([k, l, c]) => `<button class="btn ${c}" type="button" data-pjact="${k}" data-pj="${id}">${l}</button>`).join('')}</div></div>`
+    : `<div class="note" style="margin-top:12px">${s.drop || s.result === 'lose' ? '종결된 건입니다. 실주·불참 분석에서 원인을 기록합니다.' : w ? `${PJ_RN(w.turn)}의 결재를 기다리는 중입니다.` : `지금 단계는 ${ROLES[ROLE].n} 처리 단계가 아닙니다 · 담당: ${ROLES[D.own].n}`}</div>`;
+  const nx = pjNext(id);
+  const rejBox = s.rej && !w ? `<div class="note" style="margin-top:12px;border-color:var(--bad)"><b style="color:var(--bad)">${PJ_KN[s.rej.kind]} 반려</b> · ${s.rej.by}${s.rej.at ? ' · ' + s.rej.at : ''}${s.rej.op ? `<div style="margin-top:4px">사유: ${s.rej.op}</div>` : ''}</div>` : '';
+  const nxBox = nx ? `<div class="muted" style="font-size:12.5px;margin-top:10px">다음 할 일 · <b style="color:var(--fg)">${PJ_RN(nx.role)}</b> · ${nx.label} <span class="src">${vLabel(nx.view)}</span></div>` : '';
+  const revs = s.revs.length ? `<h3 style="font-size:13px;margin:16px 0 6px">리비전</h3><div style="display:flex;flex-direction:column;gap:4px">${s.revs.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:12.5px;flex-wrap:wrap"><span class="id">${D.qp} R${x.n}</span><span class="muted">${x.kind}</span>${x.est ? `<b>${eok(x.est)}</b>` : ''}${pill(x.status, x.status === '승인' ? 'p-ok' : x.status === '제출 완료' ? 'p-qp' : x.status === '승인 대기' ? 'p-warn' : '')}</div>`).join('')}</div>` : '';
+  const log = `<h3 style="font-size:13px;margin:16px 0 6px">진행 이력</h3><ul class="pjlog">${s.log.map(x => `<li><span class="src">${x.at || '기록'}</span><span><b>${x.by}</b> · ${x.t}${x.op && x.op !== '예시 데이터' ? `<div class="muted">의견: ${x.op}</div>` : ''}</span></li>`).join('')}</ul>`;
+  openPanel(row[3], `${row[4]} · 프로젝트 진행`, `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${pill(row[2], fOf(row[2]) === 't' ? 'p-qp' : fOf(row[2]) === 'p' ? 'p-sys' : 'p-rv')}<span class="id">${row[0]}</span>${s.part ? `<span class="id">${D.qp} R${r.n}</span>` : ''}${pill(st, cls)}</div>
+    <div style="margin-top:12px">${pjBar(id)}</div>${nxBox}${rejBox}${waitBox}${actBox}${revs}${log}`,
+    `<a class="btn pri" href="#${nx ? nx.view : v}" data-nav data-pjwork="${id}">${nx ? '이 단계 작업하기 →' : '현재 단계 화면 →'}</a><button class="btn rbtn qbtn" type="button" data-procgo="${pjCode(id)}">프로세스에서 위치 보기${EXT_I}</button>`);
+}
+document.addEventListener('click', e => {
+  const o = e.target.closest('[data-pjopen]'); if (o) { e.preventDefault(); pjOpen(o.dataset.pjopen); return; }
+  const g = e.target.closest('[data-apgo]'); if (g) { pjSync(); const a = APPR.find(x => !x.done && x.pid === g.dataset.apgo); if (a) APSEL = a.k; }
+  const b = e.target.closest('[data-pjact]'); if (!b) return;
+  const id = b.dataset.pj, a = b.dataset.pjact, t = document.getElementById('pjop'), op = t ? t.value.trim() : '';
+  if (a === 'req' && ROLE !== 'ceo' && !t) { PJ_PEND = {id, act: 'req'}; window.__subkey = ''; opinionForm(b.textContent.trim(), `${pjName(id)} 상신`); return; }
+  if (a === 'req' && ROLE !== 'ceo' && !op) { t.focus(); t.style.borderColor = 'var(--bad)'; toast('상신 의견을 입력하세요 (필수)'); return; }
+  const inAp = !!b.closest('#apd');
+  pjAct(id, a, ROLE, op, true); pjSync(); saveSoon();
+  const [st] = pjStatus(id); toast(`${pjName(id)} · ${st}`);
+  const inBar = !!b.closest('#pjwork'); render(); if (!inAp && !inBar) pjOpen(id);
+});
+/* 프로젝트 현황: 행 → 진행 패널 */
+window.addEventListener('click', e => {
+  if (CUR !== 'pipe') return; const tr0 = e.target.closest('[data-goto]'); if (!tr0) return;
+  const rv = (tr0.querySelector('.id') || {}).textContent, D = PJ_DEF.find(x => PIPE[x.row][0] === rv); if (!D) return;
+  e.stopImmediatePropagation(); e.preventDefault(); pjOpen(D.id);
+}, true);
+const _pipePJ = VIEWS.pipe, _pipePJA = VIEWS.pipe.after;
+VIEWS.pipe = () => { pjSync(); return _pipePJ().replace(/행을 누르면 현재 단계 화면으로 이동/g, '행을 누르면 진행·결재 이력 · 결재가 처리되면 상태가 바로 바뀝니다'); };
+if (_pipePJA) VIEWS.pipe.after = _pipePJA;
+/* 화면 상단 프로젝트 머리: 엔진 상태 칩 */
+const PJ_OF = p => p === PC ? 'c' : p === PT ? 't' : p === PP ? 'p' : null;
+const _projHeadPJ = projHead;
+projHead = (p, at, kind, cur) => {
+  const h = _projHeadPJ(p, at, kind, cur), id = PJ_OF(p); if (!id) return h;
+  const [st, cls] = pjStatus(id);
+  return h.replace(/<span class="muted" style="font-size:12px">((?:RV|QP|WO) 상태)<\/span>/, `<span class="pjchip"><span class="muted" style="font-size:12px">$1</span><span data-pjchip="${id}">${pill(st, cls)}</span><button class="btn rbtn" type="button" data-pjopen="${id}" style="min-height:26px;font-size:12px;padding:0 9px">진행·결재</button></span>`);
+};
+const pjChipRefresh = () => document.querySelectorAll('[data-pjchip]').forEach(el => { const [st, cls] = pjStatus(el.dataset.pjchip); el.innerHTML = pill(st, cls); });
+/* 메뉴 배지: 승인함 = 내 차례 건수 */
+const _shellPJ = shell;
+shell = (route, body) => { pjSync(); const n = APPR.filter(a => !a.done && a.wait.turn === ROLE).length; if (MENU_INDEX.appr) MENU_INDEX.appr.b = n || (['estC', 'estP', 'estT'].includes(ROLE) ? APPR.filter(a => !a.done && pjIsOwner(a.pid)).length || null : null); return _shellPJ(route, body); };
+/* 오늘 할 일: 결재 진행 카드 */
+const _homePJ = VIEWS.home, _homePJA = VIEWS.home.after;
+VIEWS.home = () => _homePJ();
+VIEWS.home.after = () => {
+  if (_homePJA) _homePJA();
+  pjSync();
+  const top = document.querySelector('#app .main .top'); if (!top || document.getElementById('pjhome')) return;
+  const card = (t, sub, id, v, extra) => `<a href="#${v}" data-nav data-pjwork="${id}" class="row" style="text-decoration:none;color:inherit;box-sizing:border-box;display:block;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);min-width:220px;flex:1 1 240px"><b style="font-size:13px">${t}</b><div class="muted" style="font-size:12px;margin-top:3px">${sub}</div>${extra || ''}</a>`;
+  const vis = PJ_DEF.filter(D => pjVisible(D.id));
+  const todo = vis.filter(D => pjMine(D.id)), sent = vis.filter(D => PJS[D.id].wait && pjIsOwner(D.id));
+  const items = [...todo.map(D => { const n = pjNext(D.id), s = PJS[D.id]; return card(pjName(D.id), `${n.view === 'appr' ? '내 결재 차례' : pjStatus(D.id)[0]} → <b style="color:var(--fg)">${n.label}</b>`, D.id, n.view, s.rej && !s.wait ? `<div style="font-size:12px;color:var(--bad);margin-top:3px">반려 사유 · ${s.rej.op || '—'} (${s.rej.by})</div>` : ''); }),
+    ...sent.map(D => card(pjName(D.id), `상신함 · ${PJ_KN[PJS[D.id].wait.kind]} · ${PJ_RN(PJS[D.id].wait.turn)} 결재 대기`, D.id, 'appr'))];
+  if (!items.length) return;
+  top.insertAdjacentHTML('afterend', `<section class="panel" id="pjhome" style="padding:12px 14px;margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px"><b style="font-size:13.5px">이어서 할 일 (${items.length})</b><a href="#pipe" class="muted" style="font-size:12px">프로젝트 현황 →</a></div><div style="display:flex;gap:8px;flex-wrap:wrap">${items.join('')}</div></section>`);
+};
+
+/* ---------- 화면 버튼(상신·승인 요청·제출) → 엔진 ---------- */
+const SCR_ACT = {gonogo: ['상신', null, 'req'], cest: ['승인 요청', 'c', 'req'], test: ['승인 요청', 't', 'req'], nego: ['협상가 승인 요청', 't', 'req'], won: ['실행예산 승인 요청', 'jil', 'req'], submit: ['제출 완료 기록', 'c', 'submit']};
+let PJ_PEND = null;
+window.addEventListener('click', e => {
+  const ok = e.target.closest('[data-sbok]');
+  if (ok && PJ_PEND) { const t = document.getElementById('sbo'), op = t ? t.value.trim() : ''; if (!op) return; const P0 = PJ_PEND; PJ_PEND = null; pjAct(P0.id, P0.act, ROLE, op, true); pjSync(); saveSoon(); setWork(P0.id); SUBMIT_PENDING = `${pjName(P0.id)} · ${pjStatus(P0.id)[0]}`; setTimeout(render, 450); return; }
+  const b = e.target.closest('#app .main button[data-toast]'); if (!b || b.classList.contains('off') || b.closest('#apd')) return;
+  const m = SCR_ACT[CUR]; if (!m || !btnLabel(b).includes(m[0])) return;
+  let id = WORK && PJS[WORK] && pjActs(WORK).some(x => x[0] === m[2]) ? WORK : m[1];
+  if (!id) { const c = PJ_DEF.find(D => pjIsOwner(D.id) && pjActs(D.id).some(x => x[0] === 'req') && !PJS[D.id].part); id = c ? c.id : 'c'; }
+  if (!pjActs(id).some(x => x[0] === m[2])) { e.stopImmediatePropagation(); e.preventDefault(); toast(`${pjName(id)} · 지금 상태 「${pjStatus(id)[0]}」라 이 버튼은 처리되지 않습니다 · 진행 패널을 엽니다`); setTimeout(() => pjOpen(id), 400); return; }
+  if (ROLE === 'ceo' || m[2] === 'submit') { pjAct(id, m[2], ROLE, '', true); pjSync(); saveSoon(); setTimeout(pjChipRefresh, 50); return; }
+  PJ_PEND = {id, act: m[2]};
+}, true);
+
+
+/* ===================== 작업 바: 지금 이어가는 프로젝트의 다음 할 일 (화면 → 다음 화면 → 다음 담당자) ===================== */
+let WORK = null; try { WORK = localStorage.getItem('qut-work') || null; } catch (e) {}
+const setWork = id => { WORK = id || null; try { id ? localStorage.setItem('qut-work', id) : localStorage.removeItem('qut-work'); } catch (e) {} };
+document.head.insertAdjacentHTML('beforeend', `<style>
+.pjwork{padding:12px 14px;margin-bottom:16px;border:1.5px solid var(--accent);background:linear-gradient(0deg,var(--surface),var(--surface)),var(--accent-soft)}
+.pjwork .wh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.pjwork .wt{font-size:12px;color:var(--muted);font-weight:700}
+.pjwork .wn{font-size:14px;font-weight:800;margin-top:2px}
+.pjwork .wsteps{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.pjwork .wsteps span{font-size:11.5px;padding:3px 8px;border-radius:12px;background:var(--chip);color:var(--muted);white-space:nowrap}
+.pjwork .wsteps span.d{background:var(--accent-soft);color:var(--accent)}
+.pjwork .wsteps span.c{background:var(--accent);color:#fff;font-weight:700}
+.pjwork .wa{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.pjwork .wx{all:unset;cursor:pointer;color:var(--muted);font-size:12px;padding:2px 6px;border-radius:6px}
+.pjwork .wx:hover{background:var(--chip);color:var(--fg)}
+.pjwork .wrej{margin-top:8px;font-size:12.5px;color:var(--bad)}
+.pjwork .wnote{margin-top:6px;font-size:12px;color:var(--muted)}
+</style>`);
+function workBar() {
+  const id = WORK; if (!id || !PJS[id] || !ROLE) return '';
+  pjSync();
+  const s = PJS[id], r = pjCur(id), D = PJ_D[id], n = pjNext(id), [st, cls] = pjStatus(id);
+  const L0 = r && r.status === '작성 중' ? (r.steps || ['est']) : null, k = r && pjNextStep(r);
+  const chips = L0 ? `<div class="wsteps">${L0.map((x, i) => `<span class="${(r.dn || []).includes(x) || (x === 'est' && r.est) ? 'd' : x === k ? 'c' : ''}">${i + 1}. ${x === 'est' && r.kind === '가격 협상' ? '협상 금액' : STP[x][3]}</span>`).join('')}<span class="${k ? '' : 'c'}">${L0.length + 1}. ${r.kind === '가격 협상' ? '협상가' : '견적'} 승인 요청</span></div>` : `<div style="margin-top:8px">${pjBar(id)}</div>`;
+  let act;
+  if (!n) act = `${pill(s.result === 'win' ? '인계 완료 · 실행 단계로' : '종결', s.result === 'win' ? 'p-wo' : '')}`;
+  else if (pjMine(id) || (n.view === 'appr' && roleIs(n.role))) {
+    if (n.view === 'appr') act = CUR === 'appr' ? `<span class="muted" style="font-size:12.5px">아래 결재 문서에서 의견을 적고 처리하세요</span>` : `<a class="btn pri" href="#appr" data-nav data-apgo="${id}">승인함에서 결재 →</a>`;
+    else if (CUR === n.view) act = n.acts.map(([a, l, c]) => `<button class="btn ${c}" type="button" data-pjact="${a}" data-pj="${id}">${c === 'ai-b' ? '' : HT}${l}</button>`).join('');
+    else act = `<a class="btn pri" href="#${n.view}" data-nav>${vLabel(n.view)} 화면으로 →</a>`;
+  } else act = `<span style="font-size:12.5px">다음 차례 · <b>${PJ_RN(n.role)}</b></span><button class="btn" type="button" data-pjswitch="${id}">${PJ_RN(n.role)}(으)로 바꿔 이어가기 →</button>`;
+  const smp = (document.querySelector('#app .main .ph-proj b') || {}).textContent || '';
+  const note = smp && smp.trim() !== pjName(id) && n && CUR === n.view ? `<div class="wnote">화면 내용은 「${smp.trim()}」 예시 기준입니다 · 처리 결과는 ${pjName(id)}에 기록됩니다</div>` : '';
+  const rej = s.rej && !s.wait ? `<div class="wrej"><b>${PJ_KN[s.rej.kind]} 반려</b> · ${s.rej.by}${s.rej.op ? ` · 사유: ${s.rej.op}` : ''}</div>` : '';
+  return `<section class="panel pjwork" id="pjwork"><div class="wh"><div style="min-width:0"><div class="wt">이어서 하는 작업 · ${PIPE[D.row][0]}${s.part ? ` · ${D.qp} R${r.n}` : ''}</div>
+    <div class="wn">${pjName(id)} <span style="font-weight:600">${pill(st, cls)}</span></div></div>
+    <div style="display:flex;gap:4px;align-items:center"><button type="button" class="wx" data-pjopen="${id}">이력</button><button type="button" class="wx" data-procgo="${pjCode(id)}">흐름도</button><button type="button" class="wx" data-pjwclose title="작업 바 닫기">✕</button></div></div>
+    ${chips}${n ? `<div style="font-size:13px;margin-top:8px">다음 할 일 · <b>${n.label}</b> <span class="muted">(${PJ_RN(n.role)}${n.alt ? ' 또는 ' + PJ_RN(n.alt) : ''} · ${vLabel(n.view)})</span></div>` : ''}${rej}
+    <div class="wa">${act}</div>${note}</section>`;
+}
+function workDecorate() {
+  const old = document.getElementById('pjwork');
+  if (!WORK || COMMON.includes(CUR) || CUR === 'login') { if (old) old.remove(); return; }
+  const top = document.querySelector('#app .main .top'); if (!top) return;
+  const h = workBar(); if (!h) return;
+  if (old) { if (old.dataset.v === CUR + ROLE) return; old.remove(); }
+  top.insertAdjacentHTML('afterend', h); document.getElementById('pjwork').dataset.v = CUR + ROLE;
+}
+let WB_T = 0; new MutationObserver(() => { clearTimeout(WB_T); WB_T = setTimeout(workDecorate, 20); }).observe(document.getElementById('app'), {childList: true});
+window.addEventListener('click', e => {
+  const w = e.target.closest('[data-pjwork]'); if (w) { setWork(w.dataset.pjwork); pjSync(); const a = APPR.find(x => !x.done && x.pid === w.dataset.pjwork); if (a) APSEL = a.k; }
+  const g = e.target.closest('[data-apgo]'); if (g) { pjSync(); const a = APPR.find(x => !x.done && x.pid === g.dataset.apgo); if (a) APSEL = a.k; }
+  if (e.target.closest('[data-pjwclose]')) { setWork(null); const o = document.getElementById('pjwork'); if (o) o.remove(); }
+  const sw = e.target.closest('[data-pjswitch]');
+  if (sw) {
+    e.preventDefault(); e.stopImmediatePropagation();
+    const id = sw.dataset.pjswitch, n = pjNext(id); if (!n) return;
+    ROLE = ROLES[n.role] ? n.role : ROLE; try { localStorage.setItem('qut-role', ROLE); } catch (er) {}
+    pjSync(); if (n.view === 'appr') { const a = APPR.find(x => !x.done && x.pid === id); if (a) APSEL = a.k; }
+    closeDrawer(true);
+    if (location.hash === '#' + n.view) render(); else location.hash = n.view;
+    setTimeout(() => toast(`${ROLES[ROLE].n}(으)로 바꿨습니다 · ${n.label}`), 120);
+  }
+}, true);
+/* 화면의 기존 ‘확정·완료’ 버튼도 지금 작업 단계 완료로 기록 */
+window.addEventListener('click', e => {
+  const b = e.target.closest('#app .main button[data-toast]'); if (!b || b.classList.contains('off') || b.closest('#apd') || !WORK || !PJS[WORK]) return;
+  const n = pjNext(WORK); if (!n || !n.step || CUR !== n.view || !pjMine(WORK)) return;
+  const lab = btnLabel(b); if (SUBMIT_RE.test(lab) || !/확정|완료|결정|발송|마감|반영/.test(lab)) return;
+  const id = WORK; setTimeout(() => { pjAct(id, n.step, ROLE, '', true); pjSync(); saveSoon(); render(); toast(`${pjName(id)} · ${STP[n.step][3]} 완료로 기록 → 다음: ${(pjNext(id) || {}).label || '—'}`); }, 900);
+});
+
+/* ===================== 프로토타입 ⇄ 프로세스 흐름도 상호 이동 ===================== */
+/* 흐름도 박스 코드 → [화면, 기본 역할, 화면 이름] */
+const C2V = {
+  'EXT-RFQ-01': ['mail', 'sup'], 'AI-RFQ-01': ['mail', 'sup'], 'AI-PRJ-01': ['intake', 'sup'], 'SYS-PRJ-01': ['intake', 'sup'], 'SAL-RFQ-01': ['intake', 'sup'],
+  'AI-ANL-01': ['bidchk', 'estC'], 'SAL-ANL-01': ['gonogo', 'estC'], 'CEO-ANL-01': ['appr', 'ceo'], 'SYS-DRP-01': ['lost', 'estC'],
+  'AI-ANL-02': ['anl', 'estC'], 'AI-QTY-01': ['cqty', 'estC'], 'ADM-DB-01': ['price', 'admin'], 'ADM-VND-01': ['vendor', 'admin'], 'ADM-PRJ-01': ['users', 'admin'], 'ADM-INS-01': ['lib', 'admin'], 'ADM-INS-02': ['lost', 'exec'],
+  'SAL-EST-01': ['cest', 'estC'], 'AI-EST-01': ['cest', 'estC'], 'CEO-APR-01': ['appr', 'ceo'],
+  'TNK-RFQ-01': ['tauto', 'estT'], 'VND-QTE-01': ['tauto', 'estT'], 'AI-VND-01': ['tauto', 'estT'], 'AI-VND-02': ['tauto', 'estT'], 'AI-TNK-01': ['tauto', 'estT'], 'TNK-SEL-01': ['tauto', 'estT'],
+  'TNK-EST-01': ['test', 'estT'], 'SYS-TNK-01': ['test', 'estT'], 'EXE-APR-01': ['appr', 'exec'], 'CEO-APR-02': ['appr', 'ceo'],
+  'SAL-TBE-01': ['submit', 'estC'], 'EXT-TBE-01': ['tcm', 'estC'], 'AI-TBE-01': ['tcm', 'estC'], 'SYS-TBE-01': ['tcm', 'estC'],
+  'EXT-NEG-01': ['nego', 'estT'], 'SAL-NEG-01': ['nego', 'estT'], 'SYS-NEG-01': ['nego', 'estT'], 'CEO-NEG-01': ['appr', 'ceo'],
+  'EXT-RES-01': ['won', 'estC'], 'SAL-RES-01': ['won', 'estC'], 'SYS-RES-01': ['pipe', 'exec'], 'AI-INS-01': ['lost', 'exec'], 'SYS-HND-01': ['won', 'estC'], 'NXT-BUD-01': ['won', 'exec'],
+};
+const ST2V = {'st-01': ['intake', 'sup'], 'st-02': ['gonogo', 'estC'], 'st-03': ['cqty', 'estC'], 'st-04': ['cest', 'estC'], 'st-05': ['tcm', 'estC'], 'st-06': ['nego', 'estT'], 'st-07': ['won', 'estC'], 'st-08': ['won', 'estC']};
+const V2C = {mail: 'AI-RFQ-01', brief: 'AI-PRJ-01', intake: 'SAL-RFQ-01', bidchk: 'AI-ANL-01', lib: 'AI-ANL-01', site: 'AI-ANL-01', anl: 'AI-ANL-01', sim: 'AI-ANL-01', gonogo: 'SAL-ANL-01',
+  ccheck: 'AI-ANL-02', cqty: 'AI-QTY-01', ccost: 'AI-QTY-01', cest: 'SAL-EST-01', cdocs: 'SAL-EST-01', tspec: 'TNK-RFQ-01', trfq: 'TNK-RFQ-01', tauto: 'AI-VND-01', tcmp: 'AI-VND-02', test: 'TNK-EST-01',
+  submit: 'SAL-TBE-01', tcm: 'SYS-TBE-01', nego: 'SAL-NEG-01', won: 'SYS-HND-01', lost: 'AI-INS-01', price: 'ADM-DB-01', rule: 'ADM-DB-01', riskstd: 'ADM-DB-01', users: 'ADM-PRJ-01',
+  vendor: 'ADM-VND-01', avlv: 'ADM-VND-01', avlq: 'ADM-VND-01', avlchk: 'ADM-VND-01', avl: 'ADM-VND-01', vlink: 'ADM-VND-01', vitem: 'ADM-VND-01', vreview: 'ADM-VND-01', vqa: 'ADM-VND-01', pipe: 'SYS-RES-01'};
+const vLabel = v => (MENU_INDEX[v] || {}).l || v;
+function curCode() {
+  if (CUR === 'appr') { const a = APPR.find(x => x.k === APSEL); return a ? a.code : 'CEO-APR-01'; }
+  return V2C[CUR] || '';
+}
+/* 흐름도 HTML: 박스 클릭 → 프로토타입 화면 · 진행 중 프로젝트 배지 · 지금 화면 표시 */
+function oflowNav(tab, here) {
+  pjSync();
+  const M = {}; Object.entries(C2V).forEach(([c, x]) => M[c] = [x[0], x[1], vLabel(x[0])]);
+  const SM = {}; Object.entries(ST2V).forEach(([c, x]) => SM[c] = [x[0], x[1], vLabel(x[0])]);
+  const B = {}; PJ_DEF.forEach(D => { const c = pjCode(D.id); (B[c] = B[c] || []).push(`${pjName(D.id)} · ${pjStatus(D.id)[0]}`); });
+  const proto = location.href.split('#')[0].split('?')[0];
+  const js = `<style>
+.qb{position:absolute;top:-9px;right:-9px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#E8590C;color:#fff;font:700 11.5px/20px system-ui,sans-serif;text-align:center;box-shadow:0 0 0 2px #fff;z-index:5;cursor:pointer}
+.qhere{outline:3px solid #E8590C!important;outline-offset:3px;box-shadow:0 0 0 7px rgba(232,89,12,.18)!important}
+.qhl{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;background:#E8590C;color:#fff;font:700 11.5px/1 system-ui,sans-serif;padding:5px 8px;border-radius:6px;z-index:6}
+#qbar{position:fixed;right:14px;bottom:14px;z-index:99;display:flex;gap:8px;align-items:center;background:var(--surface,#fff);border:1px solid #d0d5dd;border-radius:12px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.14);font:13px/1.4 system-ui,sans-serif;max-width:calc(100vw - 28px);flex-wrap:wrap}
+#qbar button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:7px 11px;background:#1F6FEB;color:#fff;cursor:pointer}
+#qbar small{color:#667085}
+#qtoast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#111827;color:#fff;padding:9px 14px;border-radius:9px;font:13px system-ui,sans-serif;z-index:100;display:none}
+</style><script>(function(){
+var M=${JSON.stringify(M)},SM=${JSON.stringify(SM)},B=${JSON.stringify(B)},HERE=${JSON.stringify(here || '')},P=${JSON.stringify(proto)};
+function tst(t){var e=document.getElementById('qtoast');if(!e)return;e.textContent=t;e.style.display='block';clearTimeout(tst.t);tst.t=setTimeout(function(){e.style.display='none';},2600);}
+function send(q){
+  try{ if(window.opener&&!window.opener.closed){ window.opener.postMessage({qgo:q},'*'); try{ if(window.opener.name==='qproto') window.open('','qproto'); else window.opener.focus(); }catch(e){} tst('프로토타입 창에서 「'+(q.label||'화면')+'」을(를) 열었습니다 · 탭을 확인하세요'); return; } }catch(e){}
+  if(window.parent!==window){ window.parent.postMessage({qgo:q},'*'); return; }
+  window.open(P+'?role='+(q.role||'')+'&code='+encodeURIComponent(q.code||'')+'#'+(q.v||'home'),'qproto');
+}
+window.qgo=function(code,st){ var m=M[code]||SM[st]; if(!m){tst('연결된 화면이 없습니다');return;} send({v:m[0],role:m[1],label:m[2],code:code}); };
+function deco(){
+  [].forEach.call(document.querySelectorAll('.qb,.qhl'),function(x){x.remove();});
+  Object.keys(B).forEach(function(c){ var els=[document.getElementById('b-current-'+c)].concat([].slice.call(document.querySelectorAll('.card[data-code="'+c+'"]')));
+    els.forEach(function(el){ if(!el)return; el.style.overflow='visible'; var d=document.createElement('span'); d.className='qb'; d.textContent=B[c].length; d.title='이 단계의 프로젝트\\n'+B[c].join('\\n'); el.appendChild(d); }); });
+  if(HERE){ var e=document.getElementById('b-current-'+HERE); if(e){ e.classList.add('qhere'); e.style.overflow='visible'; var l=document.createElement('span'); l.className='qhl'; l.textContent='지금 보던 화면'; e.appendChild(l); } }
+  [].forEach.call(document.querySelectorAll('.wrap'),function(w){w.scrollLeft=0;});
+}
+function toHere(){ var e=HERE&&document.getElementById('b-current-'+HERE); if(!e||!e.offsetParent)return; [].forEach.call(document.querySelectorAll('.wrap'),function(w){w.scrollLeft=0;}); var r=e.getBoundingClientRect(); window.scrollTo(0,Math.max(0,r.top+window.scrollY-window.innerHeight/2)); }
+var g=window.go; window.go=function(h){ g(h); setTimeout(deco,40); };
+document.body.insertAdjacentHTML('beforeend','<div id="qbar"><small>박스를 누르면 프로토타입 해당 화면으로 · <b style="color:#E8590C">●숫자</b> = 지금 그 단계에 있는 프로젝트</small><button type="button" id="qback">↩ 프로토타입으로</button></div><div id="qtoast"></div>');
+document.getElementById('qback').addEventListener('click',function(){ send({back:1,label:'보던 화면'}); });
+setTimeout(deco,60); setTimeout(function(){deco();toHere();},450); setTimeout(toHere,1100);
+})();<\/script>`;
+  return OFLOW_HTML
+    .replace("d.addEventListener('click', () => window.open(DESIGN + '#' + n.code + '|' + st, 'design'));", "d.addEventListener('click', () => window.qgo && qgo(n.code, st));")
+    .replace("window.open(DESIGN + '#' + c.dataset.code + '|st-' + String(c.dataset.st).padStart(2, '0'), 'design');", "window.qgo && qgo(c.dataset.code, 'st-' + String(c.dataset.st).padStart(2, '0'));")
+    .replace('클릭: 상세 설계에서 이 박스의 기능 보기 (작성 전이면 검토 자료로 안내)', '클릭: 프로토타입에서 이 단계 화면 열기')
+    .replace(/클릭: 상세 설계에서 이 기능 보기/g, '클릭: 프로토타입에서 이 단계 화면 열기')
+    .replace("go(location.hash || '#current');", `go(location.hash || '#${tab}${here ? ':' + here : ''}');`)
+    .replace(/<li>박스를 누르면 <a [^>]*>상세 설계<\/a>[^<]*<a [^>]*>검토 자료<\/a>[^<]*<\/li>/g, '<li><b>박스를 누르면 프로토타입의 해당 화면으로 이동</b>한다 (필요하면 그 화면을 쓰는 역할로 바뀐다). 주황 숫자는 지금 그 단계에 있는 프로젝트 수, 주황 테두리는 프로토타입에서 보던 화면의 위치다.</li>')
+    .replace('</body>', js + '</body>');
+}
+/* 흐름도에서 온 이동 요청 */
+function pjGo(q) {
+  closeDrawer(true);
+  if (q.back) { toast('프로토타입으로 돌아왔습니다'); return; }
+  const it = MENU_INDEX[q.v]; let sw = false;
+  pjSync();
+  const apOk = q.v !== 'appr' || (['exec', 'ceo'].includes(ROLE) && APPR.some(x => x.code === q.code && pjVisible(x.pid)));
+  if (!COMMON.includes(q.v) && (!ROLE || (it && !visible(it, ROLE)) || !apOk)) { ROLE = q.role; try { localStorage.setItem('qut-role', ROLE); } catch (e) {} sw = true; }
+  if (q.v === 'appr') { pjSync(); const a = APPR.find(x => !x.done && x.code === q.code && pjVisible(x.pid)) || APPR.find(x => x.code === q.code); if (a) APSEL = a.k; }
+  if (location.hash === '#' + q.v) render(); else location.hash = q.v;
+  setTimeout(() => toast(`프로세스 ${q.code} → ${vLabel(q.v)}${sw ? ` · 역할을 ${ROLES[ROLE].n}(으)로 전환` : ''}`), 150);
+}
+window.addEventListener('message', e => { const q = e.data && e.data.qgo; if (q) pjGo(q); });
+try { if (window.top === window) window.name = 'qproto'; } catch (e) {}
+try { const qc = new URLSearchParams(window.__QS || '').get('code'); if (qc && C2V[qc]) setTimeout(() => pjGo({v: (location.hash || '#home').slice(1), role: C2V[qc][1], code: qc}), 60); } catch (e) {}
+/* 프로토타입 → 흐름도 ('프로세스 위치로 가기') */
+function openProc(code) {
+  const w = window.open(URL.createObjectURL(new Blob([fitDoc(oflowNav('current', code))], {type: 'text/html'})), 'qflow');
+  if (!w) toast('팝업이 차단되었습니다 · 브라우저에서 팝업을 허용해 주세요'); else try { w.focus(); } catch (e) {}
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-procgo]'); if (!b) return; e.preventDefault();
+  openProc(b.dataset.procgo === '1' ? curCode() : b.dataset.procgo);
+});
+function procDecorate() {
+  const my = document.querySelector('#app .main .top [data-myflow]');
+  if (my && !my.parentElement.querySelector('[data-procgo]')) my.insertAdjacentHTML('afterend', `<button class="btn ibtn qbtn" type="button" data-procgo="1" data-tip="원본 프로세스 흐름도(8단계)를 새 창으로 열고 이 화면의 위치를 표시합니다 · 흐름도 박스를 누르면 다시 이 프로토타입 화면으로"><span class="ic">⇢</span>프로세스 위치${EXT_I}</button>`);
+}
+new MutationObserver(() => requestAnimationFrame(procDecorate)).observe(document.getElementById('app'), {childList: true, subtree: true});
+window.__pj = {PJS, pjStatus, pjNext, pjMine, setWork, pjCode};
 
 render();
 })();
