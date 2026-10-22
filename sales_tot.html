@@ -4601,7 +4601,7 @@ VIEWS.flow.after = () => { _flowA3(); const f = document.getElementById('dflow')
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-ffopen]'); if (!b) return; e.preventDefault(); e.stopPropagation();
   const k = b.dataset.ffopen;
-  if (k === 'data' || k === 'orig') { openWin(fitDoc(oflowAt(k === 'data' ? 'store' : 'current')), '흐름도'); return; }
+  if (k === 'data' || k === 'orig') { const w = window.open(flowURL(k === 'data' ? 'store' : 'current', k === 'orig' && typeof curCode === 'function' ? curCode() : ''), 'qflow'); if (!w) toast('팝업이 차단되었습니다 · 브라우저에서 팝업을 허용해 주세요'); return; }
   const w = window.open(location.pathname + '?fk=' + k + '#flowfull', '_blank'); if (!w) toast('팝업이 차단되었습니다 · 브라우저에서 팝업을 허용해 주세요');
 }, true);
 /* '흐름도 8단계' 팝업에도 새 창 버튼 */
@@ -4774,7 +4774,7 @@ document.addEventListener('click', e => { if (!e.target.closest('[data-hnav]')) 
 document.addEventListener('navmini', paintHdr);
 let HDR_T = 0; new MutationObserver(() => { clearTimeout(HDR_T); HDR_T = setTimeout(paintHdr, 30); }).observe(document.getElementById('app'), {childList: true, subtree: true});
 
-const QPOP_JS = "(function(){\nvar C=window.__QCFG||{}, M=C.M||{}, SM=C.SM||{};\nvar css=document.createElement('style');\ncss.textContent='#qpop{position:absolute;z-index:300;width:290px;background:var(--bg,#fff);color:var(--text,#1d2433);border:1px solid var(--border,#d0d5dd);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.18);padding:10px 10px 8px;font:13px/1.45 \"Pretendard\",\"Malgun Gothic\",system-ui,sans-serif}'\n +'#qpop .qh{font-weight:700;padding-right:18px}#qpop .qc{font:11.5px ui-monospace,Consolas,monospace;color:var(--muted,#7a8296);margin:2px 0 6px}'\n +'#qpop a,#qpop button{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;box-sizing:border-box;text-align:left;border:1px solid var(--border,#e3e6ee);background:none;border-radius:8px;padding:7px 9px;margin-top:5px;color:inherit;text-decoration:none;cursor:pointer;font:inherit}'\n +'#qpop a:hover,#qpop button:hover{border-color:#6b5fd3;background:rgba(107,95,211,.08)}#qpop small{color:var(--muted,#7a8296);font-size:11.5px;white-space:nowrap}#qpop .qx{position:absolute;right:6px;top:4px;border:0;width:auto;margin:0;padding:2px 6px;color:var(--muted,#7a8296)}';\ndocument.head.appendChild(css);\nfunction close(){var p=document.getElementById('qpop');if(p)p.remove();}\nwindow.qmenu=function(code,st,el,title){\n  close(); var m=M[code]||SM[st], r=el.getBoundingClientRect(), p=document.createElement('div'); p.id='qpop';\n  var d=C.design+'#'+code+'|'+st, rv=C.review+'#'+st;\n  p.innerHTML='<button type=\"button\" class=\"qx\" aria-label=\"닫기\">✕<\/button><div class=\"qh\"><\/div><div class=\"qc\">'+code+' · '+st.replace('st-','단계 ')+'<\/div>'\n    +'<a href=\"'+d+'\" target=\"design\">상세 설계 <small>기능·정책·계산 ↗<\/small><\/a>'\n    +(m?'<button type=\"button\" data-qproto>프로토타입 화면 <small>'+m[2]+' ↗<\/small><\/button>':'')\n    +'<a href=\"'+rv+'\" target=\"review\">검토 자료 <small>인터뷰·기술 검증 ↗<\/small><\/a>';\n  p.querySelector('.qh').textContent=title||code;\n  document.body.appendChild(p);\n  var x=r.left+window.scrollX, y=r.bottom+window.scrollY+6;\n  if(x+300>window.scrollX+document.documentElement.clientWidth) x=window.scrollX+document.documentElement.clientWidth-306;\n  p.style.left=Math.max(6,x)+'px'; p.style.top=y+'px';\n  p.querySelector('.qx').onclick=close;\n  var b=p.querySelector('[data-qproto]');\n  if(b) b.onclick=function(){ close(); if(window.qgo) window.qgo(code,st); else window.open(C.proto+'?role='+m[1]+'&code='+encodeURIComponent(code)+'#'+m[0],'qproto'); };\n  [].forEach.call(p.querySelectorAll('a'),function(a){a.addEventListener('click',function(){setTimeout(close,50);});});\n};\ndocument.addEventListener('click',function(e){ if(!e.target.closest('#qpop') && !e.target.closest('.card[data-code]') && !e.target.closest('[id^=\"b-current-\"],[id^=\"b-fs-\"],[id^=\"b-gd-\"]')) close(); });\ndocument.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });\n})();\n";
+const QPOP_JS = "(function(){\n/* 박스 선택 → 우측 패널 (박스 정보 + 화면 이동 · 상세 설계 · 검토 자료 버튼) */\nvar C=window.__QCFG||{}, M=C.M||{}, SM=C.SM||{};\nvar css=document.createElement('style');\ncss.textContent='#qpanel{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:92vw;z-index:300;background:var(--bg,#fff);color:var(--text,#1d2433);border-left:1px solid var(--border,#d0d5dd);box-shadow:-12px 0 32px rgba(0,0,0,.14);display:flex;flex-direction:column;font:13.5px/1.6 \"Pretendard\",\"Malgun Gothic\",system-ui,sans-serif;transform:translateX(100%);transition:transform .18s ease}'\n +'#qpanel.on{transform:none}#qpanel .qph{padding:14px 16px 10px;border-bottom:1px solid var(--border,#e3e6ee);display:flex;gap:10px;align-items:flex-start}'\n +'#qpanel .qc{font:600 12px ui-monospace,Consolas,monospace;color:var(--ai-code,#5a4ec4)}#qpanel h3{margin:2px 0 0;font-size:16px;line-height:1.4}'\n +'#qpanel .qx{margin-left:auto;border:1px solid var(--border,#e3e6ee);background:none;border-radius:8px;padding:3px 9px;cursor:pointer;color:inherit;font:inherit}'\n +'#qpanel .qb2{flex:1;overflow-y:auto;padding:12px 16px}#qpanel .qk{font-size:12px;color:var(--muted,#7a8296);font-weight:700;margin:12px 0 4px}'\n +'#qpanel .qt{display:inline-block;font-size:11.5px;font-weight:600;padding:0 7px;border-radius:9px;line-height:19px;border:1px solid var(--border,#d0d5dd);margin:0 4px 4px 0}'\n +'#qpanel ul{margin:0;padding-left:18px}#qpanel li{margin:2px 0}#qpanel .qno{font:11.5px ui-monospace,monospace;color:var(--muted,#7a8296)}'\n +'#qpanel .qf{padding:12px 16px;border-top:1px solid var(--border,#e3e6ee);display:flex;flex-direction:column;gap:6px}'\n +'#qpanel .qf a,#qpanel .qf button{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;box-sizing:border-box;border:1px solid var(--border,#d0d5dd);background:none;border-radius:8px;padding:9px 12px;color:inherit;text-decoration:none;cursor:pointer;font:inherit}'\n +'#qpanel .qf .pri{background:#1F6FEB;border-color:#1F6FEB;color:#fff;font-weight:700}#qpanel .qf small{opacity:.8;font-size:12px}'\n +'.qsel{outline:3px solid #1F6FEB!important;outline-offset:3px}';\ndocument.head.appendChild(css);\nfunction esc(s){return String(s==null?'':s).replace(/[&<>\"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c];});}\nfunction strip(s){return String(s||'').replace(/<[^>]+>/g,' ').replace(/\\s+/g,' ').trim();}\nfunction close(){var p=document.getElementById('qpanel');if(p){p.classList.remove('on');setTimeout(function(){p.remove();},180);} [].forEach.call(document.querySelectorAll('.qsel'),function(x){x.classList.remove('qsel');});}\nfunction info(code){\n  var n=null,lane='',cols=[],steps=[];\n  try{ n=(CUR.nodes||[]).filter(function(x){return x.code===code;})[0]; cols=CUR.cols||[]; }catch(e){}\n  try{ var L=(typeof LANES!=='undefined'?LANES:[]); if(n){ var l=L.filter(function(x){return x.k===n.lane;})[0]; lane=l?l.t:n.lane; } }catch(e){}\n  try{ steps=(typeof STEPS!=='undefined'?STEPS:[]).filter(function(x){return x.code===code;}); if(!lane&&steps[0]){ var A=(typeof ACTORS!=='undefined'?ACTORS:[]), a=A.filter(function(x){return x.k===steps[0].a;})[0]; lane=a?(a.t||a.n||steps[0].a):steps[0].a; } }catch(e){}\n  return {n:n,lane:lane,cols:cols,steps:steps};\n}\nwindow.qmenu=function(code,st,el,title){\n  close(); if(el) el.classList.add('qsel');\n  var m=M[code]||SM[st], I=info(code), d=C.design+'#'+code+'|'+st, rv=C.review+'#'+st, sn=parseInt(st.replace('st-',''),10);\n  var desc=I.n&&I.n.s?strip(I.n.s):(I.steps[0]&&I.steps[0].s?strip(I.steps[0].s):'');\n  var stg=I.cols[sn-1]?String(sn).padStart(2,'0')+'. '+I.cols[sn-1]:'단계 '+String(sn).padStart(2,'0');\n  var who=code.indexOf('AI-')===0?'AI 처리':code.indexOf('SYS-')===0?'시스템 처리':/^(EXT|VND|NXT)-/.test(code)?'외부':'담당자 (H)';\n  var sl=I.steps.length?'<div class=\"qk\">업무 단계<\/div><ul>'+I.steps.map(function(x){return '<li><span class=\"qno\">'+esc(x.no)+'<\/span> <b>'+esc(strip(x.t))+'<\/b>'+(x.s?' — '+esc(strip(x.s)):'')+(x.nx?' <span class=\"qno\">→ '+esc(strip(x.nx))+'<\/span>':'')+'<\/li>';}).join('')+'<\/ul>':'';\n  var p=document.createElement('aside'); p.id='qpanel'; p.setAttribute('role','dialog');\n  p.innerHTML='<div class=\"qph\"><div style=\"min-width:0\"><div class=\"qc\">'+esc(code)+'<\/div><h3>'+esc(title||code)+'<\/h3><\/div><button type=\"button\" class=\"qx\" aria-label=\"닫기\">닫기 ✕<\/button><\/div>'\n    +'<div class=\"qb2\"><div><span class=\"qt\">'+esc(stg)+'<\/span>'+(I.lane?'<span class=\"qt\">'+esc(I.lane)+'<\/span>':'')+'<span class=\"qt\">'+who+'<\/span><\/div>'\n    +(desc?'<div class=\"qk\">하는 일<\/div><div>'+esc(desc)+'<\/div>':'')+sl\n    +(m?'<div class=\"qk\">프로토타입 화면<\/div><div><b>'+esc(m[2])+'<\/b> <span class=\"qno\">#'+esc(m[0])+' · 기본 역할 '+esc(m[1])+'<\/span><\/div>':'<div class=\"qk\">프로토타입 화면<\/div><div class=\"qno\">연결된 화면 없음<\/div>')+'<\/div>'\n    +'<div class=\"qf\">'+(m?'<button type=\"button\" class=\"pri\" data-qproto>이 업무 화면으로 이동 <small>'+esc(m[2])+' →<\/small><\/button>':'')\n    +'<a href=\"'+d+'\" target=\"design\">상세 설계 <small>기능·정책·계산 ↗<\/small><\/a><a href=\"'+rv+'\" target=\"review\">검토 자료 <small>인터뷰·기술 검증 ↗<\/small><\/a><\/div>';\n  document.body.appendChild(p); requestAnimationFrame(function(){p.classList.add('on');});\n  p.querySelector('.qx').onclick=close;\n  var b=p.querySelector('[data-qproto]');\n  if(b) b.onclick=function(){ if(window.qgo) window.qgo(code,st); else window.open(C.proto+'?role='+m[1]+'&code='+encodeURIComponent(code)+'#'+m[0],'qproto'); };\n};\ndocument.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });\n})();\n";
 
 /* ===================== 프로젝트 진행 엔진 ─ 결재 흐름(담당 상신 → 영업임원 → 대표이사 자동 상신 → 승인)에 따라 데이터가 진행 ===================== */
 const PJ_KN = {part: '참여 결정', est: '견적 승인', neg: '협상가 승인', bud: '실행예산 승인'};
@@ -5370,8 +5370,12 @@ window.addEventListener('message', e => { const q = e.data && e.data.qgo; if (q)
 try { if (window.top === window) window.name = 'qproto'; } catch (e) {}
 try { const qc = new URLSearchParams(window.__QS || '').get('code'); if (qc && C2V[qc]) setTimeout(() => pjGo({v: (location.hash || '#home').slice(1), role: C2V[qc][1], code: qc}), 60); } catch (e) {}
 /* 프로토타입 → 흐름도 ('프로세스 위치로 가기') */
+/* 원본 흐름도 새 창: 같은 폴더의 estimate-ai-flow.html (상세 설계·검토 자료 링크가 그대로 열림) */
+function flowURL(tab, code) { return location.href.split('#')[0].split('?')[0].replace(/[^/]*$/, '') + 'estimate-ai-flow.html?fit=1#' + (tab || 'current') + (code ? ':' + code : ''); }
+function pjBadges() { pjSync(); const B = {}; PJ_DEF.forEach(D => { const c = pjCode(D.id); (B[c] = B[c] || []).push(`${pjName(D.id)} · ${pjStatus(D.id)[0]}`); }); return B; }
+window.addEventListener('message', e => { if (e.data && e.data.qflowHello && e.source) try { e.source.postMessage({qflowCfg: {B: pjBadges()}}, '*'); } catch (er) {} });
 function openProc(code) {
-  const w = window.open(URL.createObjectURL(new Blob([fitDoc(oflowNav('current', code))], {type: 'text/html'})), 'qflow');
+  const w = window.open(flowURL('current', code), 'qflow');
   if (!w) toast('팝업이 차단되었습니다 · 브라우저에서 팝업을 허용해 주세요'); else try { w.focus(); } catch (e) {}
 }
 document.addEventListener('click', e => {
@@ -5389,6 +5393,74 @@ window.__pj = {PJS, pjStatus, pjNext, pjMine, setWork, pjCode, C2V, vLabel};
 const _bidchkTT = VIEWS.bidchk, _bidchkTTA = VIEWS.bidchk.after;
 VIEWS.bidchk = () => { if (WORK && PJS[WORK] && pjTank(WORK) && !PJS[WORK].anl && pjMine(WORK)) CKP = 't'; const h = _bidchkTT(); return CKP === 't' ? h.replace('<div id="ckb">', `<section class="panel" style="padding:12px 14px;margin-bottom:16px">${ttBox('t', false)}</section><div id="ckb">`) : h; };
 VIEWS.bidchk.after = _bidchkTTA;
+
+/* ===================== 액터 레인 흐름(공사·탱크) : 박스 선택 → 우측 패널 → ‘화면으로 이동’ ===================== */
+const LANE_ROLE = (lane, fk) => lane === 'sup' ? 'sup' : lane === 'exec' ? 'exec' : lane === 'ceo' ? 'ceo' : lane === 'adm' ? 'admin' : fk === 'tank' ? 'estT' : 'estC';
+const fnFind = id => { for (const fk of ['civil', 'tank']) { const F = FLOWS[fk]; if (!F) continue; const n = F.nodes.find(x => x[0] === id); if (n) return {fk, F, n}; } return null; };
+function fnPanel(id, fkHint) {
+  const R0 = fnFind(id); if (!R0) return; const {F, n} = R0, fk = fkHint && FLOWS[fkHint] && FLOWS[fkHint].nodes.some(x => x[0] === id) ? fkHint : R0.fk;
+  const lane = F.lanes.find(l => l[0] === n[1]) || [n[1], n[1], ''], v = n[7], role = LANE_ROLE(n[1], fk);
+  const prev = F.edges.filter(e => e[1] === id).map(e => F.nodes.find(x => x[0] === e[0])).filter(Boolean);
+  const next = F.edges.filter(e => e[0] === id).map(e => F.nodes.find(x => x[0] === e[1])).filter(Boolean);
+  const lk = L => L.length ? L.map(x => `<button type="button" class="btn rbtn" data-fnp="${x[0]}" data-fk="${fk}" style="min-height:28px;font-size:12.5px;margin:0 4px 4px 0">${x[3] === 'dec' ? '◇ ' : ''}${x[5]}</button>`).join('') : '<span class="muted">—</span>';
+  const who = n[3] === 'ai' ? `${AT}AI 처리` : n[3] === 'sys' ? `${STg}시스템` : n[3] === 'ext' ? '외부' : `${HT}담당자`;
+  const inOpener = CUR === 'flowfull' && window.opener && !window.opener.closed;
+  openPanel(n[5], `${n[4]} · ${String(n[2] + 1).padStart(2, '0')} ${F.cols[n[2]]}`, `<div style="display:flex;gap:6px;flex-wrap:wrap">${pill(lane[1], 'p-rv')}${pill(fk === 'tank' ? '탱크 견적' : '공사 견적', '')}<span style="font-size:12.5px">${who}</span>${n[8] ? pill('추가', 'p-warn') : ''}</div>
+    ${n[6] ? `<h3 style="font-size:13px;margin:14px 0 4px">하는 일</h3><div style="font-size:13.5px">${n[6]}</div>` : ''}
+    <h3 style="font-size:13px;margin:14px 0 4px">연결 화면</h3><div style="font-size:13.5px"><b>${vLabel(v)}</b> <span class="src">#${v} · ${ROLES[role].n}</span></div>
+    <h3 style="font-size:13px;margin:14px 0 4px">앞 단계</h3><div>${lk(prev)}</div>
+    <h3 style="font-size:13px;margin:14px 0 4px">다음 단계</h3><div>${lk(next)}</div>
+    <div class="muted" style="font-size:12px;margin-top:14px">‘이 업무 화면으로 이동’을 누르면 ${inOpener ? '프로토타입 창이' : ''} ${vLabel(v)} 화면으로 바뀝니다${visible(MENU_INDEX[v] || {r: '*'}, ROLE || 'x') || !MENU_INDEX[v] ? '' : ` (역할을 ${ROLES[role].n}(으)로 전환)`}. 화면에서 ‘프로세스 위치’를 누르면 다시 이 흐름의 같은 박스로 돌아옵니다.</div>`,
+    `<button class="btn pri" type="button" data-fngo="${id}" data-fk="${fk}">${HT}이 업무 화면으로 이동 →</button><button class="btn rbtn qbtn" type="button" data-procgo="${({'SUP-RFQ-01': 'SAL-RFQ-01', 'SAL-SITE-01': 'AI-ANL-01', 'SAL-CHK-01': 'AI-ANL-02', 'SAL-DOC-01': 'SAL-EST-01', 'SUP-SUB-01': 'SAL-TBE-01', 'EXE-ANL-01': 'SAL-ANL-01', 'EXE-NEG-01': 'CEO-NEG-01'})[n[4]] || (C2V[n[4]] ? n[4] : V2C[v] || '')}">원본 흐름도에서 보기${EXT_I}</button>`);
+  document.querySelectorAll('a.fn.qsel').forEach(x => x.classList.remove('qsel')); const el = document.getElementById('fn-' + id); if (el) el.classList.add('qsel');
+}
+document.head.insertAdjacentHTML('beforeend', '<style>a.fn.qsel{outline:3px solid var(--accent);outline-offset:3px}a.fn.qhere2{outline:3px solid #E8590C;outline-offset:3px;box-shadow:0 0 0 7px rgba(232,89,12,.18)}#procmenu{position:absolute;z-index:80;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.16);padding:6px;min-width:250px}#procmenu button{all:unset;box-sizing:border-box;display:flex;justify-content:space-between;gap:10px;width:100%;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px}#procmenu button:hover{background:var(--chip)}#procmenu small{color:var(--muted)}</style>');
+document.addEventListener('click', e => {
+  const a = e.target.closest('a.fn'); if (a && a.id) { e.preventDefault(); e.stopImmediatePropagation(); fnPanel(a.id.slice(3), FLOWKEY); return; }
+  const p = e.target.closest('[data-fnp]'); if (p) { e.preventDefault(); fnPanel(p.dataset.fnp, p.dataset.fk); return; }
+  const g = e.target.closest('[data-fngo]'); if (!g) return; e.preventDefault(); e.stopImmediatePropagation();
+  const R0 = fnFind(g.dataset.fngo); if (!R0) return; const n = R0.n, fk = g.dataset.fk || R0.fk;
+  const q = {v: n[7], role: LANE_ROLE(n[1], fk), code: n[4], label: vLabel(n[7])};
+  if (CUR === 'flowfull' && window.opener && !window.opener.closed) { closeDrawer(true); window.opener.postMessage({qgo: q}, '*'); try { window.opener.focus(); } catch (er) {} toast(`프로토타입 창에서 「${vLabel(n[7])}」을(를) 열었습니다`); return; }
+  pjGo(q);
+}, true);
+/* 승인 박스(EXE-ANL·EXE-NEG 등)도 승인함의 해당 결재로 */
+const _pjGo2 = pjGo;
+pjGo = q => {
+  if (q.v === 'appr' && !q.back) {
+    pjSync(); const kind = /ANL/.test(q.code) ? 'part' : /NEG/.test(q.code) ? 'neg' : /BUD/.test(q.code) ? 'bud' : 'est';
+    if (['exec', 'ceo'].includes(q.role) && ROLE !== q.role) { ROLE = q.role; try { localStorage.setItem('qut-role', ROLE); } catch (e) {} }
+    const a = APPR.find(x => !x.done && x.code === q.code && pjVisible(x.pid)) || APPR.find(x => !x.done && x.wait.kind === kind && x.wait.turn === ROLE) || APPR.find(x => !x.done && x.wait.kind === kind);
+    if (a) q = Object.assign({}, q, {code: a.code});
+  }
+  _pjGo2(q);
+};
+/* ‘프로세스 위치’ : 원본 흐름도(8단계) 또는 액터 레인(공사·탱크)의 같은 박스로 */
+function laneHere(fk) {
+  const F = FLOWS[fk]; if (!F) return '';
+  const L = F.nodes.filter(n => n[7] === CUR); if (!L.length) return '';
+  const rl = ALIAS(ROLE), pick = L.find(n => LANE_ROLE(n[1], fk) === rl || (rl === 'estC' && n[1] === 'est' && fk === 'civil')) || L.find(n => !['ai', 'sys', 'ext'].includes(n[1])) || L[0];
+  return pick[0];
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-procgo="1"]'); const m0 = document.getElementById('procmenu');
+  if (!b) { if (m0 && !e.target.closest('#procmenu')) m0.remove(); const it = e.target.closest('#procmenu [data-pm]'); if (it) { const k = it.dataset.pm; m0.remove(); if (k === 'orig') openProc(curCode()); else { const w = window.open(location.href.split('#')[0].split('?')[0] + `?fk=${k}&here=${it.dataset.here || ''}#flowfull`, 'qlane'); if (!w) toast('팝업이 차단되었습니다'); } } return; }
+  e.preventDefault(); e.stopImmediatePropagation(); if (m0) { m0.remove(); return; }
+  const r = b.getBoundingClientRect(), hc = laneHere('civil'), ht = laneHere('tank');
+  const d = document.createElement('div'); d.id = 'procmenu';
+  d.innerHTML = `<button type="button" data-pm="orig">원본 흐름도 (8단계) <small>${curCode() || '처음'} ↗</small></button>` + (hc || ROLE !== 'estT' ? `<button type="button" data-pm="civil" data-here="${hc}">공사 견적 · 액터 레인 <small>${hc ? '이 화면 박스' : '처음'} ↗</small></button>` : '') + (ht || ROLE === 'estT' ? `<button type="button" data-pm="tank" data-here="${ht}">탱크 견적 · 액터 레인 <small>${ht ? '이 화면 박스' : '처음'} ↗</small></button>` : '');
+  document.body.appendChild(d); d.style.left = Math.max(8, Math.min(r.left + scrollX, scrollX + document.documentElement.clientWidth - 270)) + 'px'; d.style.top = (r.bottom + scrollY + 6) + 'px';
+}, true);
+/* 액터 레인 새 창: 보던 화면의 박스 표시 · 프로토타입으로 돌아가기 */
+const _ffA = VIEWS.flowfull.after;
+VIEWS.flowfull.after = () => {
+  _ffA();
+  let here = ''; try { here = new URLSearchParams(location.search).get('here') || ''; } catch (e) {}
+  const el = here && document.getElementById('fn-' + here);
+  if (el) { el.classList.add('qhere2'); el.title = '지금 보던 화면'; setTimeout(() => { const r = el.getBoundingClientRect(); window.scrollTo(0, Math.max(0, r.top + scrollY - innerHeight / 2)); }, 300); }
+  if (window.opener && !document.getElementById('ffback')) document.body.insertAdjacentHTML('beforeend', `<div id="ffback" style="position:fixed;right:14px;bottom:14px;z-index:60;display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.14);font-size:13px"><span class="muted">박스를 누르면 업무 정보 → ‘이 업무 화면으로 이동’${here ? ' · <b style="color:#E8590C">주황 테두리</b> = 보던 화면' : ''}</span><button class="btn pri" type="button" data-ffback>↩ 프로토타입으로</button></div>`);
+};
+document.addEventListener('click', e => { if (!e.target.closest('[data-ffback]')) return; try { window.opener.postMessage({qgo: {back: 1}}, '*'); window.opener.focus(); } catch (er) {} toast('프로토타입 창으로 돌아가세요 (탭 확인)'); });
 
 render();
 })();

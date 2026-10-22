@@ -1070,33 +1070,88 @@ window.addEventListener('hashchange', () => go(location.hash));
 go(location.hash);
 </script>
 <script>window.__QCFG={"M": {"EXT-RFQ-01": ["mail", "sup", "메일 분류함"], "AI-RFQ-01": ["mail", "sup", "메일 분류함"], "AI-PRJ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "SYS-PRJ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "SAL-RFQ-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "AI-ANL-01": ["bidchk", "estC", "입찰 체크리스트 (초기 판단)"], "SAL-ANL-01": ["gonogo", "estC", "참여여부 보고서"], "CEO-ANL-01": ["appr", "ceo", "승인함"], "SYS-DRP-01": ["lost", "estC", "실주·불참 분석"], "AI-ANL-02": ["anl", "estC", "문서 분석 (위험·독소·비용)"], "AI-QTY-01": ["cqty", "estC", "물량산출 (기준서 Rev.6)"], "ADM-DB-01": ["price", "admin", "단가·노임 시세"], "ADM-VND-01": ["vendor", "admin", "협력업체 목록·지정등급"], "ADM-PRJ-01": ["users", "admin", "사용자·권한·결재선"], "ADM-INS-01": ["lib", "admin", "분석 문서 라이브러리"], "ADM-INS-02": ["lost", "exec", "실주·불참 분석"], "SAL-EST-01": ["cest", "estC", "상세 견적서 · 마진/리스크"], "AI-EST-01": ["cest", "estC", "상세 견적서 · 마진/리스크"], "CEO-APR-01": ["appr", "ceo", "승인함"], "TNK-RFQ-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "VND-QTE-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-VND-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-VND-02": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "AI-TNK-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "TNK-SEL-01": ["tauto", "estT", "벤더 견적 요청·비교·결정"], "TNK-EST-01": ["test", "estT", "탱크 견적서 · 마진/리스크"], "SYS-TNK-01": ["test", "estT", "탱크 견적서 · 마진/리스크"], "EXE-APR-01": ["appr", "exec", "승인함"], "CEO-APR-02": ["appr", "ceo", "승인함"], "SAL-TBE-01": ["submit", "estC", "제출 관리"], "EXT-TBE-01": ["tcm", "estC", "TCM 기록"], "AI-TBE-01": ["tcm", "estC", "TCM 기록"], "SYS-TBE-01": ["tcm", "estC", "TCM 기록"], "EXT-NEG-01": ["nego", "estT", "가격 협상·리비전"], "SAL-NEG-01": ["nego", "estT", "가격 협상·리비전"], "SYS-NEG-01": ["nego", "estT", "가격 협상·리비전"], "CEO-NEG-01": ["appr", "ceo", "승인함"], "EXT-RES-01": ["won", "estC", "수주 → WO·실행예산·코드"], "SAL-RES-01": ["won", "estC", "수주 → WO·실행예산·코드"], "SYS-RES-01": ["pipe", "exec", "프로젝트 현황 (RV·QP·WO)"], "AI-INS-01": ["lost", "exec", "실주·불참 분석"], "SYS-HND-01": ["won", "estC", "수주 → WO·실행예산·코드"], "NXT-BUD-01": ["won", "exec", "수주 → WO·실행예산·코드"]}, "SM": {"st-01": ["intake", "sup", "공유드라이브 수신함 (일자별)"], "st-02": ["gonogo", "estC", "참여여부 보고서"], "st-03": ["cqty", "estC", "물량산출 (기준서 Rev.6)"], "st-04": ["cest", "estC", "상세 견적서 · 마진/리스크"], "st-05": ["tcm", "estC", "TCM 기록"], "st-06": ["nego", "estT", "가격 협상·리비전"], "st-07": ["won", "estC", "수주 → WO·실행예산·코드"], "st-08": ["won", "estC", "수주 → WO·실행예산·코드"]}, "design": "estimate-ai-design.html", "review": "estimate-ai-review.html", "proto": "sales_tot.html"};</script><script>(function(){
+/* 박스 선택 → 우측 패널 (박스 정보 + 화면 이동 · 상세 설계 · 검토 자료 버튼) */
 var C=window.__QCFG||{}, M=C.M||{}, SM=C.SM||{};
 var css=document.createElement('style');
-css.textContent='#qpop{position:absolute;z-index:300;width:290px;background:var(--bg,#fff);color:var(--text,#1d2433);border:1px solid var(--border,#d0d5dd);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.18);padding:10px 10px 8px;font:13px/1.45 "Pretendard","Malgun Gothic",system-ui,sans-serif}'
- +'#qpop .qh{font-weight:700;padding-right:18px}#qpop .qc{font:11.5px ui-monospace,Consolas,monospace;color:var(--muted,#7a8296);margin:2px 0 6px}'
- +'#qpop a,#qpop button{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;box-sizing:border-box;text-align:left;border:1px solid var(--border,#e3e6ee);background:none;border-radius:8px;padding:7px 9px;margin-top:5px;color:inherit;text-decoration:none;cursor:pointer;font:inherit}'
- +'#qpop a:hover,#qpop button:hover{border-color:#6b5fd3;background:rgba(107,95,211,.08)}#qpop small{color:var(--muted,#7a8296);font-size:11.5px;white-space:nowrap}#qpop .qx{position:absolute;right:6px;top:4px;border:0;width:auto;margin:0;padding:2px 6px;color:var(--muted,#7a8296)}';
+css.textContent='#qpanel{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:92vw;z-index:300;background:var(--bg,#fff);color:var(--text,#1d2433);border-left:1px solid var(--border,#d0d5dd);box-shadow:-12px 0 32px rgba(0,0,0,.14);display:flex;flex-direction:column;font:13.5px/1.6 "Pretendard","Malgun Gothic",system-ui,sans-serif;transform:translateX(100%);transition:transform .18s ease}'
+ +'#qpanel.on{transform:none}#qpanel .qph{padding:14px 16px 10px;border-bottom:1px solid var(--border,#e3e6ee);display:flex;gap:10px;align-items:flex-start}'
+ +'#qpanel .qc{font:600 12px ui-monospace,Consolas,monospace;color:var(--ai-code,#5a4ec4)}#qpanel h3{margin:2px 0 0;font-size:16px;line-height:1.4}'
+ +'#qpanel .qx{margin-left:auto;border:1px solid var(--border,#e3e6ee);background:none;border-radius:8px;padding:3px 9px;cursor:pointer;color:inherit;font:inherit}'
+ +'#qpanel .qb2{flex:1;overflow-y:auto;padding:12px 16px}#qpanel .qk{font-size:12px;color:var(--muted,#7a8296);font-weight:700;margin:12px 0 4px}'
+ +'#qpanel .qt{display:inline-block;font-size:11.5px;font-weight:600;padding:0 7px;border-radius:9px;line-height:19px;border:1px solid var(--border,#d0d5dd);margin:0 4px 4px 0}'
+ +'#qpanel ul{margin:0;padding-left:18px}#qpanel li{margin:2px 0}#qpanel .qno{font:11.5px ui-monospace,monospace;color:var(--muted,#7a8296)}'
+ +'#qpanel .qf{padding:12px 16px;border-top:1px solid var(--border,#e3e6ee);display:flex;flex-direction:column;gap:6px}'
+ +'#qpanel .qf a,#qpanel .qf button{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;box-sizing:border-box;border:1px solid var(--border,#d0d5dd);background:none;border-radius:8px;padding:9px 12px;color:inherit;text-decoration:none;cursor:pointer;font:inherit}'
+ +'#qpanel .qf .pri{background:#1F6FEB;border-color:#1F6FEB;color:#fff;font-weight:700}#qpanel .qf small{opacity:.8;font-size:12px}'
+ +'.qsel{outline:3px solid #1F6FEB!important;outline-offset:3px}';
 document.head.appendChild(css);
-function close(){var p=document.getElementById('qpop');if(p)p.remove();}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function strip(s){return String(s||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
+function close(){var p=document.getElementById('qpanel');if(p){p.classList.remove('on');setTimeout(function(){p.remove();},180);} [].forEach.call(document.querySelectorAll('.qsel'),function(x){x.classList.remove('qsel');});}
+function info(code){
+  var n=null,lane='',cols=[],steps=[];
+  try{ n=(CUR.nodes||[]).filter(function(x){return x.code===code;})[0]; cols=CUR.cols||[]; }catch(e){}
+  try{ var L=(typeof LANES!=='undefined'?LANES:[]); if(n){ var l=L.filter(function(x){return x.k===n.lane;})[0]; lane=l?l.t:n.lane; } }catch(e){}
+  try{ steps=(typeof STEPS!=='undefined'?STEPS:[]).filter(function(x){return x.code===code;}); if(!lane&&steps[0]){ var A=(typeof ACTORS!=='undefined'?ACTORS:[]), a=A.filter(function(x){return x.k===steps[0].a;})[0]; lane=a?(a.t||a.n||steps[0].a):steps[0].a; } }catch(e){}
+  return {n:n,lane:lane,cols:cols,steps:steps};
+}
 window.qmenu=function(code,st,el,title){
-  close(); var m=M[code]||SM[st], r=el.getBoundingClientRect(), p=document.createElement('div'); p.id='qpop';
-  var d=C.design+'#'+code+'|'+st, rv=C.review+'#'+st;
-  p.innerHTML='<button type="button" class="qx" aria-label="닫기">✕</button><div class="qh"></div><div class="qc">'+code+' · '+st.replace('st-','단계 ')+'</div>'
-    +'<a href="'+d+'" target="design">상세 설계 <small>기능·정책·계산 ↗</small></a>'
-    +(m?'<button type="button" data-qproto>프로토타입 화면 <small>'+m[2]+' ↗</small></button>':'')
-    +'<a href="'+rv+'" target="review">검토 자료 <small>인터뷰·기술 검증 ↗</small></a>';
-  p.querySelector('.qh').textContent=title||code;
-  document.body.appendChild(p);
-  var x=r.left+window.scrollX, y=r.bottom+window.scrollY+6;
-  if(x+300>window.scrollX+document.documentElement.clientWidth) x=window.scrollX+document.documentElement.clientWidth-306;
-  p.style.left=Math.max(6,x)+'px'; p.style.top=y+'px';
+  close(); if(el) el.classList.add('qsel');
+  var m=M[code]||SM[st], I=info(code), d=C.design+'#'+code+'|'+st, rv=C.review+'#'+st, sn=parseInt(st.replace('st-',''),10);
+  var desc=I.n&&I.n.s?strip(I.n.s):(I.steps[0]&&I.steps[0].s?strip(I.steps[0].s):'');
+  var stg=I.cols[sn-1]?String(sn).padStart(2,'0')+'. '+I.cols[sn-1]:'단계 '+String(sn).padStart(2,'0');
+  var who=code.indexOf('AI-')===0?'AI 처리':code.indexOf('SYS-')===0?'시스템 처리':/^(EXT|VND|NXT)-/.test(code)?'외부':'담당자 (H)';
+  var sl=I.steps.length?'<div class="qk">업무 단계</div><ul>'+I.steps.map(function(x){return '<li><span class="qno">'+esc(x.no)+'</span> <b>'+esc(strip(x.t))+'</b>'+(x.s?' — '+esc(strip(x.s)):'')+(x.nx?' <span class="qno">→ '+esc(strip(x.nx))+'</span>':'')+'</li>';}).join('')+'</ul>':'';
+  var p=document.createElement('aside'); p.id='qpanel'; p.setAttribute('role','dialog');
+  p.innerHTML='<div class="qph"><div style="min-width:0"><div class="qc">'+esc(code)+'</div><h3>'+esc(title||code)+'</h3></div><button type="button" class="qx" aria-label="닫기">닫기 ✕</button></div>'
+    +'<div class="qb2"><div><span class="qt">'+esc(stg)+'</span>'+(I.lane?'<span class="qt">'+esc(I.lane)+'</span>':'')+'<span class="qt">'+who+'</span></div>'
+    +(desc?'<div class="qk">하는 일</div><div>'+esc(desc)+'</div>':'')+sl
+    +(m?'<div class="qk">프로토타입 화면</div><div><b>'+esc(m[2])+'</b> <span class="qno">#'+esc(m[0])+' · 기본 역할 '+esc(m[1])+'</span></div>':'<div class="qk">프로토타입 화면</div><div class="qno">연결된 화면 없음</div>')+'</div>'
+    +'<div class="qf">'+(m?'<button type="button" class="pri" data-qproto>이 업무 화면으로 이동 <small>'+esc(m[2])+' →</small></button>':'')
+    +'<a href="'+d+'" target="design">상세 설계 <small>기능·정책·계산 ↗</small></a><a href="'+rv+'" target="review">검토 자료 <small>인터뷰·기술 검증 ↗</small></a></div>';
+  document.body.appendChild(p); requestAnimationFrame(function(){p.classList.add('on');});
   p.querySelector('.qx').onclick=close;
   var b=p.querySelector('[data-qproto]');
-  if(b) b.onclick=function(){ close(); if(window.qgo) window.qgo(code,st); else window.open(C.proto+'?role='+m[1]+'&code='+encodeURIComponent(code)+'#'+m[0],'qproto'); };
-  [].forEach.call(p.querySelectorAll('a'),function(a){a.addEventListener('click',function(){setTimeout(close,50);});});
+  if(b) b.onclick=function(){ if(window.qgo) window.qgo(code,st); else window.open(C.proto+'?role='+m[1]+'&code='+encodeURIComponent(code)+'#'+m[0],'qproto'); };
 };
-document.addEventListener('click',function(e){ if(!e.target.closest('#qpop') && !e.target.closest('.card[data-code]') && !e.target.closest('[id^="b-current-"],[id^="b-fs-"],[id^="b-gd-"]')) close(); });
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+})();
+</script><script>(function(){
+/* 프로토타입(sales_tot.html)에서 연 경우: 진행 프로젝트 배지 · 지금 보던 화면 표시 · 박스 → 프로토타입 화면 이동 */
+var C=window.__QCFG||{}, M=C.M||{}, SM=C.SM||{}, B={}, HERE='';
+var mh=(location.hash||'').match(/^#current:([A-Z0-9-]+)/); if(mh) HERE=mh[1];
+if(/[?&]fit=1/.test(location.search)){
+  var st=document.createElement('style'); st.textContent='.wrap{overflow:hidden!important}.col-h{transform:none!important}'; document.head.appendChild(st);
+  var fit=function(){[].forEach.call(document.querySelectorAll('.wrap'),function(w){var b=w.querySelector('.board');if(!b||!b.offsetWidth)return;b.style.transform='';var s=Math.min(1,(w.clientWidth-8)/b.offsetWidth);b.style.transformOrigin='0 0';b.style.transform='scale('+s+')';w.style.height=Math.ceil(b.offsetHeight*s+36)+'px';});};
+  var ft; new MutationObserver(function(){clearTimeout(ft);ft=setTimeout(fit,60);}).observe(document.body,{childList:true,subtree:true}); addEventListener('resize',fit); setTimeout(fit,200);
+}
+var op=null; try{ op=window.opener&&!window.opener.closed?window.opener:null; }catch(e){}
+if(!op) return;
+var css=document.createElement('style');
+css.textContent='.qb{position:absolute;top:-9px;right:-9px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#E8590C;color:#fff;font:700 11.5px/20px system-ui,sans-serif;text-align:center;box-shadow:0 0 0 2px #fff;z-index:5;cursor:help}'
+ +'.qhere{outline:3px solid #E8590C!important;outline-offset:3px;box-shadow:0 0 0 7px rgba(232,89,12,.18)!important}'
+ +'.qhl{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;background:#E8590C;color:#fff;font:700 11.5px/1 system-ui,sans-serif;padding:5px 8px;border-radius:6px;z-index:6}'
+ +'#qbar{position:fixed;right:14px;bottom:14px;z-index:99;display:flex;gap:8px;align-items:center;background:var(--bg,#fff);border:1px solid #d0d5dd;border-radius:12px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.14);font:13px/1.4 system-ui,sans-serif;max-width:calc(100vw - 28px);flex-wrap:wrap}'
+ +'#qbar button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:7px 11px;background:#1F6FEB;color:#fff;cursor:pointer}#qbar small{color:#667085}'
+ +'#qtoast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#111827;color:#fff;padding:9px 14px;border-radius:9px;font:13px system-ui,sans-serif;z-index:100;display:none}';
+document.head.appendChild(css);
+function tst(t){var e=document.getElementById('qtoast');if(!e)return;e.textContent=t;e.style.display='block';clearTimeout(tst.t);tst.t=setTimeout(function(){e.style.display='none';},2600);}
+function send(q){ try{ op.postMessage({qgo:q},'*'); try{ op.focus(); }catch(e){} tst('프로토타입 창에서 「'+(q.label||'화면')+'」을(를) 열었습니다 · 탭을 확인하세요'); }catch(e){ window.open(C.proto+'?role='+(q.role||'')+'&code='+encodeURIComponent(q.code||'')+'#'+(q.v||'home'),'qproto'); } }
+window.qgo=function(code,st){ var m=M[code]||SM[st]; if(!m){tst('연결된 화면이 없습니다');return;} send({v:m[0],role:m[1],label:m[2],code:code}); };
+function deco(){
+  [].forEach.call(document.querySelectorAll('.qb,.qhl'),function(x){x.remove();});
+  Object.keys(B).forEach(function(c){ var els=[document.getElementById('b-current-'+c)].concat([].slice.call(document.querySelectorAll('.card[data-code="'+c+'"]')));
+    els.forEach(function(el){ if(!el)return; el.style.overflow='visible'; var d=document.createElement('span'); d.className='qb'; d.textContent=B[c].length; d.title='이 단계의 프로젝트\n'+B[c].join('\n'); el.appendChild(d); }); });
+  if(HERE){ var e=document.getElementById('b-current-'+HERE); if(e){ e.classList.add('qhere'); e.style.overflow='visible'; var l=document.createElement('span'); l.className='qhl'; l.textContent='지금 보던 화면'; e.appendChild(l); } }
+  [].forEach.call(document.querySelectorAll('.wrap'),function(w){w.scrollLeft=0;});
+}
+function toHere(){ var e=HERE&&document.getElementById('b-current-'+HERE); if(!e||!e.offsetParent)return; [].forEach.call(document.querySelectorAll('.wrap'),function(w){w.scrollLeft=0;}); var r=e.getBoundingClientRect(); window.scrollTo(0,Math.max(0,r.top+window.scrollY-window.innerHeight/2)); }
+var g=window.go; window.go=function(h){ g(h); setTimeout(deco,40); };
+window.addEventListener('message',function(e){ var c=e.data&&e.data.qflowCfg; if(!c) return; B=c.B||{}; deco(); });
+try{ op.postMessage({qflowHello:1},'*'); }catch(e){}
+document.body.insertAdjacentHTML('beforeend','<div id="qbar"><small>박스를 누르면 프로토타입 화면 · 상세 설계 · 검토 자료 · <b style="color:#E8590C">●숫자</b> = 지금 그 단계에 있는 프로젝트</small><button type="button" id="qback">↩ 프로토타입으로</button></div><div id="qtoast"></div>');
+document.getElementById('qback').addEventListener('click',function(){ send({back:1,label:'보던 화면'}); });
+setTimeout(deco,60); setTimeout(function(){deco();toHere();},450); setTimeout(toHere,1100);
 })();
 </script></body>
 </html>
