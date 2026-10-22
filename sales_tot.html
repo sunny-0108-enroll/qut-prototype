@@ -4132,7 +4132,7 @@ async function wbExport(kind) {
   });
   const buf = await wb.xlsx.writeBuffer();
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([buf], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
-  a.download = `${p.qp}_견적서_${p.rev}_결재.xlsx`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  a.download = /^물량산출/.test(fileName) ? `${p.qp}_물량산출_DiaInch_Rev6_결재.xlsx` : `${p.qp}_견적서_${p.rev}_결재.xlsx`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500);
   toast(`견적서를 내려받았습니다 · ‘${M.sheets[target].name}’ 시트 상단에 결재란 (${A.roles.join('·')})`);
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-wbxls]'); if (b) wbExport(b.dataset.wbxls); });
@@ -5545,6 +5545,110 @@ VIEWS.cqty.after = () => {
 
 /* 액터 레인 박스에도 담당자 업무 태그 H (원본 흐름도와 같은 표기) */
 document.head.insertAdjacentHTML('beforeend', '<style>a.fn.h .c::before,a.fn.dec .c::before{content:"H";display:inline-block;margin-right:5px;padding:0 5px;border-radius:4px;background:var(--fg,#111827);color:var(--surface,#fff);font:800 9.5px/15px system-ui,sans-serif;vertical-align:1px}</style>');
+
+/* ===================== 역할별 메뉴 정리 : 그 역할이 직접 처리(H)하거나 결정하는 화면만 메뉴에 ===================== */
+/* 메뉴에서 빠진 화면도 흐름도·승인함·프로젝트 현황의 링크로 열 수 있음 (읽기 전용 표시) */
+const MENU_ROLE = {
+  home: '*', pipe: '*', pfolder: 'sup estC estT', agent: 'sup admin',
+  mail: 'sup', intake: 'sup', brief: 'sup exec ceo',
+  bidchk: 'estC estT', lib: 'estC estT', site: 'estC estT', anl: 'estC estT', sim: 'estC estT', gonogo: 'estC estT',
+  ccheck: 'estC', cqty: 'estC', ccost: 'estC', cest: 'estC exec', cdocs: 'estC',
+  tspec: 'estT', tauto: 'estT', tcmp: 'estT', test: 'estT exec',
+  appr: 'estC estT exec ceo', submit: 'sup',
+  tcm: 'estC estT', nego: 'estC estT', won: 'estC estT exec', lost: 'estC estT exec ceo',
+  vendor: 'estC estT admin', avlv: 'estC estT admin', avlq: 'estT admin', avlchk: 'admin', avl: 'admin', vlink: 'admin', vitem: 'estT admin', vreview: 'exec admin', vqa: 'admin',
+  price: 'admin', rule: 'admin', riskstd: 'exec admin', docs: 'sup estC estT admin', users: 'admin',
+};
+MENU.forEach(g => g.items.forEach(i => { if (MENU_ROLE[i.id]) i.r = MENU_ROLE[i.id]; }));
+
+/* ===================== 탱크 타입별 체크리스트 (확정 타입에 맞는 그룹만 적용) ===================== */
+const TT_CHK = [
+  // [no, 그룹, 항목, 확인 포인트, 영향, 출처·근거, 근거수준]
+  [60, '2. 고정지붕 - Dome Roof', '돔 형식', '자립형 강제 돔 / 알루미늄 Geodesic Dome 구분 — 외주 패키지·설치 범위가 달라짐', '상', '[R32] API 650 Annex G (알루미늄 돔)', 'A'],
+  [61, '2. 고정지붕 - Dome Roof', '돔 설계 책임', '알루미늄 돔은 벤더 설계·공급 · 당사 설치 범위(인양·실링) 경계 확인', '중', '업계 실무 관행 / 발주처 문서 확인 대상', 'D'],
+  [62, '2. 고정지붕 - Dome Roof', '돔-셸 접합부', 'Compression ring·Top angle 상세, 돔 하중에 따른 셸 상단 보강', '중', '[R32] API 650 (지붕 설계 조항 번호 미확인)', 'C'],
+  [63, '2. 고정지붕 - Dome Roof', 'Skylight · Vent', '알루미늄 돔 채광창·통기구 수량, 통기 용량 산정', '하', '[R37] API Std 2000 8th', 'A'],
+  [64, '3. 외부 부상지붕 (EFR)', '부상지붕 형식', 'Pontoon / Double Deck 선정 — 직경·강우량 기준', '상', '[R32] API 650 Annex C', 'A'],
+  [65, '3. 외부 부상지붕 (EFR)', 'Primary · Secondary Seal', '1·2차 Seal 형식(Mechanical shoe / Foam·Liquid filled), VOC 규제 대상 여부', '상', '[R32] API 650 Annex C, 대기환경보전법 시행규칙 별표16', 'A'],
+  [66, '3. 외부 부상지붕 (EFR)', 'Roof Drain', '관절식 / Flexible hose 형식, 비상 배수(Emergency drain) 요구', '중', '[R32] API 650 Annex C', 'A'],
+  [67, '3. 외부 부상지붕 (EFR)', 'Rolling Ladder · Gauge Pole', '점검 사다리, Gauge·Sampling pole, Anti-rotation', '하', '[R32] API 650 Annex C', 'B'],
+  [68, '3. 외부 부상지붕 (EFR)', 'Foam Dam · 소화설비', 'Seal 화재 대비 Foam dam·Foam chamber 범위 (소방 별건 여부)', '중', '위험물안전관리법 / 발주처 문서 확인 대상', 'C'],
+  [69, '4. 내부 부상지붕 (IFR)', 'IFR 재질 · 형식', '알루미늄 Pontoon / 강제 Pan 선정, 벤더 설계·공급 범위', '상', '[R32] API 650 Annex H', 'A'],
+  [70, '4. 내부 부상지붕 (IFR)', 'VOC Seal', '대기환경보전법 VOC 저장시설 Seal 기준 충족 여부', '상', '대기환경보전법 시행규칙 별표16 (VOC Seal)', 'A'],
+  [71, '4. 내부 부상지붕 (IFR)', '통기 · 지지 Leg', '고정지붕 원주 통기구, IFR 지지 Leg 높이(운전/정비)', '중', '[R32] API 650 Annex H', 'B'],
+  [72, '5. 저압·저온 탱크 (API 620)', '설계 압력 · 최저 온도', '설계압력(15 psig 이하)·최저 설계온도 → API 620 Annex R/Q 적용 범위', '상', '[R33] API 620 12th Annex R/Q', 'A'],
+  [73, '5. 저압·저온 탱크 (API 620)', '충격시험 · 재질', 'LTCS / 9%Ni 재질과 충격시험 온도, 용접부 충격시험', '상', '[R33] API 620 Annex R/Q', 'A'],
+  [74, '5. 저압·저온 탱크 (API 620)', '보냉', '보냉재(PUF·Cellular glass) 두께·외장, 시공 주체', '중', '발주처 문서 확인 대상', 'C'],
+  [75, '6. 완전방호식 (API 625)', '수행 범위 분담', '내조·외조(PC 콘크리트)·보냉·토목 분담 — 당사 단독 수행 범위 밖 요소 확인', '상', '[R34] API 625 / KGS (명칭 미확인)', 'B'],
+  [76, '6. 완전방호식 (API 625)', '내조 재질 · 용접', '9%Ni / LTCS 내조, 용접 절차·NDE 100%', '상', '[R34] API 625, [R33] API 620 Annex Q/R', 'A'],
+  [77, '6. 완전방호식 (API 625)', 'Suspended Deck · Perlite', 'Deck·Perlite 충전·바닥 단열, 바닥 히팅·누설 감지', '상', '[R34] API 625', 'B'],
+  [78, '6. 완전방호식 (API 625)', 'Cooldown · 시험', '냉각(Cooldown) 절차, 공기압·수압 시험 범위', '중', '[R34] API 625 / 발주처 문서 확인 대상', 'C'],
+  [79, '8. 저온용 탄소강 (LTCS)', '충격시험 온도', '최저 설계온도 기준 충격시험 온도·흡수에너지', '상', '[R32] API 650 (재질 인성 조항 번호 미확인)', 'C'],
+  [80, '8. 저온용 탄소강 (LTCS)', '예열 · PWHT', '두께별 예열·PWHT 요구, 노즐 조립품', '중', '[R32] API 650 5.7.4', 'B'],
+  [81, '9. 구형 (Sphere)', 'Petal 성형', 'Petal 프레스 성형 외주·운송, 현장 조립 정밀도', '상', 'KGS AC113 / ASME VIII (조항 번호 미확인)', 'C'],
+  [82, '9. 구형 (Sphere)', 'Column · Brace', '지지 기둥·브레이스 설계, 내진', '중', 'KGS AC113 (조항 번호 미확인)', 'C'],
+  [83, '9. 구형 (Sphere)', '전체 PWHT', '현장 전체 열처리 방법·장비·기간', '상', 'ASME VIII Div.1 / KGS', 'B'],
+  [84, '9. 구형 (Sphere)', '내압 · 기밀시험', '수압·기밀시험 압력, 시험수·기초 하중', '중', 'KGS AC113', 'B'],
+  [85, '10. 횡형 (Bullet) · 압력용기', 'Shop / Field 제작', 'Shop 제작 범위, 현장 용접 여부', '중', '업계 실무 관행', 'D'],
+  [86, '10. 횡형 (Bullet) · 압력용기', '운송 제약', '폭·높이·중량 운송 한계, 인양 장비', '상', '발주처 문서 확인 대상', 'C'],
+  [87, '10. 횡형 (Bullet) · 압력용기', 'Saddle · 기초', 'Saddle 설계·기초 하중, 열팽창 슬라이딩', '중', 'ASME VIII Div.1 (조항 번호 미확인)', 'C'],
+  [88, '10. 횡형 (Bullet) · 압력용기', 'ASME 스탬프', 'U 스탬프·검사기관 요구 여부', '중', 'ASME VIII Div.1', 'B'],
+];
+CHK.ttype = CHK.ttype.concat(TT_CHK.filter(x => !CHK.ttype.some(y => y[0] === x[0])));
+const TT_GRP = {CRT: '1.', DRT: '2.', EFRT: '3.', IFRT: '4.', LTT: '5.', FC: '6.', SPH: '9.', BUL: '10.'}, TM_GRP = {SUS: '7.', DUP: '7.', LTCS: '8.'};
+const ttGroups = g => { const s = new Set(); g.forEach(x => { if (TT_GRP[x[0]]) s.add(TT_GRP[x[0]]); if (x[0] === 'IFRT') s.add('1.'); if (TM_GRP[x[1]]) s.add(TM_GRP[x[1]]); }); return s; };
+const ttItems = g => { const G = ttGroups(g); return CHK.ttype.filter(x => G.has(x[1].split(' ')[0])); };
+/* 체크리스트 화면(탱크 탭 · 여수 예시): CASE 1 C.S + CASE 2 SUS 대안 */
+const CK_TT_EXTRA = {t: [['CRT', 'SUS', 2, 'CASE 2 대안', '', 0]]};
+const _ckItemsTT = ckItems;
+ckItems = k => {
+  if (k !== 't') return _ckItemsTT(k);
+  const g = ttOf('t').concat(CK_TT_EXTRA.t), keep = new Set(ttItems(g).map(x => x[0]));
+  const lbl = `탱크 타입 (${[...new Set(g.map(x => TTYPE[x[0]].s + (x[1] !== 'CS' ? '·' + x[1] : '')))].join(' · ')})`;
+  const L = _ckItemsTT(k).filter(x => x.tn !== '탱크 타입 (Cone Roof · SUS)');
+  const J = CJ.tp || {};
+  CHK.ttype.filter(it => keep.has(it[0])).forEach(it => { const j = J[it[2]]; L.push({tn: lbl, no: it[0], grp: it[1], name: it[2], pt: it[3], imp: it[4], src: it[5], lvl: it[6], st: j ? j[0] : 'un', doc: j ? j[1] : '', cls: j ? j[2] : '', memo: j ? j[3] : ''}); });
+  return L;
+};
+const _ckInitTT = ckInit;
+ckInit = k => k === 't' ? _ckInitTT(k).replace('탱크제작 59 + 탱크 타입별(Cone Roof · SUS)', `탱크제작 59 + 탱크 타입별 ${ttItems(ttOf('t').concat(CK_TT_EXTRA.t)).length} (확정 타입 CRT · CASE 2 SUS 대안 — 타입 분류에 따라 그룹이 바뀜)`) : _ckInitTT(k);
+/* 타입 분류 패널: 적용 체크리스트 항목 수 */
+const _ttDerive = ttDerive;
+ttDerive = g => { const d = _ttDerive(g), its = ttItems(g), grp = [...new Set(its.map(x => x[1]))]; d.chk = grp.map(x => `${x.replace(/^\d+\.\s*/, '')} ${its.filter(y => y[1] === x).length}항목`); return d; };
+
+/* ===================== 물량산출 워크북 · 엑셀 내려받기 ===================== */
+const _cqtyXL = VIEWS.cqty, _cqtyXLA = VIEWS.cqty.after;
+VIEWS.cqty = () => _cqtyXL().replace('<h2>물량산출 워크북 · 물량산출_DiaInch_Rev6.xlsx</h2><div style="display:flex;gap:6px;flex-wrap:wrap">', `<h2>물량산출 워크북 · 물량산출_DiaInch_Rev6.xlsx</h2><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button class="btn rbtn" type="button" data-wbxls="c" title="결재란을 첫 시트 상단에 넣어 내려받습니다" style="min-height:28px;font-size:12.5px">엑셀 내려받기</button>`);
+VIEWS.cqty.after = _cqtyXLA;
+
+/* ===================== 화면만 보기 모드 (sales_screens.html) : 설명·흐름 안내 없이 화면만 · 역할 전환 ===================== */
+if (window.__SCREEN_ONLY) {
+  document.documentElement.classList.add('scr');
+  document.title = '영업·견적 화면 (역할별)';
+  document.head.insertAdjacentHTML('beforeend', `<style>
+html.scr footer.rolef,html.scr [data-info],html.scr [data-myflow],html.scr [data-procgo],html.scr #procmenu,html.scr #pjwork,
+html.scr .main .top .sub,html.scr .main .note,html.scr .main .tag-ex,html.scr .lg-c,html.scr .lg-l .flow,html.scr .lg-l > :not(.brand),html.scr .lg-r .panel,html.scr .lg-r > .sub,html.scr .rc .k,html.scr .ro{display:none!important}
+html.scr .login{grid-template-columns:1fr!important;max-width:1100px;margin:0 auto}html.scr .lg-l,html.scr .lg-r .sub{display:none!important}
+#scrrole{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+#scrrole select{height:32px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);font:inherit;font-size:13px;padding:0 8px;cursor:pointer}
+</style>`);
+  const scrSwitch = () => {
+    const h = document.getElementById('apphdr'); if (!h || h.querySelector('#scrrole') || !ROLE) return;
+    const usr = h.querySelector('.usr'); if (!usr) return;
+    usr.insertAdjacentHTML('beforebegin', `<label id="scrrole">역할 <select aria-label="역할 바꾸기">${Object.entries(ROLES).map(([k, r]) => `<option value="${k}" ${k === ROLE ? 'selected' : ''}>${r.n}</option>`).join('')}</select></label>`);
+  };
+  const hd = document.getElementById('apphdr'); if (hd) new MutationObserver(scrSwitch).observe(hd, {childList: true});
+  document.addEventListener('change', e => {
+    const s = e.target.closest('#scrrole select'); if (!s) return;
+    ROLE = s.value; try { localStorage.setItem('qut-role', ROLE); } catch (er) {}
+    const it = MENU_INDEX[CUR], v = it && visible(it, ROLE) ? CUR : ROLES[ROLE].home;
+    if (location.hash === '#' + v) render(); else location.hash = v;
+    toast(`${ROLES[ROLE].n} 화면`);
+  });
+  const lg = () => { document.querySelectorAll('#app .main .panel').forEach(pn => { const h = pn.querySelector('.ph h2'); if (h && /이 역할이 하는 일|이 화면의 역할/.test(h.textContent)) { const col = pn.parentElement; pn.style.display = 'none'; if (col && col.children.length === 1 && col !== document.querySelector('#app .main')) col.style.display = 'none'; } }); const t = document.querySelector('.lg-r h1, .lg-r h2'); if (t && !t.dataset.scr) { t.dataset.scr = 1; t.textContent = '화면 보기 · 역할을 고르세요'; } };
+  new MutationObserver(lg).observe(document.getElementById('app'), {childList: true});
+  setTimeout(() => { lg(); scrSwitch(); }, 0);
+}
 
 render();
 })();
