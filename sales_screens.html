@@ -5663,7 +5663,11 @@ section.panel:has(.wb) .ph{position:static!important;top:auto!important}
 function wbStick(gw) {
   const t = gw && gw.querySelector('table.wb-sh'); if (!t) return;
   const fr = t.querySelector('tbody tr.frz'); if (!fr) return;
-  const rows = [...t.tBodies[0].rows], last = rows.indexOf(fr); let top = t.tHead ? t.tHead.offsetHeight : 24;
+  const rows = [...t.tBodies[0].rows]; let last = rows.indexOf(fr), top = t.tHead ? t.tHead.offsetHeight : 24;
+  /* 원본 틀 고정이 너무 아래(데이터 행까지)면 표 머리 행(NO./ITEMS/U/P/AMOUNT…)까지만 고정 */
+  if (last > 6) { const HK = /^(NO\.?|ITEMS?|DESCRIPTION|UNIT|U\/P|AMOUNT|Q'?TY|TOTAL|품명|규격|단위|수량|금액|비고)$/i;
+    let h = -1; for (let i = 0; i <= last; i++) if ([...rows[i].cells].filter(c => HK.test(c.textContent.trim())).length >= 2) h = i;
+    if (h >= 0 && h < last) { fr.classList.remove('frz'); [...fr.cells].forEach(c => { c.style.top = ''; }); rows[h].classList.add('frz'); last = h; } else if (h < 0) { rows.forEach(r => r.classList.remove('frz2', 'frzl')); return; } }
   rows.forEach(r => r.classList.remove('frz2', 'frzl'));
   for (let i = 0; i <= last; i++) { const r = rows[i]; r.classList.add('frz2'); if (i === last) r.classList.add('frzl'); [...r.cells].forEach(c => { c.style.top = top + 'px'; if (!c.style.backgroundColor && c.tagName === 'TD') c.style.backgroundColor = getComputedStyle(c).backgroundColor === 'rgba(0, 0, 0, 0)' ? '#fff' : ''; }); top += r.offsetHeight; }
 }
@@ -5693,8 +5697,8 @@ const EW = {
   t: {name: '견적 작성', steps: [['tspec', '사양·물량 검토'], ['tauto', '벤더 견적 요청·결정'], ['tcmp', '업체별 견적 비교']], dest: ['test', '탱크 견적서']},
 };
 const EW_OF = v => Object.keys(EW).find(k => EW[k].steps.some(s => s[0] === v));
-[['cqty', '물량산출'], ['ccost', '노무·장비·경비·시세'], ['cest', '상세 견적서 · 마진/리스크 · 승인요청'], ['cdocs', '부가 제출문서'], ['ccheck', '견적 체크리스트'],
- ['tspec', '사양·물량 검토'], ['tauto', '벤더 견적 요청·비교·결정'], ['tcmp', '업체별 견적 비교'], ['test', '탱크 견적서 · 마진/리스크 · 승인요청']].forEach(([id, l]) => { if (MENU_INDEX[id]) MENU_INDEX[id].l = l; });
+[['cqty', '물량산출'], ['ccost', '노무·장비·경비·시세'], ['cest', '상세견적서'], ['cdocs', '부가 제출문서'], ['ccheck', '견적 체크리스트'],
+ ['tspec', '사양·물량 검토'], ['tauto', '벤더 견적 요청·비교·결정'], ['tcmp', '업체별 견적 비교'], ['test', '상세견적서']].forEach(([id, l]) => { if (MENU_INDEX[id]) MENU_INDEX[id].l = l; });
 STP.cost[3] = '노무·장비·경비';
 document.head.insertAdjacentHTML('beforeend', `<style>
 .side .navp{display:block;padding:7px 10px 3px;font-size:13.5px;color:var(--fg2);font-weight:600}
@@ -6043,6 +6047,138 @@ document.addEventListener('click', e => {
   const m = MAIL[+c.dataset.bgo];
   openPanel(m.name || m.subj, `${m.client || ''} · ${m.cat.n}`, `<dl class="dl pb" style="padding:0">${[['분류', pill(m.cat.n, m.cat.p) + ' ' + pill(MST[m.st][0], MST[m.st][1])], ['발주처', m.client || '—'], ['건명', m.name || '—'], ['채널', m.ch || '—'], ['마감·일시', m.due || '—'],
     ...(m.ev ? [['일시 및 장소', m.ev.at], ['발주처 담당', m.ev.who]] : []), ['접수', `${m.recv} · ${m.from}`], ['연결', m.link ? `<span class="id">${m.link}</span>` : '—'], ['담당 흐름', m.flow || '—']].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`);
+}, true);
+
+/* ===================== 왼쪽 메뉴 아코디언: 항상 하나만 열림 · 기본은 현재 화면 그룹(처음엔 공통 › 오늘 할 일) ===================== */
+let NG_OPEN = null;
+function ngApply() {
+  const G = [...document.querySelectorAll('.side .ng')]; if (!G.length) return;
+  const cur = G.find(g => g.classList.contains('cur'));
+  let open = (NG_OPEN && G.find(g => g.querySelector('[data-ng]').dataset.ng === NG_OPEN)) || cur || G[0];
+  if (NG_OPEN === '') open = null;
+  G.forEach(g => {
+    const closed = g !== open, b = g.querySelector('[data-ng]'), gm = b.querySelector('.gm');
+    g.classList.toggle('closed', closed); b.setAttribute('aria-expanded', String(!closed));
+    const n = g.querySelectorAll('.gi a.nav').length, bs = [...g.querySelectorAll('.gi a.nav .badge')].reduce((a, x) => a + (+x.textContent || 0), 0);
+    if (gm) gm.innerHTML = `${closed && bs ? `<span class="badge">${bs}</span>` : `<span class="gc">${n}</span>`}<span class="chev" aria-hidden="true">▾</span>`;
+  });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.side [data-ng]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
+  const g = b.dataset.ng, isOpen = !b.parentElement.classList.contains('closed');
+  NG_OPEN = isOpen ? '' : g; ngApply();
+}, true);
+addEventListener('hashchange', () => { NG_OPEN = null; });
+new MutationObserver(() => { const s = document.querySelector('.side .navs'); if (s && !s.dataset.ngok) { s.dataset.ngok = 1; ngApply(); } }).observe(document.getElementById('app'), {childList: true, subtree: true});
+
+/* 워크북 겹침 순서: 번짐 텍스트(sp) < 행 번호 < 고정 행 < 열 머리 */
+document.head.insertAdjacentHTML('beforeend', `<style>
+.wb-sh tbody th.rn{z-index:3}
+.wb-sh tr.frz td,.wb-sh tr.frz2 td{z-index:5!important}
+.wb-sh tr.frz2 th.rn{z-index:6!important}
+.wb-sh thead th{z-index:7!important}
+.wb-sh thead th.cn{z-index:8!important}
+.wb-sh td.c.act{z-index:4}
+.wb-sh tbody tr.frz2:first-child td{box-shadow:0 -8px 0 #fff}
+.wb-sh tbody tr.frz2.frzl:first-child td{box-shadow:0 -8px 0 #fff,0 2px 0 #C8CCD2}
+</style>`);
+
+/* ===================== 탱크 부가 제출문서: 문서별 샘플 초안 (예시 데이터) ===================== */
+const TK2 = ['16GCL10BB001', '16GDL10BB001'];
+const tdT = (h, rows) => `<table style="width:100%;margin:6px 0 10px">${h ? `<tr>${h.map(x => `<th>${x}</th>`).join('')}</tr>` : ''}${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</table>`;
+const AIm = s => `<span class="ai-m">${s}</span>`, FIL = s => `<span class="fill">[${s}]</span>`;
+const tdHead = (t, sub) => `<h2 style="text-align:center;margin:0 0 4px">${t}</h2><p class="muted" style="text-align:center;margin:0 0 12px">${PT.name} · ${PT.client} · ${PT.qp} ${PT.rev}${sub ? ' · ' + sub : ''}</p>`;
+const TDRAFT = {
+  cbd: tdHead('COST BREAK-DOWN', 'CASE 1 C.S / CASE 2 SUS · 한화오션 양식') +
+    tdT(['No.', 'Description', 'Unit', 'CASE 1 (C.S)', 'CASE 2 (SUS)', 'Remark'], [
+      ['A', '<b>Direct Cost</b>', '', '', '', ''],
+      ['A-1', 'Material (Plate · Nozzle · Structure)', 'LOT', AIm('견적서 집계표 1. 자재비'), AIm('견적서 집계표 1. 자재비'), `${TK2.join(' / ')} · Plate 47.0 ton/기`],
+      ['A-2', 'Shop Fabrication', 'LOT', AIm('외주 최적가 (지경)'), AIm('외주 최적가 (지경)'), 'Cutting · Rolling · Beveling'],
+      ['A-3', 'Transportation', 'LOT', AIm('견적서 연동'), AIm('견적서 연동'), '포항 Shop → 여수 현장'],
+      ['A-4', 'Field Erection', 'LOT', AIm('외주 최적가'), AIm('외주 최적가'), 'Shell · Roof · Appurtenance'],
+      ['A-5', 'Painting', 'LOT', AIm('견적서 연동'), '—', 'ENGSPEC A110 · SUS는 Pickling·Passivation'],
+      ['A-6', 'Hydro & Pneumatic Test', 'LOT', AIm('견적서 연동'), AIm('견적서 연동'), '시험수 공급: 발주처 ' + FIL('확인')],
+      ['B', '<b>Indirect Cost</b> (현장관리 · 보험 · 일반관리비)', 'LOT', AIm('일반관리비율 적용'), AIm('일반관리비율 적용'), '영업임원 결정 값'],
+      ['C', '<b>Profit</b>', 'LOT', AIm('마진율 적용'), AIm('마진율 적용'), ''],
+      ['', '<b>TOTAL (A+B+C)</b>', 'KRW', `<b>${fmt(PT.amount)}</b>`, AIm('CASE 2 산출값'), 'VAT 별도'],
+      ['', 'OUT OF SCOPE', '', 'Internal Floating Deck · 인허가 · 기초(토목)', '', '조건서와 동일']]) +
+    `<p class="muted">금액 칸은 상세견적서(탱크) 집계표에서 자동으로 채워집니다. 견적서 리비전이 바뀌면 이 양식도 같은 리비전으로 다시 만들어집니다.</p>`,
+  cond: tdHead('견적 조건서', 'Inclusion · Exclusion · Clarification') +
+    `<h3>1. 포함 범위 (Inclusion)</h3><ol style="padding-left:20px;margin:0 0 10px"><li>Storage Tank ${AIm('2기')} (${TK2.join(', ')}) 상세설계 확인 · Shop 제작</li><li>Shop → 여수 현장 운송 (상하차 포함)</li><li>Field Erection — Shell · Bottom · Cone Roof (Supported) · Nozzle · Ladder · Platform</li><li>도장 — ENGSPEC A110 Painting System (외부·Roof)</li><li>충수시험 · 기밀시험 · NDE (RT·PT) · 검사 성적서</li></ol>
+    <h3>2. 제외 범위 (Exclusion)</h3><ol style="padding-left:20px;margin:0 0 10px"><li>Internal Floating Deck (OUT OF SCOPE)</li><li>인허가 (Local Regulation)</li><li>기초 토목 · 앵커볼트 매립</li><li>시험수 · 전력 · 용수 공급 및 처리</li><li>보온 · 내화 · 계장 기기 공급</li></ol>
+    <h3>3. 확인 사항 (Clarification)</h3>${tdT(['No.', '내용', '견적 반영'], [['C-1', 'CO2 Absorber는 탱크가 아님 — 견적 범위 확인 필요', AIm('70,000,000원 가계상')], ['C-2', '시험수 공급 주체 (발주처 공급 가정)', '미반영'], ['C-3', 'SUS(CASE 2) 내부 Pickling·Passivation 범위', FIL('회신 후 확정')]])}
+    <h3>4. 상업 조건</h3><p>견적 유효기간: 2025-09-23까지 · 지불조건: ${FIL('발주처 표준')} · 공기: 발주 후 ${AIm('28주')} (일정표 참조) · 하자보증: 준공 후 ${FIL('24개월')}</p>`,
+  dev: tdHead('TECHNICAL DEVIATION LIST', 'ENGSPEC P7000-ME-40-A310 대비') +
+    tdT(['No.', 'Spec 조항', '요구 사항', 'Deviation / Proposal', '사유', '가격 영향'], [
+      ['D-01', 'A310 §6.4 Annular Plate', `Annular Plate ${AIm('10 mm')} 이상`, `${AIm('8 mm + 부식여유 1.5 mm')} 적용 제안`, 'API 650 5.5 최소 두께 충족', '감액'],
+      ['D-02', 'A310 §9.2 NDE', 'Shell 수직 용접 RT 100%', `${AIm('API 650 Spot RT')} + 교차부 100%`, 'API 650 기준 · 선례 동일', '감액'],
+      ['D-03', 'A310 §10.1 Hydrotest', '시험수 공급: Contractor', `${AIm('발주처 공급')} (현장 용수 인입점 제공)`, '현장 용수 인프라 없음', '증액 방지']]) +
+    `<p class="muted">Deviation이 승인되지 않으면 원 사양 기준 금액(가격 영향 열)으로 견적서에 다시 반영합니다. ${FIL('담당 확정')}</p>`,
+  ds: tdHead('TANK DATA SHEET 회신', 'P7000-PR-04-B001 REV.D 대조') +
+    tdT(['항목', 'Data sheet REV.D', '견적 기준', '확인'], [
+      ['Tag No.', TK2.join(' / '), TK2.join(' / '), '일치'], ['Design Code', 'API 650 13th', 'API 650 13th', '일치'], ['Roof Type', 'Cone Roof (Supported)', 'Cone Roof (Supported)', '일치'],
+      ['Size (D × H)', 'D 12~16 m × H 14 m', 'D 12~16 m × H 14 m', '일치'], ['Design Press. / Temp.', 'ATM / 65 ℃', 'ATM / 65 ℃', '일치'], ['Corrosion Allowance', '1.5 mm', '1.5 mm', '일치'],
+      ['Material', 'CASE 1 A283-C / CASE 2 SS316L', '두 CASE 모두 견적', '일치'], ['Internal Floating Deck', '표기 있음', 'OUT OF SCOPE', AIm('조건서 E-1 참조')]].map(r => [r[0], r[1], r[2], r[3] === '일치' ? pill('일치', 'p-ok') : r[3]])) +
+    `<p>불일치 0건 · 범위 제외 1건. 회신본은 Data sheet 원본 우측 “Contractor Confirmation” 란에 표시해 PDF로 제출합니다.</p>`,
+  sch: tdHead('제작·설치 일정표', `탱크 ${TK2.length}기 병행 · 발주(PO) 기준 주차`) +
+    `<div style="overflow-x:auto">${tdT(['공정', '기간', 'W1–4', 'W5–8', 'W9–12', 'W13–16', 'W17–20', 'W21–24', 'W25–28'], [
+      ['설계 확인 · 자재 발주', '4주', '■■', '', '', '', '', '', ''], ['Shop 제작', '10주', '■', '■■', '■■', '', '', '', ''], ['운송', '1주', '', '', '', '■', '', '', ''],
+      ['Field Erection', '12주', '', '', '', '■■', '■■', '■■', ''], ['충수·기밀시험', '3주', '', '', '', '', '', '■', '■'], ['도장 마감 · 준공 서류', '2주', '', '', '', '', '', '', '■■']])}</div>
+    <p>총 공기 ${AIm('28주')} · 주요 Milestone: 자재 입고 W4 · Shop 완료 W14 · 현장 반입 W15 · 충수시험 W24 · 기계적 준공 W28. 공기 확정 시 ${FIL('발주처 착수일')} 기준으로 다시 산출합니다.</p>`,
+  ven: tdHead('주요 자재 · 서브벤더 목록', `${PT.avl} 기준`) +
+    tdT(['품목', '1순위', '2순위', '원산지', 'AVL'], [
+      ['Steel Plate (A283-C)', 'POSCO 대리점 A', '현대제철 대리점 B', '한국', pill('등록', 'p-ok')], ['Steel Plate (SS316L)', 'POSCO 대리점 A', FIL('추가 업체'), '한국', pill('등록', 'p-ok')],
+      ['Shop 제작', '부광 (포항)', 'KTS', '한국', pill('등록', 'p-ok')], ['Field Erection', '지경', 'KTS', '한국', pill('등록', 'p-ok')],
+      ['도장', '미광', '—', '한국', pill('등록', 'p-ok')], ['Breather · Vent Valve', '세원T&S', FIL('대안'), '한국', pill('등록', 'p-ok')], ['Gasket · Bolt', AIm('견적서 기준 업체'), '—', '한국', pill('확인', 'p-warn')]]),
+  itp: tdHead('INSPECTION & TEST PLAN (ITP)', 'H: Hold · W: Witness · R: Review') +
+    tdT(['No.', 'Activity', '기준', '기록', 'KDM', 'Client'], [
+      ['1', '재료 입고 검사 (Mill Cert · 외관 · 치수)', 'ASTM A283 / A240', 'Mill Cert', 'H', 'R'], ['2', '절단 · Rolling 치수', 'API 650 §7', '치수 검사표', 'H', 'R'],
+      ['3', 'Bottom · Annular 용접 · Vacuum Box Test', 'API 650 §8.6', 'VBT 성적서', 'H', 'W'], ['4', 'Shell 용접 NDE (RT · PT)', 'API 650 §8.1', 'RT Film · Report', 'H', 'R'],
+      ['5', 'Shell 진원도 · 수직도 · Peaking/Banding', 'API 650 §7.5', '측정 기록', 'H', 'W'], ['6', 'Roof 설치 · Nozzle Orientation', 'Drawing', '검사 기록', 'H', 'R'],
+      ['7', '충수시험 · 기초 침하 측정', 'API 650 §7.3.6', 'Hydro Test Report', 'H', AIm('H')], ['8', '도장 DFT · Holiday Test', 'ENGSPEC A110', 'DFT 기록', 'H', 'W'], ['9', '최종 검사 · 준공 서류', '—', 'MDR', 'H', 'H']]) +
+    `<p class="muted">선례 ITP(정일스톨트헤븐 석산) 구조를 따르고, Client Point는 ENGSPEC A310 Inspection & Test 조항에서 가져왔습니다.</p>`,
+  wps: tdHead('WPS · PQR 목록 · 용접사 자격') +
+    tdT(['WPS No.', 'Process', '모재', '두께 범위', 'PQR', '상태'], [
+      ['KDM-WPS-T01', 'SMAW', 'CS–CS', '5–25 mm', 'PQR-T01', pill('유효', 'p-ok')], ['KDM-WPS-T02', 'SAW', 'CS–CS', '6–38 mm', 'PQR-T02', pill('유효', 'p-ok')],
+      ['KDM-WPS-T03', 'FCAW', 'CS–CS', '5–25 mm', 'PQR-T03', pill('유효', 'p-ok')], ['KDM-WPS-T04', 'GTAW+SMAW', 'CS–CS', '3–20 mm', 'PQR-T04', pill('유효', 'p-ok')],
+      ['KDM-WPS-S01', 'GTAW+SMAW', 'SS316L', '3–20 mm', 'PQR-S01', pill('갱신 필요', 'p-warn')], ['KDM-WPS-S02', 'GTAW', 'SS316L', '2–10 mm', 'PQR-S02', pill('갱신 필요', 'p-warn')]]) +
+    `<h3>용접사 자격</h3>${tdT(['구분', '인원', '자격', '유효기간'], [['CS (SMAW·SAW·FCAW)', AIm('8명'), 'KS · ASME IX', '2026-12'], ['SUS (GTAW)', AIm('3명'), 'ASME IX', FIL('갱신 확인')]])}
+    <p><b>보완 필요</b> — SUS PQR 2종 갱신 후 CASE 2(SUS) 제출. ${FIL('재발급 일정')}</p>`,
+  paint: tdHead('도장 사양 확인서', 'ENGSPEC P7000-PP-82-A110 기준') +
+    tdT(['부위', '표면처리', 'Primer', 'Intermediate', 'Top', '총 DFT'], [
+      ['Shell 외부', 'SSPC-SP10 (Sa 2½)', 'Inorganic Zinc 75 μm', 'Epoxy MIO 125 μm', 'Polyurethane 50 μm', AIm('250 μm')],
+      ['Roof 외부', 'SSPC-SP10', 'Inorganic Zinc 75 μm', 'Epoxy MIO 125 μm', 'Polyurethane 50 μm', AIm('250 μm')],
+      ['Shell 내부 (CASE 1)', 'SSPC-SP10', 'Epoxy Phenolic 125 μm', '—', 'Epoxy Phenolic 125 μm', AIm('250 μm')],
+      ['CASE 2 (SUS)', 'Pickling · Passivation', '—', '—', '—', '도장 없음']]) +
+    `<p>색상: ${FIL('발주처 Color Code')} · 도장 업체: 미광 (확인 후 확정) · 검사: DFT 측정 · Holiday Test (내부)</p>`,
+  safe: tdHead('현장 설치 안전관리계획서', '중량물 · 고소 · 밀폐공간') +
+    tdT(['위험작업', '대상 작업', '판정', '근거', '주요 대책'], [
+      ['중량물 인양', 'Shell Plate · Roof 인양 (크레인 50t)', AIm('대상'), '안전보건기준규칙 제38조', 'Rigging Plan · 신호수 지정 · 하부 출입통제'],
+      ['고소작업', '외부 강관비계 · Roof 작업 (H 14 m)', AIm('대상'), '제42조', '안전대 이중걸이 · 작업발판 · 안전난간'],
+      ['밀폐공간', '탱크 내부 용접 · 도장', AIm('대상'), '제619조', '산소·유해가스 측정 · 환기 · 감시인 배치'],
+      ['화기작업', '용접 · 절단', AIm('대상'), '제241조', '화기작업 허가 · 소화기 · 불티 비산 방지']]) +
+    `<h3>안전관리 조직</h3><p>현장소장 ${FIL('성명')} (안전보건관리책임자) · 안전관리자 ${FIL('성명')} · 작업지휘자 공정별 지정</p><p class="muted">첨부: 작업계획서 4종 · 위험성평가표 · 특별안전교육 계획</p>`,
+  ref: tdHead('회사소개서 · 탱크 제작 실적표', '최근 5년 저장탱크') +
+    tdT(['연도', '발주처', '프로젝트', '수량', '용량·규격', '재질'], [
+      ['2025', '정일스톨트헤븐', '석산 터미널 저장탱크', '7기', 'D 20 m × H 18 m', 'CS'], ['2024', AIm('한화솔루션'), '여수 공장 원료 탱크', '2기', 'D 14 m × H 12 m', 'SUS304L'],
+      ['2024', AIm('롯데정밀화학'), '울산 메탄올 탱크', '1기', 'D 16 m × H 15 m', 'CS'], ['2023', AIm('S-OIL'), '온산 저장탱크 교체', '2기', 'D 12 m × H 12 m', 'CS']]) +
+    `<p class="muted">실적 12건 중 유사 4건 표시 · 전체 목록은 문서함 “회사 / 실적” 최신본에서 자동 첨부합니다.</p>`,
+  lic: tdHead('회사 증빙 서류') +
+    tdT(['서류', '번호', '발급·유효', '파일'], [
+      ['사업자등록증', '230-81-*****', '—', '사업자등록증_KDMTECH.pdf'], ['공장등록증', FIL('번호'), '—', '공장등록증_포항.pdf'], ['ISO 9001', FIL('인증번호'), '~ 2027-03', 'ISO9001_인증서.pdf'], ['건설업 등록증 (기계설비)', FIL('번호'), '—', '건설업등록증.pdf']]) +
+    `<p class="muted">문서함 최신본을 자동 첨부합니다. 유효기간이 지난 서류는 ‘보완 필요’로 바뀝니다.</p>`,
+};
+document.head.insertAdjacentHTML('beforeend', `<style>.tdraft table th{white-space:nowrap}.tdraft td,.tdraft th{font-size:12.5px;vertical-align:top}.tdraft td:first-child{white-space:nowrap}</style>`);
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-tsd]'); if (!b) return; e.stopImmediatePropagation();
+  const i = TSUBDOCS.findIndex(x => x[0] === b.dataset.tsd), d = TSUBDOCS[i], doc = TDOC[d[4][0]];
+  const pv = TSUBDOCS[(i - 1 + TSUBDOCS.length) % TSUBDOCS.length], nx = TSUBDOCS[(i + 1) % TSUBDOCS.length];
+  openPanel(d[1], `${PT.qp} ${PT.rev} · 탱크 부가 제출문서 ${i + 1} / ${TSUBDOCS.length}`, `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px">${pill(d[2], 'p-rv')}${pill(d[3], 'p-ai')}${pill(TD_ST[d[5]][0], TD_ST[d[5]][1])}<span class="muted" style="font-size:12px">근거 · ${doc ? doc[2] : ''} ${d[4][1]}</span></div>
+    <div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--ai-soft);font-size:13px;line-height:1.6"><span class="ai">AI 요약</span> ${d[6]}</div>
+    <div class="doc tdraft" style="font-size:13px;line-height:1.7">${TDRAFT[d[0]] || `<p>${d[6]}</p>`}</div>
+    <h3 style="font-size:13px;margin:16px 0 6px">근거 문서</h3><div class="row" style="cursor:default"><b style="font-weight:600;font-size:13px">${doc ? doc[1] : '—'}</b><div class="muted" style="font-size:12px">${doc ? doc[0] : ''} · ${d[4][1]}</div></div>
+    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:14px"><button type="button" class="btn rbtn" data-tsd="${pv[0]}">← ${pv[1].split(' (')[0]}</button><button type="button" class="btn rbtn" data-tsd="${nx[0]}">${nx[1].split(' (')[0]} →</button></div>`,
+    `${actBtn('수정 요청', '담당자에게 수정 요청을 남겼습니다', ['exec', 'estT'], '')}${actBtn('확정', d[1] + ' 확정 · 제출 패키지에 반영', ['estT', 'sup'])}`);
 }, true);
 
 render();
