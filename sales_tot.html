@@ -3591,7 +3591,7 @@ function inkDetail() {
   if (d === 'x') log.push(['리뷰', `${HT}제외 · 일자별 폴더에 보관 (보관 기간은 인터뷰 확인)`]);
   if (d === 'fw' && XFER[m.i]) log.push(['리뷰', `${HT}타업무 이관 · ${XFER[m.i][1]} ${XFER[m.i][2]}에게 메일 전달 · 수신 폴더는 보관`]);
   if (d === 'link' || (m.link && !d)) log.push(['리뷰', `${HT}기존 건 ${m.link || 'RV'}에 연결 · 첨부를 해당 문서함에 추가 (Rev+1)`]);
-  const acts = pending ? `<div class="acts" style="justify-content:flex-start">${can('sup') ? `<button class="btn pri" type="button" data-inkd="rv" title="RV가 발급되고 AI가 자료를 RV 문서함으로 옮긴 뒤 초기 분석을 시작합니다">${HT}리뷰 결정 → RV 생성</button><button class="btn" type="button" data-inkd="link">${HT}기존 건에 연결</button><button class="btn" type="button" data-xfer="${m.i}">${HT}타업무 이관</button>` : `<button class="btn off" type="button" title="영업지원담당자만 처리">리뷰 결정</button>`}</div>` : '';
+  const acts = pending ? `<div class="acts" style="justify-content:flex-start">${can('sup') ? `<button class="btn pri" type="button" data-inkd="rv" title="AI 메일 분류가 맞는지 확인·검증하면 리뷰로 넘어가 RV가 발급되고 담당이 배정됩니다 → 견적담당 초기 분석">${HT}분류 검증 완료 → 리뷰 (RV 생성)</button><button class="btn" type="button" data-inkd="link">${HT}기존 건에 연결</button><button class="btn" type="button" data-xfer="${m.i}" title="견적이 필요 없는 건 — 담당 부서·담당자를 바로 지정해 메일을 전달합니다">${HT}타업무 이관 (견적 불필요)</button>` : `<button class="btn off" type="button" title="영업지원담당자만 처리">리뷰 결정</button>`}</div>` : '';
   return `<div class="ph"><div style="min-width:0"><div class="src">${STO[STORE].n} · 일자별 수신 폴더</div><h2 style="margin-top:3px;overflow-wrap:anywhere">${m.name || m.subj}</h2><div class="sub">${m.client} · ${m.from} · ${m.recv}</div></div>${pill(inkSt(m)[0], inkSt(m)[1])}</div>
     <div class="pb" style="display:flex;flex-direction:column;gap:12px">
       <div><div class="muted" style="font-size:12px;margin-bottom:4px">현재 위치</div><div class="path">${decided ? `${S.proj}${rv}${S.sep}01_입찰준비자료` : recvPath(m)}</div></div>
@@ -4780,7 +4780,7 @@ const QPOP_JS = "(function(){\n/* 박스 선택 → 우측 패널 (박스 정보
 const PJ_KN = {part: '참여 결정', est: '견적 승인', neg: '협상가 승인', bud: '실행예산 승인'};
 const PJ_LN = k => k === 'bud' ? ['exec'] : ['exec', 'ceo'];
 const PJ_RN = r => r === 'exec' ? '영업임원' : r === 'ceo' ? '대표이사' : ROLES[r] ? ROLES[r].n : r;
-const PJ_STEPS = ['접수·리뷰', '참여 결정', '물량·원가', '견적서·승인', '제출·기술평가', '가격 협상', '수주 결과', '인계'];
+const PJ_STEPS = ['접수·리뷰', '초기 분석·참여 결정', '물량·원가', '견적서·승인', '제출·기술평가', '가격 협상', '수주 결과', '인계'];
 const PJ_DEF = [
   {id: 'c', row: 0, own: 'estC', qp: 'QP-2026-0011', wo: 'WO-2026-0007', base: [10210000000, 10488000000], seed: 'review anl req ok ok est req ok ok submit tbe est req'},
   {id: 't', row: 1, own: 'estT', qp: 'QP-2025-0102', wo: 'WO-2025-0044', base: [1210000000, 1290000000, 1480000000], seed: 'review anl req ok ok est req ok ok submit tbe est req ok ok submit nego est req ok'},
@@ -4805,8 +4805,8 @@ const pjVisible = id => PIPE_F().includes(fOf(pjType(id)));
 const pjIsOwner = id => !!ROLE && ALIAS(ROLE) === ALIAS(PJ_D[id].own) && pjVisible(id);
 /* 작업 단계 (리비전 안에서 순서대로) : [이름, 화면, 주체, 짧은 이름] */
 const STP = {
-  review: ['리뷰 결정 → RV 발급·담당 배정', 'intake', 'H', '리뷰 결정'],
-  anl: ['AI 초기 분석 확인 · 입찰 체크리스트 1차 판단 (탱크는 타입 분류 확정)', 'bidchk', 'AI', '초기 분석'],
+  review: ['메일 분류 검증 → 리뷰 (RV 발급·담당 배정)', 'intake', 'H', '분류 검증·리뷰'],
+  anl: ['초기 분석 검토 (AI 분석 → 담당 검토 · 입찰 체크리스트 1차 판단 · 탱크는 타입 분류 확정)', 'bidchk', 'H', '초기 분석'],
   chk: ['견적 체크리스트 확인 (질의·조건)', 'ccheck', 'H', '체크리스트'],
   qty: ['물량산출 · DiaInch 검증 → 확정 (기준서 Rev.6)', 'cqty', 'H', '물량산출'],
   cost: ['노무·장비·경비 단가 확정', 'ccost', 'H', '단가'],
@@ -4882,7 +4882,7 @@ function pjAct(id, a, by, op, live) {
   const D = PJ_D[id], s = PJS[id], r = pjCur(id), at = live ? pjNow() : '';
   const L = (t, o) => s.log.unshift({at, by: PJ_RN(by), t, op: o || ''});
   const H = res => ({res, by: PJ_RN(by), op: op || '', at});
-  if (a === 'review') { s.rv = true; L(`리뷰 결정 → ${PIPE[D.row][0]} 발급 · 담당 ${ROLES[D.own].n} 배정 · 문서함 이동`); }
+  if (a === 'review') { s.rv = true; L(`메일 분류 검증 완료 → 리뷰 · ${PIPE[D.row][0]} 발급 · 담당 ${ROLES[D.own].n} 배정 · 문서함 이동`); }
   if (['chk', 'qty', 'cost', 'spec', 'vtgt', 'vrep', 'vsel'].includes(a)) {
     r.dn = r.dn || []; if (!r.dn.includes(a)) r.dn.push(a);
     if (a === 'qty' && !pjTank(id)) {
@@ -4892,7 +4892,7 @@ function pjAct(id, a, by, op, live) {
     }
     L(a === 'vtgt' ? `R${r.n} 벤더 요청 대상 확정 → AI가 승인벤더에 패키지별 견적 요청 자동 발송` : a === 'vrep' ? `R${r.n} 벤더 회신 마감 → AI 취합·정규화·자동 비교 (항목별 최저 재구성안)` : `R${r.n} ${STP[a][0]} 완료`);
   }
-  if (a === 'anl') { s.anl++; L(`AI 초기 분석 ${s.anl}차 생성 · 참여 판단 자료 (위험·독소·비용)`); if (pjTank(id)) { s.tt = {g: PJ_TT || ttOf(id).map(x => x.slice()), by: PJ_RN(by), at}; PJ_TT = null; L(`탱크 타입 확정 · ${ttLine(s.tt.g)} → 체크리스트·견적 항목·외주 패키지 결정`); } }
+  if (a === 'anl') { s.anl++; L(`AI 초기 분석 ${s.anl}차 → 담당 검토 완료 · 참여 판단 자료 (위험·독소·비용)`); if (pjTank(id)) { s.tt = {g: PJ_TT || ttOf(id).map(x => x.slice()), by: PJ_RN(by), at}; PJ_TT = null; L(`탱크 타입 확정 · ${ttLine(s.tt.g)} → 체크리스트·견적 항목·외주 패키지 결정`); } }
   if (a === 'req') {
     const kind = !s.part ? 'part' : s.result === 'win' ? 'bud' : r.kind === '가격 협상' ? 'neg' : 'est', turn = PJ_LN(kind)[0];
     s.wait = {kind, turn, rev: kind === 'part' ? null : r.n, hist: [H('상신')]};
@@ -4947,8 +4947,8 @@ function pjStatus(id) {
     if (k === 'est') return [`견적 승인 대기 · ${t} (R${r.n})`, 'p-warn', 'appr'];
     return [`TCM·협상 · R${r.n} 협상가 승인 대기 · ${t}`, 'p-warn', 'appr'];
   }
-  if (!s.rv) return ['접수 · 리뷰 결정 대기 (영업지원)', 'p-rv', 'intake'];
-  if (!r) return s.anl ? [s.partRej ? '참여 반려 · 보완 후 재상신' : '검토중 · 참여 상신 전', s.partRej ? 'p-bad' : 'p-rv', 'gonogo'] : ['검토중 · AI 초기 분석 확인 대기', 'p-rv', 'bidchk'];
+  if (!s.rv) return ['접수 · 분류 검증 대기 (영업지원)', 'p-rv', 'intake'];
+  if (!r) return s.anl ? [s.partRej ? '참여 반려 · 보완 후 재상신' : '검토중 · 참여 상신 전', s.partRej ? 'p-bad' : 'p-rv', 'gonogo'] : ['검토중 · 초기 분석 검토 대기 (AI 분석 완료)', 'p-rv', 'bidchk'];
   if (r.status === '작성 중') {
     const k = pjNextStep(r), L0 = r.steps || ['est'], i = k ? L0.indexOf(k) : L0.length, rj = s.rej && s.rej.kind !== 'part';
     if (r.kind === '가격 협상') return [`TCM·협상 · R${r.n} 협상 리비전 ${k ? '작성' : rj ? '반려 보완' : '승인 요청 전'}`, rj ? 'p-bad' : 'p-qp', 'nego'];
@@ -5088,7 +5088,7 @@ function pjNext(id) {
   if (s.result === 'win') return s.bud ? null : {role: own, view: 'won', label: '실행예산 작성 → 승인 요청', acts: [['req', '실행예산 승인 요청', 'pri']]};
   if (!s.rv) return {role: 'sup', view: 'intake', label: STP.review[0], acts: [['review', STP.review[0], 'pri']]};
   if (!r) {
-    if (!s.anl) return {role: own, view: 'bidchk', label: STP.anl[0], acts: [['anl', 'AI 초기 분석 확인 완료', 'ai-b']]};
+    if (!s.anl) return {role: own, view: 'bidchk', label: STP.anl[0], acts: [['anl', '초기 분석 검토 완료', 'pri']]};
     return {role: own, view: 'gonogo', label: s.partRej ? '참여여부 보고서 보완 → 재상신' : '참여여부 보고서 상신', acts: [['req', s.partRej ? '보완 후 참여 결정 재상신' : '참여 결정 상신', 'pri'], ['anl', 'AI 재분석', '']]};
   }
   if (r.status === '작성 중') {
@@ -5221,7 +5221,8 @@ function workBar() {
   pjSync();
   const s = PJS[id], r = pjCur(id), D = PJ_D[id], n = pjNext(id), [st, cls] = pjStatus(id);
   const L0 = r && r.status === '작성 중' ? (r.steps || ['est']) : null, k = r && pjNextStep(r);
-  const chips = L0 ? `<div class="wsteps">${L0.map((x, i) => `<span class="${(r.dn || []).includes(x) || (x === 'est' && r.est) ? 'd' : x === k ? 'c' : ''}">${i + 1}. ${x === 'est' && r.kind === '가격 협상' ? '협상 금액' : STP[x][3]}${x === 'qty' && r.qv ? ` ${fmtDI(r.qv.di)}` : ''}</span>`).join('')}<span class="${k ? '' : 'c'}">${L0.length + 1}. ${r.kind === '가격 협상' ? '협상가' : '견적'} 승인 요청</span></div>` : `<div style="margin-top:8px">${pjBar(id)}</div>`;
+  let chips = L0 ? `<div class="wsteps">${L0.map((x, i) => `<span class="${(r.dn || []).includes(x) || (x === 'est' && r.est) ? 'd' : x === k ? 'c' : ''}">${i + 1}. ${x === 'est' && r.kind === '가격 협상' ? '협상 금액' : STP[x][3]}${x === 'qty' && r.qv ? ` ${fmtDI(r.qv.di)}` : ''}</span>`).join('')}<span class="${k ? '' : 'c'}">${L0.length + 1}. ${r.kind === '가격 협상' ? '협상가' : '견적'} 승인 요청</span></div>` : `<div style="margin-top:8px">${pjBar(id)}</div>`;
+  if (!L0 && pjStage(id) <= 1 && !s.part) chips = pjPre(id, true);
   let act;
   if (!n) act = `${pill(s.result === 'win' ? '인계 완료 · 실행 단계로' : '종결', s.result === 'win' ? 'p-wo' : '')}`;
   else if (pjMine(id) || (n.view === 'appr' && roleIs(n.role))) {
@@ -5387,7 +5388,7 @@ function procDecorate() {
   if (my && !my.parentElement.querySelector('[data-procgo]')) my.insertAdjacentHTML('afterend', `<button class="btn ibtn qbtn" type="button" data-procgo="1" data-tip="원본 프로세스 흐름도(8단계)를 새 창으로 열고 이 화면의 위치를 표시합니다 · 흐름도 박스를 누르면 다시 이 프로토타입 화면으로"><span class="ic">⇢</span>프로세스 위치${EXT_I}</button>`);
 }
 new MutationObserver(() => requestAnimationFrame(procDecorate)).observe(document.getElementById('app'), {childList: true, subtree: true});
-window.__pj = {PJS, pjStatus, pjNext, pjMine, setWork, pjCode, C2V, vLabel};
+window.__pj = {pjAct: (...a) => { pjAct(...a); pjSync(); saveSoon(); }, PJS, pjStatus, pjNext, pjMine, setWork, pjCode, C2V, vLabel};
 
 /* 입찰 체크리스트 · 탱크 탭: 타입 분류 결과 (예시 여수 건) */
 const _bidchkTT = VIEWS.bidchk, _bidchkTTA = VIEWS.bidchk.after;
@@ -5894,10 +5895,10 @@ function pjDocsAvail(id) {
 }
 const pjDocBtns = (id, back) => { const L = pjDocsAvail(id); return L.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="muted" style="font-size:12px;font-weight:700;margin-right:2px">관련 문서</span>${L.map(([k, l]) => `<button type="button" class="btn rbtn" data-pjdoc="${k}" data-pj="${id}" ${back ? `data-back="${back}"` : ''} style="min-height:28px;font-size:12.5px;padding:0 10px">${l}</button>`).join('')}</div>` : ''; };
 function pjReview(id) {
-  const D = PJ_D[id], row = PIPE[D.row], m = pjMail(id), s = PJS[id], lg = s.log.slice().reverse().find(x => /리뷰 결정/.test(x.t));
+  const D = PJ_D[id], row = PIPE[D.row], m = pjMail(id), s = PJS[id], lg = s.log.slice().reverse().find(x => /리뷰/.test(x.t));
   return `<dl class="dl pb" style="padding:0">${[['검토 ID', `<span class="id">${row[0]}</span>`], ['접수 메일', m ? `${m[0]}<div class="muted" style="font-size:12px">${m[1]} · ${m[2]}</div>` : '대표메일 접수 (원문은 문서함 01_입찰준비자료)'],
     ['AI 분류', m ? `${pill(m[3], m[4] || '')} 신뢰도 ${m[5]}%` : pill('견적요청', 'p-rv')], ['분야', `${row[2]} · 발주처 ${row[4]}`],
-    ['리뷰 결정', `${HT}리뷰 (참여 검토 진행) · ${PROFILE.sup.nm} ${PROFILE.sup.gr} (영업지원)${lg && lg.at ? ' · ' + lg.at : ''}`], ['담당 배정', `${ROLES[D.own].n}${PROFILE[D.own] ? ' · ' + PROFILE[D.own].nm + ' ' + PROFILE[D.own].gr : ''}`],
+    ['분류 검증 → 리뷰', `${HT}AI 분류 확인·검증 완료 → 리뷰 · ${PROFILE.sup.nm} ${PROFILE.sup.gr} (영업지원)${lg && lg.at ? ' · ' + lg.at : ''}`], ['담당 배정', `${ROLES[D.own].n}${PROFILE[D.own] ? ' · ' + PROFILE[D.own].nm + ' ' + PROFILE[D.own].gr : ''}`],
     ['자료 위치', `<span class="id">\\\\kdm-nas\\영업\\${row[0]}</span> · 01_입찰준비자료 (원본 잠금)`]].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
 }
 function pjAnl(id) {
@@ -6180,6 +6181,133 @@ document.addEventListener('click', e => {
     <div style="display:flex;justify-content:space-between;gap:8px;margin-top:14px"><button type="button" class="btn rbtn" data-tsd="${pv[0]}">← ${pv[1].split(' (')[0]}</button><button type="button" class="btn rbtn" data-tsd="${nx[0]}">${nx[1].split(' (')[0]} →</button></div>`,
     `${actBtn('수정 요청', '담당자에게 수정 요청을 남겼습니다', ['exec', 'estT'], '')}${actBtn('확정', d[1] + ' 확정 · 제출 패키지에 반영', ['estT', 'sup'])}`);
 }, true);
+
+/* ===================== 참여 결정까지의 공통 흐름 (모든 프로젝트) =====================
+   ① 영업지원 메일 분류 검증 → 리뷰(RV·담당 배정) · 견적 불필요 건은 타업무 이관 ② AI 초기 분석 → 견적담당 검토 ③ 견적담당 참여여부 보고서 상신
+   ④ 영업임원 검토 ⑤ 대표이사 승인 = 참여 결정 ⑥ 견적담당 상세견적 착수 */
+function pjPreSt(id) {
+  const s = PJS[id], w = s.wait && s.wait.kind === 'part' ? s.wait : null, partDone = s.part || s.done.some(d => d.kind === 'part');
+  const st = [s.rv, s.anl > 0, !!w || partDone, (w && w.turn === 'ceo') || partDone, partDone, partDone && !!pjCur(id) && (pjCur(id).est || (pjCur(id).dn || []).length > 0 || pjCur(id).n > 0)];
+  const cur = s.drop ? 4 : st.findIndex(x => !x);
+  return {st, cur, rej: s.partRej, drop: s.drop};
+}
+const PJ_PRE = [['분류 검증 → 리뷰', '영업지원', 'H', '메일 분류 확인 · RV 발급·담당 배정'], ['초기 분석', 'AI 분석 → 견적담당 검토', 'AI·H', '입찰 체크리스트 1차 판단'], ['참여여부 보고서 상신', '견적담당', 'H', 'AI 초안 → 담당 작성'],
+  ['영업임원 검토', '영업임원', 'H', '의견 필수'], ['대표이사 승인', '대표이사', 'H', '= 참여 결정'], ['상세견적 진행', '견적담당', 'H', '물량·원가 → 상세견적서']];
+function pjPre(id, compact) {
+  const {st, cur, rej, drop} = pjPreSt(id);
+  if (compact) return `<div class="wsteps">${PJ_PRE.map((p, i) => `<span class="${st[i] ? 'd' : i === cur ? 'c' : ''}">${i + 1}. ${p[0]}${i === cur && rej && i === 2 ? ' (반려 보완)' : ''}${drop && i === 4 ? ' (불참)' : ''}</span>`).join('')}</div>`;
+  return `<div class="pjpre" aria-label="참여 결정까지의 흐름">${PJ_PRE.map((p, i) => `<div class="pp ${st[i] ? 'd' : i === cur ? 'c' : ''}"><span class="n">${st[i] ? '✓' : i + 1}</span><span class="t"><b>${p[0]}</b><span>${p[2] === 'AI·H' ? `<span class="ai" style="font-size:10.5px">AI</span> 분석 → ${HT}견적담당 검토` : `${HT}${p[1]}`}</span><span class="m">${i === cur && rej && i === 2 ? '반려 → 보완 후 재상신' : drop && i === 4 ? '불참 결정 · 종결' : p[3]}</span></span></div>`).join('<span class="ar" aria-hidden="true">→</span>')}</div>`;
+}
+document.head.insertAdjacentHTML('beforeend', `<style>
+.pjpre{display:flex;align-items:stretch;gap:4px;flex-wrap:wrap;margin-top:8px}
+.pjpre .ar{align-self:center;color:var(--muted);font-size:12px}
+.pjpre .pp{flex:1 1 92px;display:flex;gap:6px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface,#fff);min-width:0}
+.pjpre .pp .n{flex:none;width:18px;height:18px;border-radius:50%;background:var(--chip);color:var(--muted);font-size:11px;font-weight:700;display:grid;place-items:center}
+.pjpre .pp .t{display:flex;flex-direction:column;font-size:11.5px;line-height:1.35;min-width:0;color:var(--fg2)}
+.pjpre .pp .t b{font-size:12px;color:var(--fg)}.pjpre .pp .m{color:var(--muted);font-size:11px}
+.pjpre .pp.d{background:var(--accent-soft);border-color:transparent}.pjpre .pp.d .n{background:var(--accent);color:#fff}
+.pjpre .pp.c{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}.pjpre .pp.c .n{background:var(--accent);color:#fff}
+</style>`);
+/* 결재 문서: 단계 막대는 결재 종류의 단계로 표시 + 참여 결정 건은 흐름 표시 */
+const AP_STG = {part: 1, est: 3, neg: 5, bud: 7};
+const _apdPre = apDetail;
+apDetail = k => {
+  let h = _apdPre(k); const a = APPR.find(x => x.k === k); if (!a || !a.wait) return h;
+  const c = AP_STG[a.wait.kind]; if (c != null) h = h.replace(/<div class="pjbar"[\s\S]*?<\/div>/, `<div class="pjbar" title="이 결재의 단계">${PJ_STEPS.map((t, i) => `<span class="${i < c ? 'd' : i === c ? 'c' : ''}">${String(i + 1).padStart(2, '0')} ${t}</span>`).join('')}</div>`);
+  if (a.wait.kind === 'part') h = h.replace(/(<div class="pjbar"[\s\S]*?<\/div>)/, `$1${pjPre(a.pid)}`);
+  return h;
+};
+/* 프로젝트 진행 패널: 참여 결정 전이면 흐름 표시 */
+const _pjOpenPre = pjOpen;
+pjOpen = id => { _pjOpenPre(id); const s = PJS[id]; if (s.part && pjStage(id) > 1) return; const bar = document.querySelector('.dw .dw-b .pjbar'); if (bar && !document.querySelector('.dw .pjpre')) bar.insertAdjacentHTML('afterend', pjPre(id)); };
+
+/* ===================== 반복 입찰 분석 (영업지원 데이터 분석 포인트) =====================
+   메일 분류 검증·리뷰 이력이 쌓이면: 유사 프로젝트의 입찰 주기 · 규모 변동 · 유지보수(정기보수·단가계약·법정검사) 주기 → 다음 입찰 예고 */
+const BH_KIND = {ta: ['정기보수(T&I·TA)', 'p-qp'], unit: ['단가계약 갱신', 'p-sys'], law: ['법정 검사 주기', 'p-warn'], rep: ['교체·개선 주기', 'p-rv']};
+const BH_RES = {win: ['수주', 'p-ok'], lose: ['실주', 'p-bad'], drop: ['불참', ''], ing: ['진행 중', 'p-rv'], fc: ['예상', 'p-ai']};
+// [id, 발주처, 반복 대상, 유형, 매칭 키워드, 회차 [[년-월, 규모(억), 결과, 범위]]]
+const BHIST = [
+  ['soil-fix', 'S-OIL', '고정장치 PKG (정기보수 현설)', 'ta', ['고정장치'], [['2022-10', 38.0, 'win', 'PKG-1~4'], ['2023-10', 41.2, 'lose', 'PKG-1~4'], ['2024-10', 44.5, 'win', 'PKG-1~5'], ['2025-10', 46.1, 'win', 'PKG-1~5'], ['2026-10', 48.9, 'ing', 'PKG-1/2/5 · 3/4 현설']]],
+  ['soil-clx', 'S-OIL', '#1CLX 열교환기 Retubing 단가계약', 'unit', ['Retubing', '#1CLX'], [['2020-10', 6.2, 'win', '2021~2023'], ['2023-10', 7.1, 'win', '2024~2026'], ['2026-10', 8.0, 'ing', '2027~2029 가견적']]],
+  ['soil-pipe', 'S-OIL', '노후배관 교체 PKG', 'rep', ['노후배관'], [['2024-10', 18.3, 'lose', 'PKG-1~2'], ['2025-10', 22.0, 'win', 'PKG-1~3'], ['2026-10', 23.5, 'ing', 'PKG-1~3 현설']]],
+  ['soil-hmp', 'S-OIL', '#1HMP Air Preheater T&I', 'ta', ['Air Preheater', '#1HMP'], [['2019-06', 3.1, 'win', 'E-31116A/B'], ['2023-06', 3.6, 'win', 'E-31116A/B'], ['2026-10', 4.0, 'ing', '2027 T&I 가견적 · B 1 Unit']]],
+  ['lot-psd', '롯데케미칼 울산', '울산2공장 PIA3 PSD 정기보수 (M.H · 열교환기 Open)', 'ta', ['PSD', 'PIA3'], [['2022-11', 4.8, 'win', '2공장 PIA3'], ['2024-11', 5.3, 'lose', '2공장 PIA3'], ['2026-10', 5.9, 'ing', '2차 견적 제출완료']]],
+  ['ski-boil', 'SK에너지', '동력보일러 개조검사 인허가', 'law', ['동력보일러'], [['2022-10', 0.9, 'win', 'PW-B105'], ['2024-10', 1.0, 'win', 'PW-B105'], ['2026-10', 1.1, 'ing', 'PW-B105 제출완료']]],
+  ['hws-aph', '한화솔루션 울산', 'PVC Air Pre-heater (H-3207) 제작', 'rep', ['H-3207', 'AIR PRE-HEATER'], [['2021-09', 2.6, 'lose', '1기'], ['2026-10', 3.4, 'ing', '1기 · 마감 변경 제출']]],
+  ['htt-ta', '한화토탈에너지스 대산', 'NCC TA 배관 교체·보수', 'ta', ['NCC', 'TA 배관'], [['2020-12', 12.4, 'win', 'NCC #1'], ['2022-12', 13.9, 'win', 'NCC #1'], ['2024-12', 15.2, 'lose', 'NCC #1·#2']]],
+  ['ync-tank', '여천NCC', '저장탱크 개방검사·보수 (위험물 정기검사)', 'law', ['개방검사'], [['2015-01', 6.8, 'win', 'TK-201~204'], ['2021-01', 8.9, 'win', 'TK-201~206']]],
+];
+const ym = s => { const [y, m] = s.split('-').map(Number); return y * 12 + m - 1; }, ymS = n => `${Math.floor(n / 12)}-${String(n % 12 + 1).padStart(2, '0')}`;
+const NOWYM = ym('2026-10');
+function bhStat(p) {
+  const R = p[5].filter(r => r[2] !== 'fc'), gaps = R.slice(1).map((r, i) => ym(r[0]) - ym(R[i][0]));
+  const cyc = gaps.length ? gaps.reduce((a, b) => a + b, 0) / gaps.length : null, dev = gaps.length > 1 ? Math.max(...gaps.map(g => Math.abs(g - cyc))) : 0;
+  const amts = R.map(r => r[1]), grow = amts.length > 1 ? (Math.pow(amts[amts.length - 1] / amts[0], 1 / (amts.length - 1)) - 1) * 100 : 0;
+  const last = R[R.length - 1], ing = last[2] === 'ing', next = cyc ? ym(last[0]) + Math.round(cyc) : null;
+  const done = R.filter(r => r[2] === 'win' || r[2] === 'lose'), win = R.filter(r => r[2] === 'win').length;
+  return {R, cyc, dev, grow, last, ing, next, nextAmt: last[1] * (1 + grow / 100), win, done: done.length, soon: next != null && !ing && next - NOWYM <= 3 && next - NOWYM >= -1, due: next != null && !ing ? next - NOWYM : null};
+}
+let BHSEL = 'soil-fix', BHF = 'all';
+function bhChart(p) {
+  const S = bhStat(p), pts = [...S.R.map(r => ({t: ym(r[0]), a: r[1], r: r[2], l: r[0]})), ...(S.next ? [{t: S.next, a: S.nextAmt, r: 'fc', l: ymS(S.next)}] : [])];
+  const t0 = pts[0].t - 6, t1 = pts[pts.length - 1].t + 6, aM = Math.max(...pts.map(x => x.a)) * 1.15, W = 640, H = 190, L = 40, B = 30, x = t => L + (t - t0) / (t1 - t0) * (W - L - 10), y = a => H - B - a / aM * (H - B - 14);
+  const yrs = []; for (let yy = Math.ceil(t0 / 12); yy * 12 <= t1; yy++) yrs.push(yy);
+  const col = r => r === 'win' ? 'var(--ok,#1a7f37)' : r === 'lose' ? 'var(--bad,#c4321c)' : r === 'fc' ? 'none' : 'var(--accent)';
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img" aria-label="${p[2]} 회차별 규모">
+    ${yrs.map(yy => `<line x1="${x(yy * 12)}" x2="${x(yy * 12)}" y1="8" y2="${H - B}" stroke="var(--line)" stroke-width="1"/><text x="${x(yy * 12) + 3}" y="${H - B + 14}" font-size="10.5" fill="var(--muted)">${yy}</text>`).join('')}
+    <line x1="${x(NOWYM)}" x2="${x(NOWYM)}" y1="8" y2="${H - B}" stroke="var(--accent)" stroke-dasharray="3 3"/><text x="${x(NOWYM) + 3}" y="16" font-size="10.5" fill="var(--accent)">오늘</text>
+    <polyline fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="${pts.length > 1 ? '0' : ''}" points="${pts.filter(q => q.r !== 'fc').map(q => `${x(q.t)},${y(q.a)}`).join(' ')}"/>
+    ${S.next ? `<line x1="${x(S.R[S.R.length - 1] ? ym(S.last[0]) : 0)}" y1="${y(S.last[1])}" x2="${x(S.next)}" y2="${y(S.nextAmt)}" stroke="var(--muted)" stroke-dasharray="4 3"/>` : ''}
+    ${pts.map(q => `<rect x="${x(q.t) - 9}" y="${y(q.a)}" width="18" height="${H - B - y(q.a)}" rx="3" fill="${col(q.r)}" fill-opacity="${q.r === 'fc' ? 0 : .22}" stroke="${q.r === 'fc' ? 'var(--muted)' : col(q.r)}" stroke-dasharray="${q.r === 'fc' ? '3 2' : '0'}"/><circle cx="${x(q.t)}" cy="${y(q.a)}" r="3.5" fill="${q.r === 'fc' ? '#fff' : col(q.r)}" stroke="${q.r === 'fc' ? 'var(--muted)' : col(q.r)}"/><text x="${x(q.t)}" y="${y(q.a) - 7}" text-anchor="middle" font-size="10.5" fill="var(--fg2)">${q.a.toFixed(1)}억</text>`).join('')}
+  </svg>`;
+}
+function bhDetail() {
+  const p = BHIST.find(x => x[0] === BHSEL) || BHIST[0], S = bhStat(p), K = BH_KIND[p[3]];
+  const ins = [
+    S.cyc ? `입찰 주기 평균 <b>${(S.cyc / 12 >= 1.5 ? (S.cyc / 12).toFixed(1) + '년' : Math.round(S.cyc) + '개월')}</b>${S.dev ? ` (편차 ±${Math.round(S.dev)}개월)` : ' · 매번 같은 달'} — ${K[0]}` : '회차가 1건이라 주기는 아직 산출 전 (2회부터 산출)',
+    S.R.length > 1 ? `규모 ${S.grow >= 0 ? '증가' : '감소'} <b>${S.grow >= 0 ? '+' : ''}${S.grow.toFixed(1)}%/회</b> · ${S.R[0][1].toFixed(1)}억 → ${S.last[1].toFixed(1)}억 (범위: ${S.R[0][3]} → ${S.last[3]})` : '',
+    `우리 결과 ${S.win}/${S.done} 수주${S.R.some(r => r[2] === 'lose') ? ` · 실주 회차 ${S.R.filter(r => r[2] === 'lose').map(r => r[0].slice(0, 4)).join(', ')} → 실주 분석 연결` : ''}`,
+    S.ing ? `이번 회차 진행 중 (${S.last[0]} · ${S.last[3]}) → 다음 예상 <b>${ymS(S.next)}</b> · 약 ${S.nextAmt.toFixed(1)}억` : S.next ? `다음 입찰 예상 <b>${ymS(S.next)}</b> (${S.due > 0 ? S.due + '개월 후' : S.due === 0 ? '이번 달' : Math.abs(S.due) + '개월 지남 · 아직 미접수'}) · 예상 규모 약 ${S.nextAmt.toFixed(1)}억` : '',
+    S.next ? `준비: ${ymS(S.next - 1)}에 지난 회차 견적서·실적·협력사 단가를 미리 묶어 담당에게 공유` : ''].filter(Boolean);
+  return `<div class="ph"><div style="min-width:0"><div class="src">${p[1]}</div><h2 style="margin-top:3px">${p[2]}</h2></div>${pill(K[0], K[1])}</div>
+    <div class="pb" style="display:flex;flex-direction:column;gap:12px">
+      ${bhChart(p)}
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px" class="muted"><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--ok,#1a7f37)"></i> 수주</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--bad,#c4321c)"></i> 실주</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--accent)"></i> 진행 중</span><span>점선 = 다음 예상 (주기·추세 기준)</span></div>
+      <div class="aibox"><span class="ai">AI 패턴 분석</span><ul class="ailist">${ins.map(x => `<li>${x}</li>`).join('')}</ul></div>
+      ${tbl(['회차', '시기', '범위', '>규모(억)', '결과'], S.R.map((r, i) => tr([i + 1, r[0], r[3], r[1].toFixed(1), pill(BH_RES[r[2]][0], BH_RES[r[2]][1])])).concat(S.next ? [tr(['예상', ymS(S.next), '추세', S.nextAmt.toFixed(1), pill('예상', 'p-ai')])] : []))}
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${actBtn('일일 요약에 예고 추가', `${p[1]} ${p[2]} — ${S.next ? ymS(S.next) : ''} 입찰 예고를 일일 요약에 넣었습니다`, ['sup'])}${actBtn('담당에게 사전 자료 공유', '지난 회차 견적서·실적·단가 묶음을 담당 견적자에게 공유했습니다', ['sup'], '')}</div></div>`;
+}
+function bhRows() {
+  const L = BHIST.filter(p => BHF === 'all' || (BHF === 'soon' ? bhStat(p).soon : p[3] === BHF));
+  return L.map(p => { const S = bhStat(p), K = BH_KIND[p[3]];
+    return `<button type="button" class="row bhrow ${p[0] === BHSEL ? 'on' : ''}" data-bh="${p[0]}"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-weight:600;font-size:13px;min-width:0">${p[1]} · ${p[2]}</b>${S.soon ? pill('곧 입찰 예상', 'p-warn') : S.ing ? pill('진행 중', 'p-rv') : ''}</div>
+      <div class="muted" style="font-size:12px;margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">${pill(K[0], K[1])}<span>${S.R.length}회</span><span>주기 ${S.cyc ? (S.cyc >= 18 ? (S.cyc / 12).toFixed(1) + '년' : Math.round(S.cyc) + '개월') : '—'}</span><span>규모 ${S.R.length > 1 ? (S.grow >= 0 ? '+' : '') + S.grow.toFixed(1) + '%/회' : '—'}</span><span>다음 ${S.next ? ymS(S.next) : '—'}</span><span>수주 ${S.win}/${S.done}</span></div></button>`; }).join('') || '<div class="muted" style="padding:14px;font-size:13px">해당 패턴 없음</div>';
+}
+document.head.insertAdjacentHTML('beforeend', `<style>.bhrow{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 14px;cursor:pointer;font:inherit;color:inherit}.bhrow:hover{background:var(--chip)}.bhrow.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}</style>`);
+VIEWS.bidhist = () => {
+  const St = BHIST.map(bhStat), n = f => St.filter(f).length;
+  return pgTop('반복 입찰 분석', '메일 분류 검증·리뷰 이력이 쌓이면 · 같은 발주처의 유사 건이 어느 주기로 나오는지 · 규모가 어떻게 바뀌는지 · 유지보수 주기인지 분석', '') +
+    `<section class="panel"><div class="kpis">${[['분석 이력', BHIST.reduce((a, p) => a + p[5].length, 0) + '회 · ' + BHIST.length + '패턴'], ['정기보수·법정검사', n((s, i) => ['ta', 'law'].includes(BHIST[i][3]))], ['이번 회차 진행 중', n(s => s.ing)], ['3개월 내 입찰 예상', n(s => s.soon)], ['규모 증가 패턴', n(s => s.grow > 5)]].map(([k, v]) => `<div class="kpi"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}</div></section>
+    <div class="aibox" style="margin-bottom:14px"><span class="ai">AI 요약</span> ${St.filter(s => s.soon).length ? `${BHIST.filter((p, i) => St[i].soon).map(p => `${p[1]} ${p[2]}`).join(' · ')} — 지난 주기로 보면 곧 입찰이 나올 시기입니다. ` : ''}S-OIL 고정장치 PKG는 매년 10월 현설 · 규모 +6%/회로 늘고 있습니다. 단가계약(Retubing)은 3년마다 10월에 갱신됩니다.</div>
+    <div class="cols"><section class="panel" style="overflow:hidden;flex:1 1 380px"><div class="ph">${seg('bhf', [['all', '전체'], ['soon', '곧 입찰 예상'], ['ta', '정기보수'], ['unit', '단가계약'], ['law', '법정 검사'], ['rep', '교체·개선']], BHF)}</div><div id="bhlist">${bhRows()}</div></section>
+    <section class="panel w2" style="overflow:hidden" id="bhdet">${bhDetail()}</section></div>
+    <div class="note" style="margin-top:12px">이력 데이터: 메일 분류함(발주처·건명·채널·마감) + RV·QP 결과(수주·실주·불참)를 발주처 · 대상 설비/공사 · 범위 키워드로 묶어 회차를 만듭니다. 화면의 수치는 예시 데이터입니다.</div>` +
+    roleFoot('반복 입찰 분석', '영업지원담당자는 메일 분류를 검증해 리뷰로 넘기는 동시에, 쌓인 이력으로 같은 발주처의 반복 입찰을 봅니다. 정기보수(T&I·TA)·단가계약 갱신·법정 검사·교체 주기를 찾아 다음 입찰 시기와 규모를 예상하고, 일일 요약 예고와 담당 사전 자료 공유로 이어집니다.', [['영업지원담당자 · 분석·공유', 'p-rv'], ['AI · 패턴 묶기·주기 산출', 'p-ai']]);
+};
+SEG_HOOK.bhf = k => { BHF = k; const l = document.getElementById('bhlist'); if (l) l.innerHTML = bhRows(); };
+document.addEventListener('click', e => { const b = e.target.closest('[data-bh]'); if (!b) return; BHSEL = b.dataset.bh; const l = document.getElementById('bhlist'), d = document.getElementById('bhdet'); if (l) l.innerHTML = bhRows(); if (d) d.innerHTML = bhDetail(); else location.hash = '#bidhist'; });
+(() => { const g = MENU.find(g => g.items.some(i => i.id === 'brief')); if (g && !MENU_INDEX.bidhist) { const it = {id: 'bidhist', l: '반복 입찰 분석', r: 'sup exec ceo'}; MENU_ROLE.bidhist = 'sup exec ceo'; MENU_ROLE.bidhist = 'sup exec ceo'; g.items.splice(g.items.findIndex(i => i.id === 'brief') + 1, 0, it); MENU_INDEX.bidhist = it; } })();
+/* 메일 분류 검증 화면: 같은 발주처의 반복 입찰 이력 표시 */
+const bhMatch = m => BHIST.find(p => (m.client || '').includes(p[1].split(' ')[0]) && p[4].some(k => (m.subj || '').toUpperCase().includes(k.toUpperCase())));
+function bhInk() {
+  const acts = document.querySelector('#app .acts [data-inkd="rv"]'); if (!acts || document.querySelector('#app .bhink')) return;
+  const sel = document.querySelector('#app [data-ink].on'); const m = sel && MAIL[+sel.dataset.ink]; const p = m && bhMatch(m); if (!p) return;
+  const S = bhStat(p);
+  acts.closest('.acts').insertAdjacentHTML('beforebegin', `<div class="sec bhink" style="border:1px solid var(--line);border-radius:10px;padding:10px 12px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:13px">${AT}반복 입찰 이력 · ${p[2]}</b><button type="button" class="btn rbtn" data-bh="${p[0]}" style="min-height:26px;font-size:12px;padding:0 9px">분석 보기 →</button></div>
+    <div style="font-size:12.5px;margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">${pill(BH_KIND[p[3]][0], BH_KIND[p[3]][1])} ${S.R.map(r => `<span class="kchip">${r[0].slice(0, 4)} ${r[1].toFixed(1)}억 ${BH_RES[r[2]][0]}</span>`).join('')}</div>
+    <div class="muted" style="font-size:12px;margin-top:4px">주기 ${S.cyc ? (S.cyc >= 18 ? (S.cyc / 12).toFixed(1) + '년' : Math.round(S.cyc) + '개월') : '—'} · 규모 ${S.grow >= 0 ? '+' : ''}${S.grow.toFixed(1)}%/회 · 분류 검증 시 기존 반복 건으로 묶어 리뷰합니다</div></div>`);
+}
+new MutationObserver(() => { if (CUR === 'intake') bhInk(); }).observe(document.getElementById('app'), {childList: true, subtree: true});
 
 render();
 })();
