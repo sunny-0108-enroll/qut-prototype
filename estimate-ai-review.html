@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>공사 견적 AI 인터뷰·기술 검증 계획</title>
+<style>
+:root{
+  --bg:#ffffff; --border:#e3e6ee; --text:#1d2433; --muted:#7a8296; --card:#fafbfd;
+  --accent:#5a4ec4; --accent-bd:#6b5fd3; --accent-bg:#f1efff;
+  --warn:#b98a12; --warn-bg:#fff8e6; --ok:#1d9e75; --new:#d0603a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171c; --border:#2c313c; --text:#e8eaf0; --muted:#9aa1b2; --card:#1b1e25;
+    --accent:#b3abf5; --accent-bd:#8f85ea; --accent-bg:#26223f;
+    --warn:#d9a838; --warn-bg:#2d2615; --ok:#3cc398; --new:#ea845f;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171c; --border:#2c313c; --text:#e8eaf0; --muted:#9aa1b2; --card:#1b1e25;
+  --accent:#b3abf5; --accent-bd:#8f85ea; --accent-bg:#26223f;
+  --warn:#d9a838; --warn-bg:#2d2615; --ok:#3cc398; --new:#ea845f;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 24px 64px}
+header h1{font-size:21px;font-weight:600;margin:0 0 6px}
+.meta{font-size:13px;color:var(--muted)}
+.toc{margin:18px 0 8px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;background:var(--card);font-size:13.5px;line-height:1.9}
+.toc b{font-weight:600;margin-right:6px}
+.toc a{color:var(--accent)}
+h2{font-size:18px;font-weight:600;margin:36px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border);scroll-margin-top:12px}
+h3{font-size:15.5px;font-weight:600;margin:22px 0 8px;scroll-margin-top:12px}
+p,li{font-size:14px;line-height:1.75}
+ul,ol{margin:6px 0;padding-left:22px}
+li+li{margin-top:2px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:6px 0}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top;line-height:1.6}
+th{background:var(--card);font-weight:600}
+td ul{margin:0;padding-left:18px}
+td li{font-size:13.5px;line-height:1.6}
+td.no{text-align:center;color:var(--muted);font-weight:600}
+td.name{font-weight:600}
+.muted{color:var(--muted)}
+.note{border-left:3px solid var(--accent-bd);background:var(--accent-bg);padding:10px 14px;margin:10px 0;font-size:14px;line-height:1.7}
+.note ul{margin:0}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0 4px}
+.card{border:1px solid var(--border);border-radius:10px;background:var(--card);padding:12px 16px}
+.card .k{font-size:12.5px;color:var(--muted)}
+.card .v{font-size:20px;font-weight:600;margin:2px 0;color:var(--accent)}
+.card .d{font-size:13px;line-height:1.6}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;padding:0 7px;border-radius:9px;line-height:19px;border:1px solid;vertical-align:1px;white-space:nowrap}
+.tag.r1{color:var(--accent);border-color:var(--accent)}
+.tag.r2{color:var(--ok);border-color:var(--ok)}
+.tag.r3{color:var(--warn);border-color:var(--warn)}
+.tag.new{color:var(--new);border-color:var(--new)}
+.end{margin-top:36px;padding:14px 18px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.end ul{margin:0}
+@media (max-width:640px){
+  .wrap{padding:16px 16px 48px}
+  table{font-size:13px}
+  th,td{padding:6px 8px}
+}
+@media print{
+  :root,:root[data-theme="dark"],:root:not([data-theme="light"]){
+    --bg:#ffffff; --border:#c9cdd8; --text:#000000; --muted:#555c6b; --card:#f4f5f8;
+    --accent:#3f35a3; --accent-bd:#5a4ec4; --accent-bg:#f1efff;
+    --warn:#8a6508; --ok:#16775a; --new:#a8462a;
+  }
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .wrap{max-width:none;padding:0}
+  .toc{display:none}
+  h2{break-after:avoid;margin-top:24px}
+  h3{break-after:avoid}
+  tr,.card,.note,.end{break-inside:avoid}
+  thead{display:table-header-group}
+  .tbl{overflow:visible}
+}
+@page{size:A4;margin:14mm 12mm}
+.topnav a{border:1px solid var(--border);border-radius:8px;padding:4px 10px;text-decoration:none;color:var(--accent)}tr:target,section:target{outline:3px solid var(--new);outline-offset:2px}.stg td a{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="topnav" style="position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border);padding:8px 0;display:flex;gap:6px;flex-wrap:wrap;font-size:13px"><a href="estimate-ai-flow.html" target=flow>← 프로세스 흐름도</a><a href="estimate-ai-design.html" target=design>상세 설계</a><a href="sales_tot.html" target=qproto>화면 프로토타입 ↗</a></nav><header style="margin-top:14px">
+  <h1>공사 견적 AI · 인터뷰·기술 검증 계획</h1>
+  <div class="meta">작성 2026-10-22</div>
+</header>
+
+<div class="toc">
+  <b>목차</b>
+  <a href="#intro">1. 개요</a> ·
+  <a href="#interview">2. 영업부 인터뷰 주제</a> ·
+  <a href="#interview-plan">3. 인터뷰 진행안</a> ·
+  <a href="#poc">4. 기술 검증 계획</a> ·
+  <a href="#schedule">5. 전체 진행 순서(안)</a> ·
+  <a href="#next">6. 향후 계획</a> ·
+  <a href="#stages">7. 흐름도 단계별 확인 항목</a>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="intro">1. 개요</h2>
+<ul>
+  <li>견적 요청(RFQ) 접수부터 계약까지의 업무 흐름(8단계)과 단계별 기능 설계를 검토함.</li>
+  <li>남은 설계 항목 중 상당수는 영업부의 실제 업무 방식에 따라 달라지므로 영업부 인터뷰로 확인이 필요함.</li>
+  <li>개발 전에 기술적으로 불확실한 두 가지(지난 견적 자료 검색, 도면 인식)를 작은 시험으로 먼저 확인할 계획임.</li>
+  <li>본 자료는 인터뷰 주제와 기술 검증 계획을 정리한 것임.</li>
+</ul>
+
+<div class="summary">
+  <div class="card">
+    <div class="k">영업부 인터뷰</div>
+    <div class="v">8개 주제 · 3회</div>
+    <div class="d">회당 1~1.5시간<br>영업 임원 · 견적 담당 · 영업 지원 담당</div>
+  </div>
+  <div class="card">
+    <div class="k">기술 검증</div>
+    <div class="v">2건</div>
+    <div class="d">① 지난 견적 자료 정리·검색<br>② 도면 인식(용접·볼팅 포인트 세기)</div>
+  </div>
+  <div class="card">
+    <div class="k">목표</div>
+    <div class="v">설계 확정</div>
+    <div class="d">인터뷰·검증 결과를 반영해<br>상세 설계와 화면 구성을 확정</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="interview">2. 영업부 인터뷰 주제</h2>
+<ul class="muted">
+  <li>검토 중 나온 확인 질문과 미결·정의 필요 사항을 주제별로 묶은 목록임.</li>
+  <li>질문은 대표 질문만 적었으며, 세부 질문은 인터뷰 때 함께 확인함.</li>
+</ul>
+<div class="tbl">
+<table>
+  <thead>
+  <tr><th style="width:36px">#</th><th style="width:150px">주제</th><th style="width:190px">왜 필요한가</th><th>대표 질문</th><th style="width:190px">결과가 반영되는 곳</th></tr>
+  </thead>
+  <tr id="topic-1"><td class="no">1</td><td class="name">참여 판단 기준</td>
+    <td>AI가 만드는 참여 판단 자료가 실제 판단 기준과 맞아야 함</td>
+    <td><ul>
+      <li>지금은 견적 요청을 받은 뒤 언제(접수 직후 / 시방서 검토 후), 무엇을 근거로 참여 여부를 판단하는가</li>
+      <li>대표의 참여 승인 기준은 무엇인가</li>
+      <li>대표의 반려는 '불참' 결정인가, '자료 보강 후 재검토' 요청인가</li>
+      <li>불참하는 건은 어느 정도이며 주된 이유는 무엇인가</li>
+    </ul></td>
+    <td>참여 판단 화면, 대표 승인 화면, 불참 사유 분류</td></tr>
+  <tr id="topic-2"><td class="no">2</td><td class="name">견적 형식과 단가·공수 기준</td>
+    <td>AI 물량·원가 계산의 기준이 되는 자료임</td>
+    <td><ul>
+      <li>주로 받는 견적 형식은 무엇인가(단위당 단가형 / 물량표 항목별 금액 채우기형)</li>
+      <li>자재·노임·장비 단가는 어디서 가져오고, 누가 얼마나 자주 갱신하는가(구매 이력 / 공급사 견적 / 물가정보지)</li>
+      <li>노임은 어떤 기준(시중노임단가 / 실투입 인건비 / 발주처 기준)으로 잡으며, 지역별로 더하는 비용은 무엇인가</li>
+      <li>발주처 자료끼리 수치가 다를 때 지금은 어떻게 처리하는가(한쪽 선택 / 가정 명시 / 발주처 질의)</li>
+    </ul></td>
+    <td>물량·원가 계산 기준, 단가 자료의 관리 주체와 갱신 방식</td></tr>
+  <tr id="topic-3"><td class="no">3</td><td class="name">영업이익(%) 결정 방식</td>
+    <td>견적 금액과 협상 중 금액 계산에 직접 쓰임</td>
+    <td><ul>
+      <li>영업이익(%)은 누가, 어떻게 정하는가(담당자가 정하고 위에서 확인 / 위에서 정해 줌)</li>
+      <li>견적 전체에 하나로 적용하는가, 항목별로 다르게 적용하는가</li>
+      <li>원가의 어느 부분에 붙이는가(원가 전체 / 노무비·경비 등 일부)</li>
+    </ul></td>
+    <td>견적서 금액 계산, 협상 단계의 영업이익 자동 계산</td></tr>
+  <tr id="topic-4"><td class="no">4</td><td class="name">사내 견적서 양식과 부가 제출 서류</td>
+    <td>AI가 만드는 견적서와 결재 자료의 형식을 정해야 함</td>
+    <td><ul>
+      <li>내부 결재에 쓰는 사내 견적서 양식이 있는가, 어떤 칸(항목별 원가, 영업이익, 합계, 견적 조건, 가정·예외 사항 등)이 있는가</li>
+      <li>견적서와 함께 주로 내는 부가 서류(안전관리계획서 등)는 무엇이며, 얼마나 자주 요구되는가 <span class="tag new">새 기능 후보</span></li>
+    </ul></td>
+    <td>회사 표준 견적서 양식, 부가 서류 자동 작성 기능의 대상 범위</td></tr>
+  <tr id="topic-5"><td class="no">5</td><td class="name">기술평가·가격 협상 진행 방식</td>
+    <td>제출 뒤 견적서가 어떻게 바뀌고 누가 승인하는지 정해야 함</td>
+    <td><ul>
+      <li>기술평가를 거치는 건은 얼마나 되고, 기술평가에서 탈락하는 경우가 있는가</li>
+      <li>기술평가 중에도 항목별 가격 조정이 오가는가, 최종 가격 협상과 따로 진행되는가</li>
+      <li>기술평가 답변으로 범위·사양이 바뀌어 물량·원가를 다시 계산하는 경우가 있는가</li>
+      <li>협상 중 금액이 바뀌면 대표 승인을 다시 받는가, 담당자가 바로 받는가 임원을 거치는가, 기준(할인 한도 등)이 따로 있는가</li>
+    </ul></td>
+    <td>견적서 변경 이력(Rev) 관리, 협상 금액 승인 절차</td></tr>
+  <tr id="topic-6"><td class="no">6</td><td class="name">수주 결과와 사후 분석</td>
+    <td>결과 기록이 쌓여야 다음 견적에 참고할 수 있음</td>
+    <td><ul>
+      <li>결과는 어떤 문서로 받는가(가격·기술 협상서, 수주통보서, 계약서), 수주통보서와 계약서는 따로 오는가</li>
+      <li>실주 원인은 지금 어떻게 파악하며, 주로 어떤 원인이 많은가</li>
+      <li>유찰은 얼마나 자주 있는가, 발주처 사정에 의한 취소나 진행 중 포기는 어느 단계에서 얼마나 있는가</li>
+      <li>수주 뒤 계약 단계에서 금액이 바뀌는 경우가 있는가</li>
+    </ul></td>
+    <td>결과 입력 화면(수주 / 실주 / 유찰, 취소는 별도), 지난 견적 참고 자료(인사이트 데이터)의 항목</td></tr>
+  <tr id="topic-7"><td class="no">7</td><td class="name">결재·권한·견적 관리 방식</td>
+    <td>사용자별 권한과 견적 관리 번호 체계를 정해야 함</td>
+    <td><ul>
+      <li>영업 내부에서 견적을 검토·승인하는 단계가 있는가, 있다면 누가 누구에게 받는가</li>
+      <li>영업부 직원이면 누구나 다른 담당자 건의 원가·영업이익까지 봐도 되는가</li>
+      <li>견적 번호·프로젝트 번호·견적서 Rev 표기 규칙이 있는가</li>
+      <li>같은 공사를 다시 견적하는 경우(재입찰·재견적)는 얼마나 되고, 지금은 어떻게 관리하는가</li>
+    </ul></td>
+    <td>사용자 권한, 결재 흐름, 관리 번호 형식</td></tr>
+  <tr id="topic-8"><td class="no">8</td><td class="name">지난 견적 자료 정리 협조</td>
+    <td>기술 검증 ①은 영업의 판단이 있어야 진행 가능함</td>
+    <td><ul>
+      <li>AI가 지난 견적에서 뽑은 요약 항목 초안에 '중요 / 필요 없음 / 빠진 것' 표시를 해 줄 수 있는가(작성이 아니라 선택)</li>
+      <li>지난 견적에서 실제로 찾아보고 싶은 것을 질문 10개 정도로 알려 줄 수 있는가(예: "울산 지역 배관 공사 중 감리 상주 조건이 있었던 건")</li>
+      <li>시범 결과를 표본으로 확인할 시간을 언제 잡을 수 있는가</li>
+    </ul></td>
+    <td>지난 견적 요약 양식, 기술 검증 ① 일정</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="interview-plan">3. 인터뷰 진행안</h2>
+<div class="tbl">
+<table>
+  <thead>
+  <tr><th style="width:90px">회차</th><th style="width:200px">주제</th><th style="width:220px">대상</th><th>비고</th></tr>
+  </thead>
+  <tr><td><span class="tag r1">1회</span></td><td>1. 참여 판단 기준<br>2. 견적 형식과 단가·공수 기준<br>3. 영업이익(%) 결정 방식</td><td>영업 임원, 견적 담당</td>
+    <td><ul>
+      <li>견적 금액이 나오는 데 필요한 기준이라 가장 먼저 확인함</li>
+      <li>사전 요청: 사내 견적서 엑셀 1부(영업이익 계산식 확인용)</li>
+    </ul></td></tr>
+  <tr><td><span class="tag r2">2회</span></td><td>4. 사내 견적서 양식과 부가 제출 서류<br>5. 기술평가·가격 협상 진행 방식<br>6. 수주 결과와 사후 분석</td><td>영업 임원, 견적 담당</td>
+    <td><ul>
+      <li>사전 요청: 최근 제출 건의 부가 서류 예시, 수주통보서·계약서 예시</li>
+    </ul></td></tr>
+  <tr><td><span class="tag r3">3회</span></td><td>7. 결재·권한·견적 관리 방식<br>8. 지난 견적 자료 정리 협조</td><td>견적 담당, 영업 지원 담당<br>(권한 범위는 영업 임원 확인)</td>
+    <td><ul>
+      <li>기술 검증 ①의 영업 확인 일정을 이 자리에서 함께 정함</li>
+    </ul></td></tr>
+  <tr><td>수시</td><td>기술 검증 중 확인</td><td>견적 담당</td>
+    <td><ul>
+      <li>요약 항목 고르기, 시범 결과 확인, 규칙 후보 확인(각 30분 내외, 3번 정도)</li>
+    </ul></td></tr>
+</table>
+</div>
+<div class="note"><ul>
+  <li>주제 1·5의 대표 승인 기준(참여 승인 기준, 반려의 의미, 협상 금액 승인 방식)은 대표께 직접 확인하면 인터뷰 시간을 줄일 수 있음.</li>
+  <li>회당 1~1.5시간, 약 2~3주 안에 3회 진행을 목표로 함(영업부 일정에 맞춰 조정).</li>
+</ul></div>
+
+<!-- ============================================================ -->
+<h2 id="poc">4. 기술 검증 계획</h2>
+<ul class="muted">
+  <li>개발 전에 기술적으로 불확실한 부분을 작은 시험으로 먼저 확인하는 단계임.</li>
+  <li>두 검증은 서로 독립적이어서 동시에 진행할 수 있음.</li>
+</ul>
+<div class="tbl">
+<table>
+  <thead>
+  <tr><th style="width:110px">구분</th><th style="width:46%">① 지난 견적 자료 정리·검색</th><th>② 도면 인식 테스트</th></tr>
+  </thead>
+  <tr><th>무엇을 검증하나</th>
+    <td><ul>
+      <li>지난 견적 자료를 정해진 양식의 글(요약)로 정리해 두면, 별도 검색 서버 없이 AI가 필요한 사례를 잘 찾아내는지</li>
+    </ul></td>
+    <td><ul>
+      <li>AI가 배관 도면에서 용접·볼팅 포인트를 중복 없이 정확히 세고, 다이아인치(배관 용접 작업량 단위)를 얼마나 정확히 계산하는지</li>
+    </ul></td></tr>
+  <tr><th>왜</th>
+    <td><ul>
+      <li>AI 분석이 신입 수준을 넘으려면 지난 견적의 조건·특이사항을 참고해야 함</li>
+      <li>단순한 방식으로 충분하면 서버 추가 부담 없이 시작할 수 있음</li>
+      <li>지난 자료를 쓸 수 있게 정리하는 일이 곧 이 검증의 준비 작업임</li>
+    </ul></td>
+    <td><ul>
+      <li>도면 인식이 물량 산출에서 가장 큰 기술 위험임</li>
+      <li>도면 기준 물량(최소값)이 틀리면 담당자가 정하는 최종 물량도 틀어짐</li>
+    </ul></td></tr>
+  <tr><th>어떻게</th>
+    <td><ol style="margin:0;padding-left:18px">
+      <li>종류가 다른 지난 견적 10건을 AI가 읽고 요약 양식 초안 작성</li>
+      <li>영업이 초안 항목을 '중요 / 필요 없음 / 빠진 것'으로 선택</li>
+      <li>20~30건 시범 요약 후, 영업이 준 실제 질문 10개로 찾기 시험</li>
+      <li>정확도·응답 시간·비용을 보고 방식 결정</li>
+      <li>2024~2026 지난 견적 전체를 같은 양식으로 정리</li>
+      <li>반복되는 숨은 비용 조건(인허가, 감리, 상주 인력 등)을 AI 분석 규칙 후보로 정리, 영업 확인 후 반영</li>
+    </ol></td>
+    <td><ol style="margin:0;padding-left:18px">
+      <li>도면과 물량표(BM)가 모두 있는 지난 배관 공사 몇 건 선정</li>
+      <li>사람이 같은 도면에서 포인트·다이아인치를 직접 세어 정답표 작성</li>
+      <li>AI가 도면으로 계산(최소값), 물량표로도 계산(최대값)</li>
+      <li>정답과 비교해 오차, 놓친 포인트, 중복 계산 포인트 기록</li>
+      <li>오차가 허용 범위 안이면 도면 기준을 산출에 사용, 넘으면 참고용으로만 두고 물량표 기준 사용</li>
+    </ol></td></tr>
+  <tr><th>결과물</th>
+    <td><ul>
+      <li>지난 견적 요약 양식(앞으로 쌓일 데이터도 같은 양식으로 저장)</li>
+      <li>검색 방식 판단 결과(현재 방식 채택 / 고급 검색 추가 검토)</li>
+      <li>정리된 지난 견적 자료와 AI 분석 규칙 후보</li>
+    </ul></td>
+    <td><ul>
+      <li>정답표·AI 결과표·비교표</li>
+      <li>도면 인식 결과의 산출 반영 여부 판단</li>
+    </ul></td></tr>
+  <tr><th>대략 기간(예상)</th>
+    <td><ul>
+      <li>1~4단계(시범·판단): 약 3~4주</li>
+      <li>5~6단계(전체 정리·규칙 후보): 분량이 커서 별도 일정 수립</li>
+      <li>영업 확인(2·3·6단계)이 일정을 좌우함</li>
+    </ul></td>
+    <td><ul>
+      <li>약 2~3주</li>
+      <li>정답표 작성(사람이 세기)에 가장 많은 시간이 듦</li>
+    </ul></td></tr>
+  <tr><th>쓰이는 곳</th>
+    <td>참여 판단·세부 분석의 재분석, 물량·원가 재산출 때 유사 공사 참고</td>
+    <td>물량·원가 산출의 물량 검증</td></tr>
+</table>
+</div>
+<div class="note"><ul>
+  <li><b>보안</b>: 견적 자료와 도면은 발주처 내부 자료이므로 외부에 올리지 않고 사내 환경에서만 검증함. AI에 보내는 범위는 검증 전에 정함.</li>
+  <li><b>지난 견적 금액</b>: 시점·경제 상황이 달라 그대로 쓰지 않으며, 조건·특이사항을 참고하는 데만 씀.</li>
+  <li><b>미정</b>: 검증 담당, 대상 건수, 합격 기준(정확도·허용 오차·비용 한도).</li>
+</ul></div>
+
+<!-- ============================================================ -->
+<h2 id="schedule">5. 전체 진행 순서(안)</h2>
+<div class="tbl">
+<table>
+  <thead>
+  <tr><th style="width:110px">시기(예상)</th><th>영업부 인터뷰</th><th>기술 검증</th><th>설계</th></tr>
+  </thead>
+  <tr><td>1~2주</td><td>1회·2회 인터뷰</td><td>대상 자료 선정, 보안 범위 결정</td><td>인터뷰 결과로 참여 판단·물량·원가 설계 보완</td></tr>
+  <tr><td>2~3주</td><td>3회 인터뷰(자료 정리 협조 일정 확정)</td><td>① 요약 양식 초안 · ② 정답표 작성</td><td>견적서 양식·결과 입력·권한 설계 보완</td></tr>
+  <tr><td>3~6주</td><td>수시 확인(항목 고르기, 시범 결과 확인)</td><td>① 시범 요약·찾기 시험 · ② AI 인식·비교</td><td>검증 결과를 설계에 반영</td></tr>
+  <tr><td>이후</td><td>규칙 후보 확인</td><td>① 지난 견적 전체 정리</td><td>상세 설계 확정, 개발 착수 준비</td></tr>
+</table>
+</div>
+<ul class="muted">
+  <li>기간은 예상치이며, 영업부 일정과 검증 담당이 정해진 뒤 확정함.</li>
+</ul>
+
+
+<!-- ============================================================ -->
+<h2 id="stages">7. 흐름도 단계별 확인 항목</h2>
+<ul class="muted"><li>프로세스 흐름도(8단계)의 단계마다 확인이 필요한 인터뷰 주제와 기술 검증을 연결한 표임.</li><li>박스 ID를 누르면 상세 설계의 해당 박스로, ↗를 누르면 흐름도의 박스 위치로 이동함.</li></ul>
+<div class="tbl"><table class="stg"><thead><tr><th style="width:150px">단계</th><th style="width:170px">관련 박스</th><th style="width:210px">인터뷰 주제</th><th style="width:70px">기술 검증</th><th>확인할 내용</th></tr></thead><tr id="st-01"><td><b>01</b><br>RFQ 접수·등록</td><td><a href="estimate-ai-design.html#SAL-RFQ-01|st-01" target="design">SAL-RFQ-01</a> <a href="estimate-ai-flow.html#current:SAL-RFQ-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#SYS-PRJ-01|st-01" target="design">SYS-PRJ-01</a> <a href="estimate-ai-flow.html#current:SYS-PRJ-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#AI-RFQ-01|st-01" target="design">AI-RFQ-01</a> <a href="estimate-ai-flow.html#current:AI-RFQ-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#ADM-PRJ-01|st-01" target="design">ADM-PRJ-01</a> <a href="estimate-ai-flow.html#current:ADM-PRJ-01" target="flow" title="흐름도에서 보기">↗</a></td><td><a href="#topic-7">7. 결재·권한·견적 관리 방식</a></td><td>—</td><td>견적요청리뷰ID·RV 체계, 리뷰 결정 주체 (프로토타입은 영업지원담당자로 가정)</td></tr><tr id="st-02"><td><b>02</b><br>참여 판단·참여 결정</td><td><a href="estimate-ai-design.html#AI-ANL-01|st-02" target="design">AI-ANL-01</a> <a href="estimate-ai-flow.html#current:AI-ANL-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#SAL-ANL-01|st-02" target="design">SAL-ANL-01</a> <a href="estimate-ai-flow.html#current:SAL-ANL-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#CEO-ANL-01|st-02" target="design">CEO-ANL-01</a> <a href="estimate-ai-flow.html#current:CEO-ANL-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#SYS-DRP-01|st-02" target="design">SYS-DRP-01</a> <a href="estimate-ai-flow.html#current:SYS-DRP-01" target="flow" title="흐름도에서 보기">↗</a></td><td><a href="#topic-1">1. 참여 판단 기준</a></td><td><a href="#poc">①</a></td><td>참여 판단 시점·근거, 대표 반려의 의미(불참/재검토) · 탱크 타입 분류 항목과 타입별 체크리스트 범위</td></tr><tr id="st-03"><td><b>03</b><br>세부 분석·물량·원가 / 탱크 예가 견적</td><td><a href="estimate-ai-design.html#AI-ANL-02|st-03" target="design">AI-ANL-02</a> <a href="estimate-ai-flow.html#current:AI-ANL-02" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#AI-QTY-01|st-03" target="design">AI-QTY-01</a> <a href="estimate-ai-flow.html#current:AI-QTY-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#ADM-DB-01|st-03" target="design">ADM-DB-01</a> <a href="estimate-ai-flow.html#current:ADM-DB-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#TNK-RFQ-01|st-03" target="design">TNK-RFQ-01</a> <a href="estimate-ai-flow.html#current:TNK-RFQ-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#AI-VND-01|st-03" target="design">AI-VND-01</a> <a href="estimate-ai-flow.html#current:AI-VND-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#TNK-SEL-01|st-03" target="design">TNK-SEL-01</a> <a href="estimate-ai-flow.html#current:TNK-SEL-01" target="flow" title="흐름도에서 보기">↗</a></td><td><a href="#topic-2">2. 견적 형식과 단가·공수 기준</a><br><a href="#topic-8">8. 지난 견적 자료 정리 협조</a></td><td><a href="#poc">① ②</a></td><td>단가·노임 출처와 갱신, Dia-Inch 검증 허용 오차·기준 충돌 처리, 탱크 벤더 선정·최종 결정 기준</td></tr><tr id="st-04"><td><b>04</b><br>견적서·승인 / 탱크 임원·대표 승인</td><td><a href="estimate-ai-design.html#SAL-EST-01|st-04" target="design">SAL-EST-01</a> <a href="estimate-ai-flow.html#current:SAL-EST-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#TNK-EST-01|st-04" target="design">TNK-EST-01</a> <a href="estimate-ai-flow.html#current:TNK-EST-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#EXE-APR-01|st-04" target="design">EXE-APR-01</a> <a href="estimate-ai-flow.html#current:EXE-APR-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#CEO-APR-01|st-04" target="design">CEO-APR-01</a> <a href="estimate-ai-flow.html#current:CEO-APR-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#CEO-APR-02|st-04" target="design">CEO-APR-02</a> <a href="estimate-ai-flow.html#current:CEO-APR-02" target="flow" title="흐름도에서 보기">↗</a></td><td><a href="#topic-3">3. 영업이익(%) 결정 방식</a><br><a href="#topic-4">4. 사내 견적서 양식과 부가 제출 서류</a><br><a href="#topic-7">7. 결재·권한·견적 관리 방식</a></td><td>—</td><td>영업이익(%) 결정 주체·적용 범위, 사내 견적서 양식, 결재선·전결 기준</td></tr><tr id="st-05"><td><b>05</b><br>제출·기술평가 (해당 시)</td><td><a href="estimate-ai-design.html#SAL-TBE-01|st-05" target="design">SAL-TBE-01</a> <a href="estimate-ai-flow.html#current:SAL-TBE-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#SYS-TBE-01|st-05" target="design">SYS-TBE-01</a> <a href="estimate-ai-flow.html#current:SYS-TBE-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#EXT-TBE-01|st-05" target="design">EXT-TBE-01</a> <a href="estimate-ai-flow.html#current:EXT-TBE-01" target="flow" title="흐름도에서 보기">↗</a></td><td><a href="#topic-5">5. 기술평가·가격 협상 진행 방식</a></td><td>—</td><td>기술평가 빈도·탈락, 기술평가 답변으로 물량·원가 재산정 여부</td></tr><tr id="st-06"><td><b>06</b><br>가격 협상·최종 견적</td><td><a href="estimate-ai-design.html#SAL-NEG-01|st-06" target="design">SAL-NEG-01</a> <a href="estimate-ai-flow.html#current:SAL-NEG-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#CEO-NEG-01|st-06" target="design">CEO-NEG-01</a> <a href="estimate-ai-flow.html#current:CEO-NEG-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#SYS-NEG-01|st-06" target="design">SYS-NEG-01</a> <a href="estimate-ai-flow.html#current:SYS-NEG-01" target="flow" title="흐름도에서 보기">↗</a></td><td><a href="#topic-5">5. 기술평가·가격 협상 진행 방식</a></td><td>—</td><td>협상 금액 변경 시 승인 절차·할인 한도</td></tr><tr id="st-07"><td><b>07</b><br>수주 결과</td><td><a href="estimate-ai-design.html#SAL-RES-01|st-07" target="design">SAL-RES-01</a> <a href="estimate-ai-flow.html#current:SAL-RES-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#SYS-RES-01|st-07" target="design">SYS-RES-01</a> <a href="estimate-ai-flow.html#current:SYS-RES-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#AI-INS-01|st-07" target="design">AI-INS-01</a> <a href="estimate-ai-flow.html#current:AI-INS-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#ADM-INS-02|st-07" target="design">ADM-INS-02</a> <a href="estimate-ai-flow.html#current:ADM-INS-02" target="flow" title="흐름도에서 보기">↗</a></td><td><a href="#topic-6">6. 수주 결과와 사후 분석</a></td><td><a href="#poc">①</a></td><td>결과 문서 종류, 실주·유찰·취소 분류, 사후 분석 항목</td></tr><tr id="st-08"><td><b>08</b><br>실행예산 인계</td><td><a href="estimate-ai-design.html#SYS-HND-01|st-08" target="design">SYS-HND-01</a> <a href="estimate-ai-flow.html#current:SYS-HND-01" target="flow" title="흐름도에서 보기">↗</a><br><a href="estimate-ai-design.html#NXT-BUD-01|st-08" target="design">NXT-BUD-01</a> <a href="estimate-ai-flow.html#current:NXT-BUD-01" target="flow" title="흐름도에서 보기">↗</a></td><td><a href="#topic-6">6. 수주 결과와 사후 분석</a><br><a href="#topic-7">7. 결재·권한·견적 관리 방식</a></td><td>—</td><td>인계 패키지 범위, 실행예산 전결 기준</td></tr></table></div>
+
+<!-- ============================================================ -->
+<div class="end" id="next">
+  <h3 style="margin-top:0">6. 향후 계획</h3>
+  <ul>
+    <li>인터뷰와 기술 검증 결과를 반영해 상세 설계와 화면 구성을 확정함.</li>
+    <li>확정된 설계를 기준으로 1차 개발 범위와 일정을 다시 보고함.</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>
