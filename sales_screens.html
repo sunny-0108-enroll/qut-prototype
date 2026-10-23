@@ -6373,7 +6373,7 @@ window.__excBlock = e => {
   if (e.target.closest('[data-netretry]')) { e.preventDefault(); if (EXC.mode === 'offline' && navigator.onLine !== false) toast('아직 연결되지 않았습니다 · 잠시 후 다시 시도하세요 (상태 미리보기: 네트워크 오류)'); else { excBanner(); toast('다시 연결되었습니다'); } return; }
   if (!excOffline()) return;
   const b = e.target.closest('#app button, .dw button'); if (!b) return;
-  if (b.matches('[data-seg] *, [data-seg], [data-ng], .dw-x, [data-close], [data-rpreview], [data-rlist], [data-rsel], [data-rst], [data-exc], [data-mnav], [data-bh], [data-ap], .hb, [data-ink], [data-tsd], [data-pjdoc], [data-apv], [data-apvback], [data-bmsg], [data-bgo], [data-rdo], [data-rptgo], .wb *')) return;
+  if (b.matches('[data-seg] *, [data-seg], [data-ng], .dw-x, [data-close], [data-rpreview], [data-rlist], [data-rsel], [data-rst], [data-exc], [data-mnav], [data-bh], [data-ap], .hb, [data-ink], [data-tsd], [data-pjdoc], [data-apv], [data-apvback], [data-bmsg], [data-bgo], [data-rdo], [data-rptgo], [data-rdock], [data-rptcell], .wb *')) return;
   if (!(b.classList.contains('pri') || b.matches('[data-toast], [data-pjact], [data-sbok], [data-inkd], [data-xfer], [data-rdo]'))) return;
   e.preventDefault(); e.stopImmediatePropagation();
   b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 500);
@@ -6567,7 +6567,7 @@ function rpField(x, r, editable) {
   return `<div class="rfld ${x.w === 2 ? 'w2' : ''} ${e ? 'err' : w ? 'wrn' : ''}" data-fk="${x.k}">${lab}${inp}<div class="fm" id="${id}-m">${e ? `<span class="em">⚠ ${e}</span>` : w ? `<span class="wm">${w}</span>` : ''}${hint}</div></div>`;
 }
 function rpEditor() {
-  const r = RV.w; if (!r) return '';
+  const r = RV.w; if (!r) return ''; RV.route = CUR;
   const P = rpPerm(r), S = rpStatus(r), st = RSTG[r.st], line = st[4], ed = P.edit;
   const errN = Object.keys(RV.errs).length, showSum = RV.tried && errN;
   const flash = RV.flash ? `<div class="rnext ${RV.flash.ok ? '' : 'bad'}" role="status"><b>${RV.flash.ok ? '✓' : '⚠'} ${RV.flash.msg}</b>${RV.flash.next ? `<span>다음 · ${RV.flash.next}</span>` : ''}<div>${(RV.flash.links || []).map(([l, h, a]) => `<a class="btn ${a ? 'pri' : ''}" href="${h}" ${h.startsWith('#') ? '' : ''}>${l}</a>`).join('')}</div></div>` : '';
@@ -6692,9 +6692,10 @@ document.addEventListener('click', async e => {
     if (!(await rpLeave())) return;
     const st0 = RSTG[RV.st], n = rpList(RV.pid, RV.st).length, base = `${pjName(RV.pid).split(' ').slice(0, 2).join(' ')} ${st0[2]}`;
     const title = n ? `${base} #${n + 1}` : base;
-    RV.w = {id: 'R' + Date.now(), pid: RV.pid, st: RV.st, title, status: 'draft', f: {}, by: ROLE, at: pjNow(), hist: [[pjNow(), ROLE, '작성 시작', '']], turn: null};
+    const pre = rpPrefill(RV.pid, RV.st);
+    RV.w = {id: 'R' + Date.now(), pid: RV.pid, st: RV.st, title, status: 'draft', f: pre, by: ROLE, at: pjNow(), hist: [[pjNow(), ROLE, Object.keys(pre).length ? '작성 시작 (AI 초안 불러옴)' : '작성 시작', '']], turn: null};
     RV.sel = RV.w.id; RV.dirty = true; RV.errs = {}; RV.touched = {}; RV.tried = false; RV.save = 'idle';
-    rpRevalidate(); RV.flash = {ok: true, msg: '새 보고서를 열었습니다', next: '필수(*) 항목을 채우면 상신할 수 있습니다 · 입력하면 자동 저장'};
+    rpRevalidate(); RV.flash = {ok: true, msg: Object.keys(pre).length ? 'AI 초안을 불러와 새 보고서를 열었습니다' : '새 보고서를 열었습니다', next: '내용을 고치고 필수(*) 항목을 채우면 상신할 수 있습니다 · 입력하면 자동 저장'}; RV.dockOpen = true;
     render(); rpDoSave(false); return;
   }
   const r = RV.w; if (!r) return; const P = rpPerm(r), stg = RSTG[r.st], line = stg[4];
@@ -6729,8 +6730,8 @@ document.addEventListener('click', async e => {
     r.status = line.length ? 'sub' : 'fix'; r.turn = line[0] || null; r.hist.push([pjNow(), ROLE, line.length ? '상신' : '확정', op]);
     await rpDoSave(false);
     const nextStg = RPT_STG[stg[1] + 1];
-    RV.flash = line.length ? {ok: true, msg: `상신했습니다 → ${PJ_RN(line[0])} 검토`, next: eng ? '승인함에 결재가 올라갔습니다' : `${PJ_RN(line[0])}가 이 화면에서 승인·반려합니다`, links: [[eng ? '승인함 보기' : '프로젝트 진행 보기', eng ? '#appr' : '#pipe', 1], ['목록으로', '#rpt-list']]}
-      : {ok: true, msg: '확정했습니다', next: nextStg ? `${String(nextStg[1] + 1).padStart(2, '0')} ${nextStg[2]}` : '마지막 단계입니다', links: nextStg ? [[`${nextStg[2]} 작성 →`, '#rpt', 1]] : []};
+    RV.flash = line.length ? {ok: true, msg: `상신했습니다 → ${PJ_RN(line[0])} 검토`, next: eng ? '승인함에 결재가 올라갔습니다' : `${PJ_RN(line[0])}${josa(PJ_RN(line[0]), '이', '가')} 보고서를 열어 승인·반려합니다`, links: [[eng ? '승인함 보기' : '프로젝트 진행 보기', eng ? '#appr' : '#pipe', 1], ['내 보고서 현황', '#rpt']]}
+      : {ok: true, msg: '확정했습니다', next: nextStg ? `${String(nextStg[1] + 1).padStart(2, '0')} ${nextStg[2]}` : '마지막 단계입니다', links: nextStg ? [[`${nextStg[2]} 작성 →`, '#rpt-next', 1], ['내 보고서 현황', '#rpt']] : [['내 보고서 현황', '#rpt']]};
     if (!line.length && nextStg) RV.nextSt = nextStg[0];
     toast(RV.flash.msg); render(); return;
   }
@@ -6749,7 +6750,7 @@ document.addEventListener('click', async e => {
     toast(RV.flash.msg); render(); return;
   }
 });
-document.addEventListener('click', e => { const a = e.target.closest('.rnext a[href="#rpt"], .rnext a[href="#rpt-list"]'); if (!a) return; e.preventDefault(); if (a.getAttribute('href') === '#rpt' && RV.nextSt) { RV.st = RV.nextSt; RV.nextSt = null; RV.noAuto = false; } else RV.noAuto = true; RV.sel = null; RV.w = null; render(); });
+document.addEventListener('click', e => { const a = e.target.closest('.rnext a[href="#rpt-next"]'); if (!a) return; e.preventDefault(); if (RV.nextSt) { const st = RV.nextSt; RV.nextSt = null; rpGo(RV.pid, st); } });
 document.addEventListener('change', async e => {
   if (e.target.id !== 'rpid') return; const v = e.target.value;
   if (!(await rpLeave())) { e.target.value = RV.pid; return; }
@@ -6757,8 +6758,8 @@ document.addEventListener('change', async e => {
 });
 /* 다른 메뉴로 나가기 · 뒤로 가기 · 창 닫기 확인 */
 document.addEventListener('click', async e => {
-  if (CUR !== 'rpt' || (!RV.dirty && RV.save !== 'fail')) return;
-  const a = e.target.closest('a[href^="#"]'); if (!a || a.closest('.rnext') || a.getAttribute('href') === '#' || a.getAttribute('href') === '#rpt') return;
+  if (!RV.route || CUR !== RV.route || (!RV.dirty && RV.save !== 'fail')) return;
+  const a = e.target.closest('a[href^="#"]'); if (!a || a.closest('.rnext') || a.getAttribute('href') === '#' || a.getAttribute('href') === '#' + RV.route) return;
   e.preventDefault(); e.stopImmediatePropagation();
   if (await rpLeave()) location.hash = a.getAttribute('href');
 }, true);
@@ -6766,15 +6767,15 @@ let RP_BACK = false;
 addEventListener('hashchange', async ev => {
   if (RP_BACK) { RP_BACK = false; return; }
   const from = (ev.oldURL.split('#')[1] || ''), to = location.hash;
-  if (from.split('?')[0] !== 'rpt' || to === '#rpt' || (!RV.dirty && RV.save !== 'fail')) return;
-  RP_BACK = true; location.hash = '#rpt';
+  if (!RV.route || from.split('?')[0] !== RV.route || to === '#' + RV.route || (!RV.dirty && RV.save !== 'fail')) return;
+  RP_BACK = true; location.hash = '#' + RV.route;
   if (await rpLeave()) location.hash = to;
 });
-addEventListener('beforeunload', e => { if (CUR === 'rpt' && (RV.dirty || RV.save === 'fail')) { e.preventDefault(); e.returnValue = ''; } });
+addEventListener('beforeunload', e => { if (RV.route && CUR === RV.route && (RV.dirty || RV.save === 'fail')) { e.preventDefault(); e.returnValue = ''; } });
 /* 진입: 메뉴 · 프로젝트 진행 패널 · 승인함 */
-(() => { const g = MENU[0]; if (!MENU_INDEX.rpt) { const it = {id: 'rpt', l: '단계별 보고서', r: '*'}; g.items.splice(Math.min(2, g.items.length), 0, it); MENU_INDEX.rpt = it; MENU_ROLE.rpt = '*'; } })();
+(() => { const g = MENU[0]; if (!MENU_INDEX.rpt) { const it = {id: 'rpt', l: '내 보고서 현황', r: '*'}; g.items.splice(Math.min(2, g.items.length), 0, it); MENU_INDEX.rpt = it; MENU_ROLE.rpt = '*'; } })();
 V2C.rpt = 'SAL-ANL-01';
-document.addEventListener('click', e => { const b = e.target.closest('[data-rptgo]'); if (!b) return; e.preventDefault(); const [pid, st] = b.dataset.rptgo.split(':'); RV.pid = pid; RV.st = st; RV.sel = null; RV.w = null; if (typeof closeDrawer === 'function') try { closeDrawer(true); } catch (x) {} if (location.hash === '#rpt') render(); else location.hash = '#rpt'; });
+document.addEventListener('click', e => { const b = e.target.closest('[data-rptgo]'); if (!b) return; e.preventDefault(); const [pid, st] = b.dataset.rptgo.split(':'); rpGo(pid, st); });
 const _pjOpenRpt = pjOpen;
 pjOpen = id => { _pjOpenRpt(id); const b = document.querySelector('.dw .dw-b'); if (!b || b.querySelector('[data-rptgo]')) return; const st = RPT_STG[Math.min(7, pjStage(id))]; const bar = b.querySelector('.pjbar'); (bar || b.firstElementChild).insertAdjacentHTML('afterend', `<div style="margin-top:10px"><button type="button" class="btn rbtn" data-rptgo="${id}:${st[0]}" style="min-height:28px;font-size:12.5px">📝 ${st[2]} 작성·보기 →</button></div>`); };
 const _apdRpt = apDetail;
@@ -6829,6 +6830,159 @@ html.scr .rspec{display:none}
   .redit{padding:14px}
   body:has(.rfoot) .toast{bottom:96px}
   .rstat{align-items:flex-start;flex-direction:row;flex-wrap:wrap}
+}
+</style>`);
+
+/* =====================================================================================
+   보고서는 각 담당자의 업무 화면 안에서 편집 · 공통 메뉴는 "내 담당 프로젝트의 보고서 현황"
+   ===================================================================================== */
+const RP_VIEW = (pid, st) => ({rv: 'rptdoc', part: 'gonogo', qty: pjTank(pid) ? 'tspec' : 'cqty', est: pjTank(pid) ? 'test' : 'cest', sub: 'tcm', neg: 'nego', res: 'lost', hnd: 'won'})[st];
+const RP_DOCKV = {gonogo: ['part'], cqty: ['qty'], tspec: ['qty'], cest: ['est'], test: ['est'], tcm: ['sub'], nego: ['neg'], lost: ['res'], won: ['hnd', 'res']};
+const rpFit = (pid, v) => !!pid && PJS[pid] && pjVisible(pid) && (['tspec', 'test'].includes(v) ? pjTank(pid) : ['cqty', 'cest'].includes(v) ? !pjTank(pid) : true);
+function rpLoad(pid, st) {
+  RV.pid = pid; RV.st = st;
+  if (RV.w && RV.w.pid === pid && RV.w.st === st) return;
+  const L = rpList(pid, st), r = L[L.length - 1];
+  RV.sel = r ? r.id : null; RV.w = r ? JSON.parse(JSON.stringify(r)) : null;
+  RV.dirty = false; RV.errs = {}; RV.warns = {}; RV.touched = {}; RV.tried = false; RV.save = 'idle'; RV.cmt = ''; RV.cErr = '';
+}
+function rpGo(pid, st) {
+  const writer = rpCanCreate(pid, st);
+  const v = writer ? RP_VIEW(pid, st) : 'rptdoc';
+  RV.w = null; rpLoad(pid, st); RV.dockOpen = true; RV.scrollDock = true;
+  if (writer && st !== 'rv') try { setWork(pid); } catch (e) {}
+  if (typeof closeDrawer === 'function') try { closeDrawer(true); } catch (x) {}
+  if (location.hash === '#' + v) render(); else location.hash = '#' + v;
+}
+function rpPrefill(pid, st) {
+  const f = {};
+  try {
+    if (st === 'part') {
+      const box = document.createElement('div'); box.innerHTML = pjReport(pid);
+      const ps = [...box.querySelectorAll('p')].map(p => p.textContent.trim()).filter(t => t.length > 20);
+      f.ov = ps.slice(0, 2).join('\n\n');
+      const rows = [...box.querySelectorAll('tr')].slice(1).map(tr => [...tr.cells].map(c => c.textContent.trim())).filter(c => c.length >= 2);
+      if (rows.length) f.reqs = rows.map(c => `${c[0]} — ${c[c.length - 1]}`).join('\n');
+      const li = [...box.querySelectorAll('li')].map(l => l.textContent.trim()).filter(Boolean); if (li.length) f.risk = li.slice(0, 5).join('\n');
+      const D = PJ_D[pid]; if (D.base && D.base[0]) f.scale = String(D.base[0]);
+      f.vd = PJS[pid].drop ? '불참 권고' : '참여 권고'; f.op = '';
+    }
+    if (st === 'qty' && !pjTank(pid)) { const q = qtyVerify(pid); f.di = String(q.di); f.basis = q.basis === 'iso' ? 'ISO 6m' : 'BM 9m (ISO 미확보)'; f.dpct = q.dpct.toFixed(1); f.lab = '사내 실적'; f.chk = q.chk.join('\n'); }
+    if (st === 'est') { const r = pjCur(pid), D = PJ_D[pid]; const amt = (r && r.est) || (D.base && D.base[D.base.length - 1]); if (amt) f.amt = String(amt); f.gm = '2.0'; f.rk = '0'; f.mg = '1.95'; }
+    if (st === 'hnd') { const D = PJ_D[pid]; if (D.wo && D.wo !== '—') f.wo = D.wo; }
+  } catch (e) {}
+  return f;
+}
+function rpDockPid(v, st) {
+  if (RV.pid && rpFit(RV.pid, v) && RP_DOCKV[v].includes(RV.st)) return RV.pid;
+  if (typeof WORK !== 'undefined' && rpFit(WORK, v)) return WORK;
+  const d = ['tspec', 'test'].includes(v) ? 't' : 'c'; if (rpFit(d, v)) return d;
+  return rpPids().find(id => rpFit(id, v)) || null;
+}
+function rpDock(v) {
+  const sts = RP_DOCKV[v]; if (!sts || !ROLE) return '';
+  const st = RV.pid && RP_DOCKV[v].includes(RV.st) && rpFit(RV.pid, v) ? RV.st : sts[0];
+  const pid = rpDockPid(v, st); if (!pid) return '';
+  rpLoad(pid, st);
+  const S = RSTG[st], r = RV.w, cc = rpCanCreate(pid, st), stat = r ? rpStatus(r) : null, line = S[4];
+  const open = RV.dockOpen || (r && cc && ['draft', 'rej'].includes(stat.s)) || (!r && cc && v === 'gonogo');
+  const tabs = sts.length > 1 ? `<span class="rdt">${sts.map(k => `<button type="button" class="${k === st ? 'on' : ''}" data-rdock="st:${k}">${RSTG[k][2]}</button>`).join('')}</span>` : '';
+  const pillH = r ? pill(RPT_ST[stat.s][0] + (stat.s === 'sub' && stat.turn ? ` · ${PJ_RN(stat.turn)}` : ''), RPT_ST[stat.s][1]) : pill(cc ? '작성 전' : '미작성', cc ? 'p-warn' : '');
+  const body = !open ? '' : r ? `<div class="redit">${rpEditor()}</div>`
+    : `<div class="pb">${emptyBox('📝', `${S[2]}가 아직 없습니다`, cc ? (st === 'part' ? 'AI가 만든 초안(아래 보고서)을 불러와 시작합니다. 고친 뒤 상신하면 영업임원 → 대표이사 결재로 넘어갑니다.' : '작성을 시작하면 자동 저장되고, 필수값을 채워야 상신할 수 있습니다.') : `이 보고서는 ${ROLES[rpOwner(st, pid)].n}가 작성합니다.`, cc ? [`<button type="button" class="btn pri" data-rdo="new">${st === 'part' || st === 'qty' || st === 'est' ? 'AI 초안으로 작성 시작' : '작성 시작'}</button>`] : [])}</div>`;
+  return `<section class="panel rdock ${open ? 'open' : ''}" id="rdock" aria-label="${S[2]} 편집"><div class="ph rdh"><div style="min-width:0"><h2>📝 ${S[2]}</h2><div class="muted" style="font-size:12px;margin-top:2px">${pjName(pid)} · 작성 ${ROLES[rpOwner(st, pid)].n}${line.length ? ` · 결재 ${line.map(PJ_RN).join(' → ')}` : ' · 작성자 확정'}</div></div>
+    <div class="rda">${tabs}${pillH}<button type="button" class="btn" data-rdock="toggle" aria-expanded="${!!open}">${open ? '접기' : r ? (cc && stat && ['draft', 'rej'].includes(stat.s) ? '편집' : '열기') : cc ? '작성' : '열기'}</button><a class="btn rbtn" href="#rpt">내 보고서 현황</a></div></div>${body}</section>`;
+}
+Object.keys(RP_DOCKV).forEach(v => {
+  const o = VIEWS[v]; if (!o) return; const af = o.after;
+  VIEWS[v] = () => { const h = o(); RV.dockHtml = rpDock(v); return h; };
+  VIEWS[v].after = () => {
+    if (af) af();
+    const top = document.querySelector('#app .main .top');
+    if (RV.dockHtml && top && !document.getElementById('rdock')) top.insertAdjacentHTML('afterend', RV.dockHtml);
+    if (RV.dockHtml && v === 'gonogo') document.querySelectorAll('#app .main .top .btn.pri').forEach(b => { if (/상신/.test(b.textContent)) b.style.display = 'none'; });
+    RV.dockHtml = null; rpAfter(true);
+  };
+});
+function rpAfter(dock) {
+  const f = RV.focus, fl = document.querySelector('.rnext'), sc = RV.scrollDock; RV.focus = null; RV.scrollDock = false;
+  setTimeout(() => {
+    const el = f && document.getElementById('rf-' + f);
+    if (el) { el.focus({preventScroll: true}); el.scrollIntoView({block: 'center'}); }
+    else if (dock && (sc || fl)) { const d = document.getElementById('rdock'); if (d) d.scrollIntoView({block: 'start'}); }
+    else if (fl && innerWidth < 900) fl.scrollIntoView({block: 'start'});
+  }, 30);
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-rdock]'); if (!b) return; e.preventDefault();
+  const a = b.dataset.rdock;
+  if (a === 'toggle') { if (RV.dockOpen && !(await rpLeave())) return; RV.dockOpen = !document.getElementById('rdock').classList.contains('open'); RV.scrollDock = true; render(); return; }
+  if (a.startsWith('st:')) { if (!(await rpLeave())) return; RV.w = null; RV.st = a.slice(3); RV.dockOpen = true; RV.scrollDock = true; render(); }
+});
+/* 단독 보고서 화면 (결재자·열람자, 영업지원 리뷰 기록) */
+VIEWS.rptdoc = () => {
+  if (!RV.pid || !RV.st) return pgTop('보고서', '', '<a class="btn" href="#rpt">← 내 보고서 현황</a>') + `<section class="panel">${emptyBox('📝', '열린 보고서가 없습니다', '내 보고서 현황에서 보고서를 고르세요.', ['<a class="btn pri" href="#rpt">내 보고서 현황</a>'])}</section>`;
+  rpLoad(RV.pid, RV.st);
+  const S = RSTG[RV.st], cc = rpCanCreate(RV.pid, RV.st);
+  return pgTop(S[2], `${pjName(RV.pid)} · ${String(S[1] + 1).padStart(2, '0')} ${PJ_STEPS[S[1]]}`, '<a class="btn" href="#rpt">← 내 보고서 현황</a>') +
+    `<section class="panel redit">${RV.w ? rpEditor() : emptyBox('📝', `${S[2]}가 아직 없습니다`, cc ? '작성을 시작하면 자동 저장됩니다.' : `이 보고서는 ${ROLES[rpOwner(RV.st, RV.pid)].n}가 작성합니다.`, cc ? ['<button type="button" class="btn pri" data-rdo="new">작성 시작</button>'] : [])}</section>`;
+};
+VIEWS.rptdoc.after = () => rpAfter(false);
+/* 공통 메뉴: 내 담당 프로젝트의 보고서 현황 */
+function rpMine() {
+  if (['exec', 'ceo', 'admin', 'sup'].includes(ALIAS(ROLE)) || ['exec', 'ceo', 'admin', 'sup'].includes(ROLE)) return rpPids();
+  return rpPids().filter(id => pjIsOwner(id));
+}
+function rpCell(pid, st) {
+  const L = rpList(pid, st), r = L[L.length - 1], S = RSTG[st], reached = S[1] <= pjStage(pid) || !!r, w = rpCanCreate(pid, st);
+  if (r) { const s = rpStatus(r), mine = s.s === 'sub' && s.turn && roleIs(s.turn), ed = w && ['draft', 'rej'].includes(s.s);
+    return {k: mine ? 'turn' : ed ? (s.s === 'rej' ? 'rej' : 'draft') : s.s, html: `${pill(RPT_ST[s.s][0].replace(' · 결재 중', '') + (s.s === 'sub' && s.turn ? ` · ${PJ_RN(s.turn)}` : ''), RPT_ST[s.s][1])}<span class="act">${mine ? '결재 →' : ed ? '편집 →' : '보기 →'}</span>`, go: true}; }
+  if (reached && w) return {k: 'need', html: `${pill('작성 필요', 'p-warn')}<span class="act">작성 →</span>`, go: true};
+  if (reached) return {k: 'none', html: '<span class="muted">미작성</span>', go: false};
+  return {k: 'pre', html: '<span class="faint">단계 전</span>', go: false};
+}
+VIEWS.rpt = () => {
+  const P = rpMine(), wr = ['est', 'estC', 'estP', 'estT'].some(x => ROLE === x) ? '담당 프로젝트' : ROLE === 'sup' ? '접수·리뷰를 맡은 프로젝트' : '전체 프로젝트';
+  const C = P.flatMap(pid => RPT_STG.map(s => rpCell(pid, s[0]))), n = k => C.filter(c => c.k === k).length;
+  const turnR = RPTS.filter(r => { const s = rpStatus(r); return s.s === 'sub' && s.turn && roleIs(s.turn) && pjVisible(r.pid); });
+  const head = pgTop('내 보고서 현황', `${ROLES[ROLE].n} · ${wr}의 단계별 보고서 · 칸을 누르면 그 업무 화면의 편집기로 갑니다`, '');
+  if (!P.length || EXC.mode === 'empty') return head + `<section class="panel">${emptyBox('📂', '맡은 프로젝트가 없습니다', '담당 프로젝트가 배정되면 단계별 보고서 현황이 여기에 표시됩니다.', ['<a class="btn pri" href="#pipe">프로젝트 현황 보기</a>'])}</section>`;
+  return head + `<section class="panel"><div class="kpis">${[['작성 필요', n('need')], ['작성 중', n('draft')], ['반려 · 보완', n('rej')], ['내 결재 차례', n('turn')], ['결재 중', n('sub')]].map(([k, v]) => `<div class="kpi"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}</div></section>
+    ${turnR.length ? `<section class="panel" style="margin-bottom:14px"><div class="ph"><h2>내 결재 차례</h2>${pill(turnR.length + '건', 'p-rv')}</div>${turnR.map(r => `<button type="button" class="rrow" data-rptcell="${r.pid}:${r.st}"><b>${esc(r.title)}</b><span class="muted">${RSTG[r.st][2]} · ${pjName(r.pid)} · 상신 ${PJ_RN(r.by)}</span></button>`).join('')}</section>` : ''}
+    <div class="rboard">${P.map(pid => `<section class="panel rbp"><div class="ph"><div style="min-width:0"><h2 style="overflow-wrap:anywhere">${pjName(pid)}</h2><div class="muted" style="font-size:12px;margin-top:2px">${PIPE[PJ_D[pid].row][4]} · ${pjType(pid)} · 지금 ${String(pjStage(pid) + 1).padStart(2, '0')} ${PJ_STEPS[pjStage(pid)]}</div></div></div>
+      <div class="rcells">${RPT_STG.map(s => { const c = rpCell(pid, s[0]); return `<${c.go ? 'button type="button"' : 'div'} class="rcell k-${c.k}" ${c.go ? `data-rptcell="${pid}:${s[0]}"` : ''}><span class="sn">${String(s[1] + 1).padStart(2, '0')} ${s[2]}</span>${c.html}</${c.go ? 'button' : 'div'}>`; }).join('')}</div></section>`).join('')}</div>` +
+    roleFoot('내 보고서 현황', '내가 맡은 프로젝트의 8단계 보고서 상태를 한눈에 봅니다. 작성자는 칸을 누르면 그 단계 업무 화면(예: 참여여부 보고서 화면)의 편집기로 가고, 결재자는 보고서를 열어 승인·반려합니다.', [['담당 · 작성', 'p-rv'], ['영업임원·대표이사 · 결재', 'p-qp']]);
+};
+VIEWS.rpt.after = () => {};
+document.addEventListener('click', e => { const b = e.target.closest('[data-rptcell]'); if (!b) return; e.preventDefault(); const [pid, st] = b.dataset.rptcell.split(':'); rpGo(pid, st); });
+/* 첫 화면(index)으로 가는 버튼: 역할 선택 화면 */
+new MutationObserver(() => {
+  const lg = document.querySelector('#app .login'); if (!lg || lg.querySelector('.toindex')) return;
+  lg.insertAdjacentHTML('afterbegin', '<a class="btn toindex" href="index.html">← 첫 화면 (index)</a>');
+}).observe(document.getElementById('app'), {childList: true, subtree: true});
+document.head.insertAdjacentHTML('beforeend', `<style>
+.toindex{position:absolute;top:14px;left:14px;z-index:5;min-height:34px;font-size:13px}
+.login{position:relative}
+.rdock{margin-bottom:14px;border:1px solid var(--accent)}.rdock .rdh{align-items:flex-start;gap:10px;flex-wrap:wrap}
+.rdock .rda{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-left:auto}.rdock .rda .btn{min-height:30px;font-size:12.5px;padding:0 10px}
+.rdock .rdt{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.rdock .rdt button{border:0;background:none;padding:5px 9px;font:inherit;font-size:12px;cursor:pointer;color:var(--fg2)}.rdock .rdt button.on{background:var(--accent);color:#fff}
+.rdock .redit{padding:4px 18px 16px}
+.rboard{display:flex;flex-direction:column;gap:12px}
+.rcells{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;padding:12px 14px 14px}
+.rcell{display:flex;flex-direction:column;gap:5px;align-items:flex-start;text-align:left;border:1px solid var(--line);border-radius:9px;padding:8px;background:var(--surface);font:inherit;color:inherit;min-width:0;min-height:76px}
+button.rcell{cursor:pointer}button.rcell:hover{border-color:var(--accent)}
+.rcell .sn{font-size:11.5px;color:var(--fg2);font-weight:600;line-height:1.3}.rcell .act{font-size:11.5px;color:var(--accent);font-weight:600;margin-top:auto}
+.rcell.k-pre{background:var(--chip);border-style:dashed}.rcell.k-need{border-color:#E8A23A;background:#FFF8EC}.rcell.k-turn{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}.rcell.k-rej{border-color:var(--bad)}
+@media (max-width:1100px){.rcells{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){.rcells{grid-template-columns:repeat(2,minmax(0,1fr))}.toindex{position:static;margin:12px 16px 0}}
+@media (max-width:900px){.rdock .redit{padding:4px 14px 14px}}
+</style>`);
+document.head.insertAdjacentHTML('beforeend', `<style>
+@media (max-width:720px){
+  #scrrole{font-size:0;gap:0}#scrrole select{font-size:13px;max-width:132px}
+  html.scr #apphdr .crumb{display:none}
+  #apphdr .usr .av ~ *{display:none}
+  .dlay>div:has(>.dpane){order:2}
 }
 </style>`);
 
