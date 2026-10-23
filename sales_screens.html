@@ -6958,10 +6958,10 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-rptc
 /* 첫 화면(index)으로 가는 버튼: 역할 선택 화면 */
 new MutationObserver(() => {
   const lg = document.querySelector('#app .login'); if (!lg || lg.querySelector('.toindex')) return;
-  lg.insertAdjacentHTML('afterbegin', '<a class="btn toindex" href="index.html">← 첫 화면 (index)</a>');
+  (lg.querySelector('.rolecards') || lg).insertAdjacentHTML(lg.querySelector('.rolecards') ? 'afterend' : 'beforeend', '<div class="toidx"><a class="btn toindex" href="index.html">← 첫 화면 (index)</a></div>');
 }).observe(document.getElementById('app'), {childList: true, subtree: true});
 document.head.insertAdjacentHTML('beforeend', `<style>
-.toindex{position:absolute;top:14px;left:14px;z-index:5;min-height:34px;font-size:13px}
+.toidx{display:flex;justify-content:center;align-self:stretch;margin:28px 0 8px}.toindex{min-height:36px;font-size:13px}
 .login{position:relative}
 .rdock{margin-bottom:14px;border:1px solid var(--accent)}.rdock .rdh{align-items:flex-start;gap:10px;flex-wrap:wrap}
 .rdock .rda{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-left:auto}.rdock .rda .btn{min-height:30px;font-size:12.5px;padding:0 10px}
@@ -6974,7 +6974,7 @@ button.rcell{cursor:pointer}button.rcell:hover{border-color:var(--accent)}
 .rcell .sn{font-size:11.5px;color:var(--fg2);font-weight:600;line-height:1.3}.rcell .act{font-size:11.5px;color:var(--accent);font-weight:600;margin-top:auto}
 .rcell.k-pre{background:var(--chip);border-style:dashed}.rcell.k-need{border-color:#E8A23A;background:#FFF8EC}.rcell.k-turn{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}.rcell.k-rej{border-color:var(--bad)}
 @media (max-width:1100px){.rcells{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:520px){.rcells{grid-template-columns:repeat(2,minmax(0,1fr))}.toindex{position:static;margin:12px 16px 0}}
+@media (max-width:520px){.rcells{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:900px){.rdock .redit{padding:4px 14px 14px}}
 </style>`);
 document.head.insertAdjacentHTML('beforeend', `<style>
