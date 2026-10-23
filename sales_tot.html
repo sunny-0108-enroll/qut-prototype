@@ -3961,6 +3961,11 @@ const LABOR = LAB_RAW.map(([no, n, cur, prev]) => {
   ['c', 't', 'p'].forEach(k => { if (LAB_USE[k].includes(no)) use.add(k); });
   return {no, n, cur, prev, rate: (cur - prev) / prev * 100, grp: LAB_GRP(no), use: [...use], key: LAB_KEY.includes(no)};
 });
+window.addEventListener('click', e => { if (window.__excBlock) window.__excBlock(e); }, true);
+window.inlineErr = el => { if (!el) return; const msg = el.id === 'qvop' ? '기준 확인 필요 항목의 처리 내용을 적어 주세요' : '의견을 입력하세요 · 대표이사가 아닌 상신·결재는 의견이 필수입니다';
+  el.setAttribute('aria-invalid', 'true'); let m = el.parentElement.querySelector('.ferr'); if (!m) { m = document.createElement('div'); m.className = 'ferr'; m.setAttribute('role', 'alert'); el.insertAdjacentElement('afterend', m); m.id = (el.id || 'f') + '-err'; el.setAttribute('aria-describedby', m.id); }
+  m.textContent = '⚠ ' + msg; const clr = () => { if (el.value.trim()) { m.remove(); el.removeAttribute('aria-invalid'); el.style.borderColor = ''; el.removeEventListener('input', clr); } }; el.addEventListener('input', clr); };
+document.head.insertAdjacentHTML('beforeend', '<style>.ferr{color:var(--bad);font-size:12px;font-weight:600;margin-top:4px}</style>');
 const HT = '<span class="htag">H</span>', AT = '<span class="atag">AI</span>', STg = '<span class="stag">시스템</span>';
 
 /* ---------- 단가·노임 시세 › 노임단가 (공사·탱크·배관 공통) ---------- */
@@ -4447,7 +4452,7 @@ document.addEventListener('click', e => {
   const ap = document.getElementById('apc');
   if (ap && b.closest('.acts') && ap.closest('.pb, .panel, #apd, section') ) {
     // 승인함: 상세의 의견란을 필수로 사용
-    if (!ap.value.trim()) { ap.focus(); ap.style.borderColor = 'var(--bad)'; ap.placeholder = '의견을 입력해야 다음 결재자에게 넘어갑니다 (필수)'; toast('의견을 입력하세요 · 대표이사가 아닌 결재는 의견 필수'); return; }
+    if (!ap.value.trim()) { ap.focus(); ap.style.borderColor = 'var(--bad)'; window.inlineErr && inlineErr(ap); ap.placeholder = '의견을 입력해야 다음 결재자에게 넘어갑니다 (필수)'; toast('의견을 입력하세요 · 대표이사가 아닌 결재는 의견 필수'); return; }
     toast(b.dataset.toast + ' · 의견 기록'); return;
   }
   window.__subkey = CUR + '|' + label; opinionForm(label, b.dataset.toast);
@@ -5068,7 +5073,7 @@ window.addEventListener('click', e => {
   e.stopImmediatePropagation(); e.preventDefault();
   const a = APPR.find(x => x.k === APSEL); if (!a || a.done || a.wait.turn !== ROLE) return;
   const lab = btnLabel(b), ap = document.getElementById('apc'), op = ap ? ap.value.trim() : '';
-  if (ROLE !== 'ceo' && !op) { ap.focus(); ap.style.borderColor = 'var(--bad)'; ap.placeholder = '의견을 입력해야 다음 결재자에게 넘어갑니다 (필수)'; toast('의견을 입력하세요 · 대표이사가 아닌 결재는 의견 필수'); return; }
+  if (ROLE !== 'ceo' && !op) { ap.focus(); ap.style.borderColor = 'var(--bad)'; window.inlineErr && inlineErr(ap); ap.placeholder = '의견을 입력해야 다음 결재자에게 넘어갑니다 (필수)'; toast('의견을 입력하세요 · 대표이사가 아닌 결재는 의견 필수'); return; }
   const act = b.hasAttribute('data-apdrop') ? 'drop' : /반려/.test(lab) ? 'reject' : /조건부/.test(lab) ? 'cond' : 'ok';
   const id = a.pid, kind = a.wait.kind, ln = PJ_LN(kind), last = ln.indexOf(ROLE) === ln.length - 1;
   pjAct(id, act, ROLE, op, true); pjSync(); saveSoon();
@@ -5132,9 +5137,9 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-pjact]'); if (!b) return;
   if (b.dataset.pjact === 'anl' && b.closest('#ttbox')) PJ_TT = [...b.closest('#ttbox').querySelectorAll('[data-ttrow]')].map(tr0 => { const o = ttOf(b.dataset.pj)[+tr0.dataset.ttrow]; return [tr0.querySelector('[data-tt-type]').value, tr0.querySelector('[data-tt-mat]').value, +tr0.querySelector('[data-tt-n]').value || o[2], o[3], o[4], o[5]]; });
   const id = b.dataset.pj, a = b.dataset.pjact, t = document.getElementById(a === 'qty' && document.getElementById('qvop') ? 'qvop' : 'pjop'), op = t ? t.value.trim() : '';
-  if (a === 'qty' && !pjTank(id) && t && !op && qtyVerify(id).chk.length) { t.focus(); t.style.borderColor = 'var(--bad)'; toast('기준 확인 필요 항목의 처리 내용을 적어 주세요'); return; }
+  if (a === 'qty' && !pjTank(id) && t && !op && qtyVerify(id).chk.length) { t.focus(); t.style.borderColor = 'var(--bad)'; window.inlineErr && inlineErr(t); toast('기준 확인 필요 항목의 처리 내용을 적어 주세요'); return; }
   if (a === 'req' && ROLE !== 'ceo' && !t) { PJ_PEND = {id, act: 'req'}; window.__subkey = ''; opinionForm(b.textContent.trim(), `${pjName(id)} 상신`); return; }
-  if (a === 'req' && ROLE !== 'ceo' && !op) { t.focus(); t.style.borderColor = 'var(--bad)'; toast('상신 의견을 입력하세요 (필수)'); return; }
+  if (a === 'req' && ROLE !== 'ceo' && !op) { t.focus(); t.style.borderColor = 'var(--bad)'; window.inlineErr && inlineErr(t); toast('상신 의견을 입력하세요 (필수)'); return; }
   const inAp = !!b.closest('#apd');
   pjAct(id, a, ROLE, op, true); pjSync(); saveSoon();
   const [st] = pjStatus(id); toast(`${pjName(id)} · ${st}`);
@@ -6308,6 +6313,524 @@ function bhInk() {
     <div class="muted" style="font-size:12px;margin-top:4px">주기 ${S.cyc ? (S.cyc >= 18 ? (S.cyc / 12).toFixed(1) + '년' : Math.round(S.cyc) + '개월') : '—'} · 규모 ${S.grow >= 0 ? '+' : ''}${S.grow.toFixed(1)}%/회 · 분류 검증 시 기존 반복 건으로 묶어 리뷰합니다</div></div>`);
 }
 new MutationObserver(() => { if (CUR === 'intake') bhInk(); }).observe(document.getElementById('app'), {childList: true, subtree: true});
+
+
+/* =====================================================================================
+   예외 상태 공통 + 단계별 보고서 작성·편집
+   1 빈 상태 · 2 저장 중/실패/네트워크 오류 · 3 인라인 검증 · 4 권한 차이 · 5 확인 절차 · 6 모바일 · 7 버튼 결과·다음 화면
+   ===================================================================================== */
+const EXC = {mode: 'normal'}; // normal | empty | savefail | offline
+try { EXC.mode = sessionStorage.getItem('qut-exc') || 'normal'; } catch (e) {}
+const excOffline = () => EXC.mode === 'offline' || (typeof navigator !== 'undefined' && navigator.onLine === false);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const josa = (w, a, b) => { const c = String(w).replace(/\s*\(.*\)$/, '').trim().slice(-1).charCodeAt(0); return c >= 0xAC00 && c <= 0xD7A3 ? ((c - 0xAC00) % 28 ? a : b) : a + '(' + b + ')'; };
+const nowHM = () => new Date().toTimeString().slice(0, 5);
+
+/* ---------- 확인 모달 (삭제·수정·이동) ---------- */
+function qModal({title, body, buttons}) {
+  return new Promise(res => {
+    const ov = document.createElement('div'); ov.className = 'qm-ov';
+    ov.innerHTML = `<div class="qm" role="alertdialog" aria-modal="true" aria-labelledby="qmt"><h3 id="qmt">${title}</h3><div class="qmb">${body}</div><div class="qmf">${buttons.map((b, i) => `<button type="button" class="btn ${b.cls || ''}" data-qmv="${i}">${b.l}</button>`).join('')}</div></div>`;
+    document.body.appendChild(ov);
+    const done = v => { ov.remove(); document.removeEventListener('keydown', key, true); res(v); };
+    const key = e => { if (e.key === 'Escape') { e.stopPropagation(); done(null); } };
+    document.addEventListener('keydown', key, true);
+    ov.addEventListener('click', e => { const b = e.target.closest('[data-qmv]'); if (b) done(buttons[+b.dataset.qmv].v); else if (e.target === ov) done(null); });
+    setTimeout(() => { const f = ov.querySelector('.btn.pri, .btn.dng') || ov.querySelector('.btn'); f && f.focus(); }, 30);
+  });
+}
+
+/* ---------- 빈 상태 ---------- */
+const emptyBox = (ic, t, d, ctas) => `<div class="empty" role="status"><div class="ei" aria-hidden="true">${ic}</div><b>${t}</b><p>${d}</p>${ctas && ctas.length ? `<div class="ea">${ctas.join('')}</div>` : ''}</div>`;
+const EMPTY_V = {
+  appr: ['✓', '결재할 문서가 없습니다', '상신된 참여 결정·견적 승인·협상가·실행예산 결재가 여기에 모입니다. 새 결재가 오면 메뉴에 숫자가 표시됩니다.', [['#home', '오늘 할 일 보기']]],
+  brief: ['🗓', '이 날짜의 일일 요약이 없습니다', '확정된 메일이 없거나 아직 분류 검증 전입니다. 메일 분류함에서 검증을 마치면 요약이 만들어집니다.', [['#mail', '메일 분류함으로', 'sup']]],
+  bidhist: ['📈', '분석할 반복 입찰 이력이 아직 없습니다', '같은 발주처·대상 건이 2회 이상 쌓이면 주기와 규모 변동을 계산합니다. 메일 분류 검증·리뷰를 진행하면 이력이 쌓입니다.', [['#intake', '수신함으로', 'sup']]],
+  pipe: ['📂', '진행 중인 프로젝트가 없습니다', '영업지원이 메일 분류를 검증해 리뷰로 넘기면 RV가 발급되고 여기에 나타납니다.', [['#intake', '수신함으로', 'sup']]],
+  mail: ['✉', '새 메일이 없습니다', '대표메일 수신함을 10분마다 확인합니다. 마지막 확인 ' + '09:40', []],
+  intake: ['📥', '검증할 수신 건이 없습니다', '오늘 받은 메일은 모두 분류 검증이 끝났습니다.', [['#brief', '일일 요약 보기']]],
+  home: ['☕', '오늘 할 일이 없습니다', '새 업무가 배정되면 여기에 표시됩니다.', [['#pipe', '프로젝트 현황 보기']]],
+  tdocs: ['📄', '요구된 부가 제출문서가 없습니다', 'RFQ·ENGSPEC에서 요구 문서를 찾지 못했습니다. 재판정하거나 직접 추가하세요.', []],
+  cdocs: ['📄', '요구된 부가 제출문서가 없습니다', '입찰초청서·안내문에서 요구 문서를 찾지 못했습니다. 재판정하거나 직접 추가하세요.', []],
+};
+Object.keys(EMPTY_V).forEach(v => {
+  const o = VIEWS[v]; if (!o) return; const af = o.after;
+  VIEWS[v] = () => { if (EXC.mode !== 'empty') return o(); const [ic, t, d, c] = EMPTY_V[v], it = MENU_INDEX[v];
+    return pgTop(it ? it.l : t, '데이터 없음 상태', '') + `<section class="panel">${emptyBox(ic, t, d, c.filter(x => !x[2] || can(x[2])).map(x => `<a class="btn pri" href="${x[0]}">${x[1]}</a>`))}</section>`; };
+  if (af) VIEWS[v].after = () => { if (EXC.mode !== 'empty') af(); };
+});
+
+/* ---------- 네트워크 오류 배너 · 처리 버튼 차단 ---------- */
+function excBanner() {
+  let b = document.getElementById('netbar');
+  if (!excOffline()) { if (b) b.remove(); document.body.classList.remove('offline'); return; }
+  document.body.classList.add('offline');
+  if (!b) { b = document.createElement('div'); b.id = 'netbar'; b.setAttribute('role', 'alert'); document.body.appendChild(b); }
+  b.innerHTML = `<b>네트워크 연결이 끊겼습니다.</b><span>보기는 되지만 저장·상신·승인은 연결 후 다시 해야 합니다. 작성 중인 보고서는 이 기기에 임시 보관됩니다.</span><button type="button" class="btn" data-netretry>다시 연결 시도</button>`;
+}
+addEventListener('online', excBanner); addEventListener('offline', excBanner);
+window.__excBlock = e => {
+  if (e.target.closest('[data-netretry]')) { e.preventDefault(); if (EXC.mode === 'offline' && navigator.onLine !== false) toast('아직 연결되지 않았습니다 · 잠시 후 다시 시도하세요 (상태 미리보기: 네트워크 오류)'); else { excBanner(); toast('다시 연결되었습니다'); } return; }
+  if (!excOffline()) return;
+  const b = e.target.closest('#app button, .dw button'); if (!b) return;
+  if (b.matches('[data-seg] *, [data-seg], [data-ng], .dw-x, [data-close], [data-rpreview], [data-rlist], [data-rsel], [data-rst], [data-exc], [data-mnav], [data-bh], [data-ap], .hb, [data-ink], [data-tsd], [data-pjdoc], [data-apv], [data-apvback], [data-bmsg], [data-bgo], [data-rdo], [data-rptgo], .wb *')) return;
+  if (!(b.classList.contains('pri') || b.matches('[data-toast], [data-pjact], [data-sbok], [data-inkd], [data-xfer], [data-rdo]'))) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 500);
+  toast('네트워크 오류 · 처리하지 못했습니다. 연결을 확인한 뒤 다시 시도하세요');
+};
+
+/* ---------- 상태 미리보기 스위치 (프로토타입 검토용) ---------- */
+const EXC_OPTS = `<option value="normal">정상</option><option value="empty">데이터 없음</option><option value="savefail">저장 실패</option><option value="offline">네트워크 오류</option>`;
+function excBar() {
+  if (!ROLE) return;
+  if (!document.getElementById('excbar')) { const d = document.createElement('div'); d.id = 'excbar'; d.innerHTML = `<label for="excsel">상태 미리보기</label><select id="excsel" data-exc>${EXC_OPTS}</select>`; document.body.appendChild(d); }
+  const side = document.querySelector('.side .navs'); if (side && !document.querySelector('.side .excside')) side.insertAdjacentHTML('afterend', `<div class="excside"><label for="excsel2">상태 미리보기</label><select id="excsel2" data-exc>${EXC_OPTS}</select></div>`);
+  document.querySelectorAll('select[data-exc]').forEach(s => { s.value = EXC.mode; });
+}
+document.addEventListener('change', e => {
+  const s = e.target.closest('select[data-exc]'); if (!s) return;
+  EXC.mode = s.value; try { sessionStorage.setItem('qut-exc', EXC.mode); } catch (er) {}
+  excBanner(); render(); excBar();
+  toast({normal: '정상 상태로 봅니다', empty: '데이터가 없을 때의 화면으로 봅니다', savefail: '저장이 실패하는 상황으로 봅니다 (보고서 편집)', offline: '네트워크 오류 상황으로 봅니다'}[EXC.mode]);
+});
+
+/* ---------- 모바일: 왼쪽 메뉴를 서랍으로 ---------- */
+function mnavBtn() {
+  const h = document.getElementById('apphdr'); if (!h || h.querySelector('[data-mnav]')) return;
+  h.insertAdjacentHTML('afterbegin', `<button type="button" class="hb mnav" data-mnav aria-label="메뉴 열기" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>`);
+}
+const mnavSet = on => { document.documentElement.classList.toggle('mnav', on); const b = document.querySelector('[data-mnav]'); if (b) { b.setAttribute('aria-expanded', String(on)); b.setAttribute('aria-label', on ? '메뉴 닫기' : '메뉴 열기'); } };
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-mnav]')) { mnavSet(!document.documentElement.classList.contains('mnav')); return; }
+  if (document.documentElement.classList.contains('mnav') && (e.target.closest('.side a.nav') || e.target.classList.contains('mnav-ov'))) mnavSet(false);
+});
+addEventListener('hashchange', () => { mnavSet(false); setTimeout(excBar, 30); });
+let MNV_T = 0; new MutationObserver(() => { cancelAnimationFrame(MNV_T); MNV_T = requestAnimationFrame(() => { mnavBtn(); excBar(); }); }).observe(document.body, {childList: true, subtree: true});
+new MutationObserver(() => { mnavBtn(); excBar(); if (!document.querySelector('.mnav-ov')) document.body.insertAdjacentHTML('beforeend', '<div class="mnav-ov" aria-hidden="true"></div>'); }).observe(document.body, {childList: true});
+setTimeout(() => { mnavBtn(); excBar(); excBanner(); }, 50);
+
+document.head.insertAdjacentHTML('beforeend', `<style>
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:40px 20px;color:var(--fg2)}
+.empty .ei{font-size:30px;width:58px;height:58px;border-radius:50%;background:var(--chip);display:grid;place-items:center;margin-bottom:4px}
+.empty b{font-size:15px;color:var(--fg)}.empty p{margin:0;max-width:440px;font-size:13px;line-height:1.6;color:var(--muted)}.empty .ea{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.qm-ov{position:fixed;inset:0;background:rgba(15,20,30,.42);z-index:200;display:grid;place-items:center;padding:16px}
+.qm{background:var(--surface,#fff);color:var(--fg);border-radius:14px;width:min(440px,100%);padding:18px 18px 14px;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+.qm h3{margin:0 0 8px;font-size:16px}.qm .qmb{font-size:13.5px;line-height:1.65;color:var(--fg2)}.qm .qmf{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:16px}
+.btn.dng{background:var(--bad);border-color:var(--bad);color:#fff}
+#netbar{position:fixed;left:0;right:0;top:var(--hdr,52px);z-index:49;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 16px;background:#FDECEA;color:#8A1C11;border-bottom:1px solid #F3B8B0;font-size:13px}
+#netbar .btn{min-height:28px;padding:0 10px;font-size:12.5px;margin-left:auto}
+body.offline #app{padding-top:44px}
+.shake{animation:shk .4s}@keyframes shk{20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+#excbar{position:fixed;left:12px;bottom:12px;z-index:45;display:flex;gap:6px;align-items:center;background:var(--surface,#fff);border:1px solid var(--line);border-radius:10px;padding:5px 8px;box-shadow:0 4px 14px rgba(0,0,0,.1);font-size:12px;color:var(--muted)}
+#excbar select{font:inherit;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:2px 4px;background:var(--surface);color:var(--fg)}
+#apphdr .mnav{display:none}
+.mnav-ov{display:none}
+.side .excside{display:none;gap:6px;align-items:center;margin:14px 6px 0;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.side .excside select{font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:3px 6px;background:var(--surface);color:var(--fg)}
+@media (max-width:1180px){.dlay{grid-template-columns:minmax(0,1fr)!important}.dlay>*{min-width:0}}
+@media (max-width:720px){
+  #apphdr .mnav{display:grid}
+  .app .side{position:fixed!important;top:var(--hdr,52px);left:0;bottom:0;width:86vw;max-width:320px;height:auto!important;flex:none!important;transform:translateX(-105%);transition:transform .2s ease;z-index:58;overflow-y:auto;border-right:1px solid var(--line)!important;border-bottom:0!important;box-shadow:8px 0 30px rgba(0,0,0,.15)}
+  html.mnav .app .side{transform:none}
+  html.mnav .mnav-ov{display:block;position:fixed;inset:var(--hdr,52px) 0 0 0;background:rgba(15,20,30,.35);z-index:57}
+  .app .main{flex-basis:100%;max-width:100%;padding-left:16px!important;padding-right:16px!important}
+  .top{flex-direction:column;align-items:stretch!important}.top>div:last-child{justify-content:flex-start}
+  .dlay .dpane{max-width:100%}
+  .steps{display:flex!important;overflow-x:auto;scrollbar-width:thin}.steps .st{flex:0 0 auto;min-width:110px}
+  #excbar{display:none}.side .excside{display:flex}
+}
+</style>`);
+
+/* =====================================================================================
+   단계별 보고서
+   ===================================================================================== */
+const RPT_ST = {draft: ['작성 중', 'p-warn'], sub: ['상신 · 결재 중', 'p-rv'], ok: ['승인', 'p-ok'], fix: ['확정', 'p-ok'], rej: ['반려 · 보완', 'p-bad']};
+// [key, 단계 번호, 보고서 이름, 작성자(own=프로젝트 담당), 결재선, 엔진 결재 종류]
+const RPT_STG = [
+  ['rv', 0, '분류 검증·리뷰 기록', 'sup', [], null],
+  ['part', 1, '참여여부 보고서', 'own', ['exec', 'ceo'], 'part'],
+  ['qty', 2, '물량·원가 검증 의견서', 'own', ['exec'], null],
+  ['est', 3, '견적 승인 요청서', 'own', ['exec', 'ceo'], 'est'],
+  ['sub', 4, '제출·TCM 회의 보고', 'own', [], null],
+  ['neg', 5, '가격 협상 결과 보고서', 'own', ['exec', 'ceo'], 'neg'],
+  ['res', 6, '수주·실주 분석 보고서', 'own', ['exec'], null],
+  ['hnd', 7, '실행예산 인계 보고서', 'own', ['exec'], 'bud'],
+];
+const RSTG = Object.fromEntries(RPT_STG.map(s => [s[0], s]));
+const F = (k, l, t, o = {}) => Object.assign({k, l, t}, o);
+const RPT_F = {
+  rv: [F('client', '발주처', 'text', {req: 1}), F('due', '마감일', 'date', {req: 1, ph: '2026-11-05'}), F('name', '건명', 'text', {req: 1, w: 2}),
+    F('cat', 'AI 분류', 'sel', {req: 1, opts: ['견적요청', '가견적·예산', '재견적·차수', '현장설명회', '자격·평가 자료', '검토·회신 요청']}), F('conf', '분류 검증', 'sel', {req: 1, opts: ['AI 분류 맞음', '분류 수정함']}),
+    F('dec', '처리', 'sel', {req: 1, opts: ['리뷰 (RV 생성)', '기존 건 연결', '타업무 이관 (견적 불필요)']}), F('own', '담당 배정', 'text', {req: 1, ph: '예: EPC공사 견적담당자'}),
+    F('op', '검증 의견', 'area', {req: 1, min: 10, w: 2, ph: '분류를 확인한 근거 · 수정했다면 이유'})],
+  part: [F('ov', '1. 개요', 'area', {req: 1, min: 30, w: 2, ph: '발주처·공사 범위·기간·계약 방식을 문단으로 적습니다'}), F('scale', '예상 규모', 'num', {req: 1, unit: '원'}), F('dl', '입찰 마감', 'date', {req: 1}),
+    F('reqs', '2. 참여 요건', 'list', {req: 1, w: 2, ph: '한 줄에 하나 · 예: 발주처 PQ — 충족'}), F('prof', '3. 수익성', 'area', {w: 2}), F('risk', '4. 핵심 리스크', 'list', {req: 1, w: 2, ph: '한 줄에 하나'}),
+    F('vd', '5. 의견', 'sel', {req: 1, opts: ['참여 권고', '조건부 참여', '불참 권고']}), F('op', '의견 상세', 'area', {req: 1, min: 10, w: 2})],
+  qty: [F('di', 'DiaInch 합계', 'num', {req: 1, unit: 'DI', dec: 1}), F('basis', '산정 기준', 'sel', {req: 1, opts: ['ISO 6m', 'BM 9m (ISO 미확보)']}), F('dpct', '기존 견적 대비', 'spct', {unit: '%'}),
+    F('lab', '노무 기준', 'sel', {req: 1, opts: ['사내 실적', '표준품셈']}), F('chk', '기준 확인 필요 처리', 'list', {req: 1, w: 2, ph: '항목 — 처리 내용'}), F('op', '검증 의견', 'area', {req: 1, min: 10, w: 2})],
+  est: [F('amt', '견적가', 'num', {req: 1, unit: '원'}), F('gm', '일반관리비율', 'pct', {req: 1, unit: '%'}), F('rk', '리스크 반영율', 'pct', {req: 1, unit: '%', warn: v => v < 1 ? '권장 1~2% 미만 · 상신 의견에 사유를 적어 주세요' : ''}),
+    F('mg', '마진율', 'pct', {req: 1, unit: '%'}), F('open', '미결 리스크', 'list', {w: 2}), F('cond', '견적 조건', 'area', {w: 2}), F('op', '상신 의견', 'area', {req: 1, min: 10, w: 2})],
+  sub: [F('sd', '제출일', 'date', {req: 1}), F('ch', '제출 채널', 'sel', {req: 1, opts: ['전자조달', '메일', '직접 방문']}), F('nd', '제출 문서 수', 'num', {unit: '종'}), F('td', 'TCM 일자', 'date'),
+    F('qs', '질의·조건 변경', 'list', {w: 2}), F('nx', '후속 조치', 'area', {req: 1, min: 5, w: 2})],
+  neg: [F('ask', '발주처 요청 금액', 'num', {req: 1, unit: '원'}), F('neg', '협상 금액', 'num', {req: 1, unit: '원'}), F('chg', '조건 변경', 'list', {w: 2}), F('op', '협상 의견', 'area', {req: 1, min: 10, w: 2})],
+  res: [F('rs', '결과', 'sel', {req: 1, opts: ['수주', '실주', '불참']}), F('win', '낙찰가', 'num', {unit: '원'}), F('our', '우리 금액', 'num', {req: 1, unit: '원'}), F('why', '원인', 'list', {w: 2, ph: '실주·불참이면 필수'}), F('les', '교훈', 'area', {w: 2})],
+  hnd: [F('wo', 'WO 번호', 'code', {req: 1, re: /^WO-\d{4}-\d{4}$/, fmt: 'WO-2026-0007 형식', ph: 'WO-2026-0007'}), F('bud', '실행예산', 'num', {req: 1, unit: '원'}), F('cc', '실행코드', 'code', {re: /^C\d{2}-\d{4}(-[0-9a-z]{2})?$/, fmt: 'C26-0007 또는 C26-0007-01 형식', ph: 'C26-0007'}),
+    F('to', '인계 대상 (현장·공무)', 'text', {req: 1}), F('note', '특이사항', 'area', {w: 2})],
+};
+const RKEY = 'qut-rpt-v1';
+const rpSeed = () => {
+  const r = (id, pid, st, title, status, f, by, at, extra) => Object.assign({id, pid, st, title, status, f, by, at, hist: [[at, by, status === 'draft' ? '작성' : '상신', '']], turn: null}, extra || {});
+  return [
+    r('R1', 'c', 'rv', 'OTK 2부두 분류 검증·리뷰', 'fix', {client: '오드펠터미널코리아㈜', due: '2026-02-27', name: 'OTK 2부두 개선공사', cat: '견적요청', conf: 'AI 분류 맞음', dec: '리뷰 (RV 생성)', own: 'EPC공사 견적담당자', op: '입찰참여 안내 메일 · 첨부 BM·Design input 확인 → 견적요청 분류 맞음'}, 'sup', '01-20 09:12'),
+    r('R2', 'c', 'part', 'OTK 2부두 참여여부 보고서', 'ok', {ov: '본 건은 오드펠터미널코리아㈜가 발주한 OTK 2부두 개선공사로, 울산 온산 운영 부두에서 15개월간 수행하는 턴키 공사입니다. 파이프랙·옹벽·배관·준설이 포함된 다공종 EPC 공사입니다.', scale: '10210000000', dl: '2026-02-27', reqs: '발주처 PQ — 충족\n자체 시공 공종 — 배관·철골 충족\n준설 — 협력사', prof: '예상 마진율 2% 내외 · 다공종 협력사 단가 확인 필요', risk: '지체상금 요율 미기재 (질의 Q-03)\nISO 미확보 — 배관 9m 기준 산정', vd: '조건부 참여', op: '지체상금 회신 후 리스크율 재검토 조건으로 참여 권고'}, 'estC', '01-22 14:30'),
+    r('R3', 'c', 'qty', 'OTK 2부두 물량·원가 검증 R1', 'ok', {di: '3865.8', basis: 'ISO 6m', dpct: '-2.5', lab: '사내 실적', chk: 'SO 플랜지 SW — 1P 유지\n커플링 — 9-3 PT 적용 (0P)', op: 'ISO 수령 후 6m 기준 재산정 · 기존 대비 −2.5%'}, 'estC', '02-10 17:05'),
+    r('R4', 'c', 'est', 'OTK 2부두 견적 승인 요청 R1', 'sub', {amt: '10488000000', gm: '2.0', rk: '0', mg: '1.95', open: '지체상금 요율 미기재 (Q-03)\nISO 미확보 — 9m 기준', cond: '턴키 · 15개월 · VAT 별도', op: '리스크 반영율 0% 유지 — Q-03 회신 후 재검토'}, 'estC', '02-18 10:20', {turn: 'exec'}),
+    r('R5', 'c', 'sub', 'OTK 2부두 1차 TCM 보고', 'draft', {sd: '2026-02-27', ch: '직접 방문', nd: '15', td: '2026-03-10', qs: '준설 범위 축소 요청\nISO 제공 일정 회신', nx: ''}, 'estC', '03-10 18:00'),
+    r('R6', 't', 'rv', '여수 Storage Tank 분류 검증·리뷰', 'fix', {client: '한화오션', due: '2025-09-05', name: '여수에코에너지 집단에너지사업 Storage Tank', cat: '견적요청', conf: 'AI 분류 맞음', dec: '리뷰 (RV 생성)', own: '탱크견적담당자', op: 'RFQ 메일 · Data sheet·ENGSPEC 첨부 확인'}, 'sup', '08-20 09:30'),
+    r('R7', 't', 'part', '여수 Storage Tank 참여여부 보고서', 'ok', {ov: '본 건은 한화오션이 발주한 여수에코에너지 집단에너지사업 Storage Tank 2기 제작·설치 견적 요청으로, Cone Roof 탱크 2기(CASE 1 C.S / CASE 2 SUS)를 Shop 제작 후 현장 설치합니다.', scale: '1210000000', dl: '2025-09-05', reqs: '탱크 제작 실적 — 충족\nShop 제작·Field Erection — 외주', risk: 'CO2 Absorber 범위 불명확\nSUS PQR 갱신 필요', vd: '참여 권고', op: '범위 확인 질의 후 참여'}, 'estT', '08-22 11:00'),
+    r('R8', 't', 'neg', '여수 Storage Tank 가격 협상 R3', 'draft', {ask: '1450000000', neg: '', chg: '할인 약 2% 요청', op: ''}, 'estT', '10-12 16:40'),
+  ];
+};
+let RPTS = (() => { try { const s = JSON.parse(localStorage.getItem(RKEY) || 'null'); if (Array.isArray(s)) return s; } catch (e) {} return rpSeed(); })();
+const rpPersist = () => { try { localStorage.setItem(RKEY, JSON.stringify(RPTS)); return true; } catch (e) { return false; } };
+const RV = {pid: null, st: null, sel: null, w: null, dirty: false, errs: {}, warns: {}, touched: {}, tried: false, save: 'idle', savedAt: '', flash: null, cmt: ''};
+const rpOwner = (st, pid) => RSTG[st][3] === 'sup' ? 'sup' : PJ_D[pid].own;
+const rpIsOwner = r => !!ROLE && ALIAS(ROLE) === ALIAS(rpOwner(r.st, r.pid));
+function rpStatus(r) { // 엔진(승인함)과 연결된 결재는 엔진 상태를 따름
+  if (r.status !== 'sub' || !r.eng) return {s: r.status, turn: r.turn};
+  const s = PJS[r.pid], k = r.eng.kind;
+  if (s.wait && s.wait.kind === k) return {s: 'sub', turn: s.wait.turn};
+  if (s.done.filter(d => d.kind === k).length > r.eng.n) return {s: 'ok', turn: null};
+  if (s.rej && s.rej.kind === k) return {s: 'rej', turn: null};
+  return {s: 'sub', turn: r.turn};
+}
+function rpPerm(r) {
+  const own = rpIsOwner(r), adm = ROLE === 'admin', S = rpStatus(r), line = RSTG[r.st][4];
+  const appr = S.s === 'sub' && S.turn && roleIs(S.turn);
+  return {
+    own, adm, appr,
+    edit: (own && (S.s === 'draft' || S.s === 'rej')) || (adm && S.s !== 'ok' && S.s !== 'fix'),
+    del: (own && S.s === 'draft') || adm,
+    reopen: own && (S.s === 'sub' || S.s === 'fix') && !(r.eng && S.s === 'sub' && PJS[r.pid].wait && PJS[r.pid].wait.hist.length > 1),
+    submit: (own || adm) && (S.s === 'draft' || S.s === 'rej'), noLine: !line.length,
+    why: own ? '' : adm ? '시스템데이터관리자 — 모든 보고서를 고치고 지울 수 있습니다 (변경 이력에 남음)' : appr ? `${ROLES[ROLE].n} — 결재 차례입니다. 내용은 고칠 수 없고 승인·반려만 할 수 있습니다` : `읽기 전용 — 이 보고서는 ${ROLES[rpOwner(r.st, r.pid)].n}가 작성합니다${line.length ? ` · 결재: ${line.map(PJ_RN).join(' → ')}` : ''}`,
+  };
+}
+const rpCanCreate = (pid, st) => ROLE === 'admin' || (!!ROLE && ALIAS(ROLE) === ALIAS(rpOwner(st, pid)));
+const rpList = (pid, st) => RPTS.filter(r => r.pid === pid && r.st === st);
+const rpNum = v => { const s = String(v == null ? '' : v).replace(/,/g, '').trim(); return s === '' ? null : /^-?\d+(\.\d+)?$/.test(s) ? +s : NaN; };
+const rpFmt = (f, v) => { if (v == null || v === '') return ''; if (f.t === 'num') { const n = rpNum(v); return isNaN(n) || n == null ? v : n.toLocaleString('ko-KR', {maximumFractionDigits: f.dec || 0}); } return v; };
+function rpValidate(r) {
+  const E = {}, W = {}, f = r.f;
+  (RPT_F[r.st] || []).forEach(x => {
+    const v = f[x.k], s = String(v == null ? '' : v).trim();
+    if (x.req && !s) { E[x.k] = x.t === 'sel' ? `${x.l.replace(/^\d\.\s*/, '')}${josa(x.l, '을', '를')} 고르세요` : `${x.l.replace(/^\d\.\s*/, '')}${josa(x.l, '을', '를')} 입력하세요`; return; }
+    if (!s) return;
+    if (x.t === 'num' && (isNaN(rpNum(s)) || rpNum(s) < 0)) E[x.k] = '숫자만 입력하세요 (쉼표는 괜찮습니다)';
+    if (x.t === 'pct' || x.t === 'spct') { const n = rpNum(s); if (isNaN(n)) E[x.k] = '숫자만 입력하세요'; else if (x.t === 'pct' && (n < 0 || n > 100)) E[x.k] = '0~100 사이로 입력하세요'; else if (x.t === 'spct' && (n < -100 || n > 100)) E[x.k] = '−100~100 사이로 입력하세요'; else if (x.warn && x.warn(n)) W[x.k] = x.warn(n); }
+    if (x.t === 'date') { const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/), d = m && new Date(+m[1], +m[2] - 1, +m[3]); if (!m || d.getMonth() !== +m[2] - 1) E[x.k] = '날짜는 2026-11-05 형식으로 입력하세요'; }
+    if (x.t === 'code' && x.re && !x.re.test(s)) E[x.k] = `${x.fmt}으로 입력하세요`;
+    if (x.min && x.t === 'area' && s.length < x.min) E[x.k] = `${x.min}자 이상 적어 주세요 (지금 ${s.length}자)`;
+  });
+  if (r.st === 'neg' && !E.neg && !E.ask && rpNum(f.neg) > rpNum(f.ask)) E.neg = '협상 금액이 발주처 요청 금액보다 큽니다';
+  if (r.st === 'res' && /실주|불참/.test(f.rs || '') && !String(f.why || '').trim()) E.why = '실주·불참이면 원인을 한 줄 이상 적어 주세요';
+  if (r.st === 'est' && !E.amt && rpNum(f.amt) === 0) E.amt = '견적가가 0원입니다';
+  const t = String(r.title || '').trim();
+  if (!t) E.title = '보고서 제목을 입력하세요';
+  else if (RPTS.some(o => o.id !== r.id && o.pid === r.pid && o.st === r.st && o.title.trim() === t)) E.title = '같은 단계에 같은 제목의 보고서가 있습니다 · 리비전이나 차수를 붙여 구분하세요';
+  return {E, W};
+}
+/* ---------- 화면 ---------- */
+const rpPids = () => PJ_DEF.map(d => d.id).filter(pjVisible);
+function rpEnsure() {
+  const P = rpPids();
+  if (!RV.pid || !P.includes(RV.pid)) RV.pid = (typeof WORK !== 'undefined' && WORK && P.includes(WORK)) ? WORK : P[0] || null;
+  if (!RV.pid) return;
+  if (!RV.st) RV.st = RPT_STG[Math.min(7, pjStage(RV.pid))][0];
+  const L = rpList(RV.pid, RV.st);
+  if (RV.sel && !RPTS.some(r => r.id === RV.sel)) RV.sel = null;
+  if (RV.sel && !L.some(r => r.id === RV.sel)) RV.sel = null;
+  if (!RV.sel && L.length && !RV.w && !RV.noAuto) RV.sel = L[L.length - 1].id;
+  if (RV.sel && (!RV.w || RV.w.id !== RV.sel)) { RV.w = JSON.parse(JSON.stringify(RPTS.find(r => r.id === RV.sel))); RV.dirty = false; RV.errs = {}; RV.warns = {}; RV.touched = {}; RV.tried = false; RV.save = 'idle'; }
+}
+const rpSaveTxt = () => ({idle: RV.dirty ? '<span class="sv">변경됨 · 곧 자동 저장</span>' : RV.savedAt ? `<span class="sv ok">✓ 저장됨 ${RV.savedAt}</span>` : '', saving: '<span class="sv"><i class="spin"></i> 저장 중…</span>', saved: `<span class="sv ok">✓ 저장됨 ${RV.savedAt}</span>`, fail: `<span class="sv bad" role="alert">저장 실패 · ${excOffline() ? '네트워크 오류' : '서버 응답 없음'} — 이 기기에 임시 보관 중 <button type="button" class="lnk" data-rdo="save">다시 시도</button></span>`}[RV.save]);
+function rpField(x, r, editable) {
+  const v = r.f[x.k] == null ? '' : r.f[x.k], e = RV.errs[x.k] && (RV.touched[x.k] || RV.tried) ? RV.errs[x.k] : '', w = !e && RV.warns[x.k] ? RV.warns[x.k] : '', id = 'rf-' + x.k;
+  const lab = `<label for="${id}">${x.l}${x.req ? ' <span class="rq" aria-hidden="true">*</span>' : ''}${x.unit ? ` <span class="muted">(${x.unit})</span>` : ''}</label>`;
+  const aria = `aria-invalid="${!!e}" aria-describedby="${id}-m" ${x.req ? 'aria-required="true"' : ''}`;
+  let inp;
+  if (!editable) inp = `<div class="rv-ro">${x.t === 'list' ? (v ? `<ul>${String(v).split('\n').filter(Boolean).map(s => `<li>${esc(s)}</li>`).join('')}</ul>` : '—') : esc(rpFmt(x, v)) || '—'}${x.unit && v !== '' && x.t !== 'num' ? ' ' + x.unit : ''}</div>`;
+  else if (x.t === 'sel') inp = `<select id="${id}" data-f="${x.k}" ${aria}><option value="">선택</option>${x.opts.map(o => `<option ${o === v ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+  else if (x.t === 'area' || x.t === 'list') inp = `<textarea id="${id}" data-f="${x.k}" rows="${x.t === 'list' ? 3 : 4}" placeholder="${esc(x.ph || (x.t === 'list' ? '한 줄에 하나씩' : ''))}" ${aria}>${esc(v)}</textarea>`;
+  else inp = `<input id="${id}" data-f="${x.k}" value="${esc(x.t === 'num' ? rpFmt(x, v) : v)}" ${x.t === 'num' || x.t === 'pct' || x.t === 'spct' ? 'inputmode="decimal"' : ''} placeholder="${esc(x.ph || (x.t === 'date' ? 'YYYY-MM-DD' : ''))}" autocomplete="off" ${aria}>`;
+  const hint = x.t === 'area' && x.min && editable ? `<span class="cnt">${String(v).trim().length}/${x.min}자 이상</span>` : x.t === 'list' && editable ? '<span class="cnt">한 줄에 하나씩</span>' : '';
+  return `<div class="rfld ${x.w === 2 ? 'w2' : ''} ${e ? 'err' : w ? 'wrn' : ''}" data-fk="${x.k}">${lab}${inp}<div class="fm" id="${id}-m">${e ? `<span class="em">⚠ ${e}</span>` : w ? `<span class="wm">${w}</span>` : ''}${hint}</div></div>`;
+}
+function rpEditor() {
+  const r = RV.w; if (!r) return '';
+  const P = rpPerm(r), S = rpStatus(r), st = RSTG[r.st], line = st[4], ed = P.edit;
+  const errN = Object.keys(RV.errs).length, showSum = RV.tried && errN;
+  const flash = RV.flash ? `<div class="rnext ${RV.flash.ok ? '' : 'bad'}" role="status"><b>${RV.flash.ok ? '✓' : '⚠'} ${RV.flash.msg}</b>${RV.flash.next ? `<span>다음 · ${RV.flash.next}</span>` : ''}<div>${(RV.flash.links || []).map(([l, h, a]) => `<a class="btn ${a ? 'pri' : ''}" href="${h}" ${h.startsWith('#') ? '' : ''}>${l}</a>`).join('')}</div></div>` : '';
+  RV.flash = null;
+  const sum = showSum ? `<div class="rsum" role="alert"><b>${errN}개 항목을 확인하세요</b><ul>${Object.entries(RV.errs).map(([k, m]) => `<li><a href="#" data-rfocus="${k}">${k === 'title' ? '제목' : (RPT_F[r.st].find(x => x.k === k) || {}).l} — ${m}</a></li>`).join('')}</ul></div>` : '';
+  const lineBox = line.length ? `<div class="rline">${['담당 상신', ...line.map(PJ_RN)].map((t, i) => { const c = S.s === 'ok' ? 'd' : S.s === 'sub' ? (i === 0 ? 'd' : line[i - 1] === S.turn ? 'c' : line.indexOf(S.turn) > i - 1 ? 'd' : '') : ''; return `<span class="${c}">${t}</span>`; }).join('<i>→</i>')}</div>` : `<div class="muted" style="font-size:12px">결재 없음 · 작성자가 확정합니다</div>`;
+  const hist = (r.hist || []).slice().reverse().map(h => `<li><span class="t">${h[0]}</span><span>${PJ_RN(h[1])} · ${h[2]}${h[3] ? ` — ${esc(h[3])}` : ''}</span></li>`).join('');
+  const apprBox = P.appr ? (r.eng ? `<div class="rnote">이 결재는 승인함에서 진행합니다. <a class="btn pri" href="#appr" data-apgo="${r.pid}">승인함에서 결재 →</a></div>`
+    : `<div class="rfld w2 ${RV.cErr ? 'err' : ''}"><label for="rcmt">${HT}결재 의견 ${ROLE === 'ceo' ? '<span class="muted">(반려 시 필수)</span>' : '<span class="rq">*</span>'}</label><textarea id="rcmt" rows="3" aria-invalid="${!!RV.cErr}" aria-describedby="rcmt-m">${esc(RV.cmt)}</textarea><div class="fm" id="rcmt-m">${RV.cErr ? `<span class="em">⚠ ${RV.cErr}</span>` : ''}</div></div>`) : '';
+  const btns = [];
+  if (P.del) btns.push(`<button type="button" class="btn rdel" data-rdo="del">삭제</button>`);
+  btns.push('<span class="sp"></span>');
+  btns.push(`<button type="button" class="btn" data-rpreview>미리보기</button>`);
+  if (ed) btns.push(`<button type="button" class="btn" data-rdo="save">임시저장</button>`);
+  if (P.submit) btns.push(`<button type="button" class="btn pri" data-rdo="submit">${P.noLine ? '확정' : `상신 → ${PJ_RN(line[0])}`}</button>`);
+  if (P.reopen && !ed) btns.push(`<button type="button" class="btn" data-rdo="reopen">${S.s === 'fix' ? '수정' : '회수 후 수정'}</button>`);
+  if (P.appr && !r.eng) btns.push(`<button type="button" class="btn" data-rdo="rej" style="color:var(--bad)">반려</button><button type="button" class="btn pri" data-rdo="ok">${line.indexOf(S.turn) < line.length - 1 ? `승인 → ${PJ_RN(line[line.indexOf(S.turn) + 1])}` : '최종 승인'}</button>`);
+  return `${flash}<div class="rhead"><div style="min-width:0;flex:1">${ed ? `<div class="rfld ${RV.errs.title && (RV.touched.title || RV.tried) ? 'err' : ''}" style="margin:0"><label for="rf-title" class="sr">보고서 제목</label><input id="rf-title" class="rtitle" data-f="title" value="${esc(r.title)}" aria-invalid="${!!RV.errs.title}" aria-describedby="rf-title-m"><div class="fm" id="rf-title-m">${RV.errs.title && (RV.touched.title || RV.tried) ? `<span class="em">⚠ ${RV.errs.title}</span>` : ''}</div></div>` : `<h2 class="rtitle">${esc(r.title)}</h2>`}
+      <div class="muted" style="font-size:12px;margin-top:2px">${st[2]} · ${pjName(r.pid)} · 작성 ${PJ_RN(r.by)} · ${r.at}</div></div>
+      <div class="rstat">${pill(RPT_ST[S.s][0] + (S.s === 'sub' && S.turn ? ` · ${PJ_RN(S.turn)}` : ''), RPT_ST[S.s][1])}<span id="rsave" aria-live="polite">${ed ? rpSaveTxt() : ''}</span></div></div>
+    ${P.why ? `<div class="rperm ${P.adm ? 'adm' : ''}">${P.adm ? '🛡' : '🔒'} ${P.why}</div>` : ''}
+    ${S.s === 'rej' ? `<div class="rnote bad">반려됨 — ${esc(((r.hist || []).filter(h => h[2] === '반려').pop() || [])[3] || '')} · 보완 후 다시 상신하세요</div>` : ''}
+    ${lineBox}${sum}
+    <form id="rform" class="rgridf" novalidate onsubmit="return false">${RPT_F[r.st].map(x => rpField(x, r, ed)).join('')}${apprBox}</form>
+    <div class="rfoot">${btns.join('')}</div>
+    <details class="rhist"><summary>처리 이력 ${(r.hist || []).length}</summary><ul class="tl">${hist}</ul></details>`;
+}
+function rpListHtml() {
+  const L = rpList(RV.pid, RV.st), cc = rpCanCreate(RV.pid, RV.st), st = RSTG[RV.st];
+  if (!L.length || EXC.mode === 'empty') return emptyBox('📝', `${st[2]}가 아직 없습니다`, cc ? '이 단계의 보고서를 작성하세요. 작성 중에는 자동 저장되고, 필수값을 채워야 상신할 수 있습니다.' : `이 단계 보고서는 ${ROLES[rpOwner(RV.st, RV.pid)].n}가 작성합니다. 작성되면 여기에서 볼 수 있습니다.`, cc ? [`<button type="button" class="btn pri" data-rdo="new">+ ${st[2]} 작성</button>`] : []);
+  return L.map(r => { const S = rpStatus(r); return `<button type="button" class="rrow ${r.id === RV.sel ? 'on' : ''}" data-rsel="${r.id}"><b>${esc(r.title)}</b><span class="muted">${PJ_RN(r.by)} · ${r.at}</span>${pill(RPT_ST[S.s][0] + (S.s === 'sub' && S.turn ? ` · ${PJ_RN(S.turn)}` : ''), RPT_ST[S.s][1])}</button>`; }).join('') + (cc ? `<button type="button" class="btn rnew" data-rdo="new">+ 새 보고서</button>` : '');
+}
+VIEWS.rpt = () => {
+  rpEnsure();
+  if (!RV.pid) return pgTop('단계별 보고서', '', '') + `<section class="panel">${emptyBox('📂', '볼 수 있는 프로젝트가 없습니다', '담당 분야의 프로젝트가 생기면 단계별 보고서를 작성할 수 있습니다.', [])}</section>`;
+  const cnt = st => rpList(RV.pid, st).length, cur = pjStage(RV.pid);
+  const sel = `<label class="sr" for="rpid">프로젝트</label><select id="rpid" class="rpid">${rpPids().map(id => `<option value="${id}" ${id === RV.pid ? 'selected' : ''}>${pjName(id)}</option>`).join('')}</select>`;
+  return pgTop('단계별 보고서', '단계마다 보고서를 작성·편집하고 상신합니다 · 자동 저장 · 필수값·형식·중복 검사 · 권한별 편집', sel) +
+    `<nav class="rstg" aria-label="단계">${RPT_STG.map(s => `<button type="button" class="${s[0] === RV.st ? 'on' : ''} ${s[1] < cur ? 'pd' : s[1] === cur ? 'pc' : ''}" data-rst="${s[0]}" aria-current="${s[0] === RV.st}"><span class="n">${String(s[1] + 1).padStart(2, '0')}</span><span class="l">${s[2]}</span>${cnt(s[0]) ? `<span class="c">${cnt(s[0])}</span>` : ''}</button>`).join('')}</nav>
+    <div class="rlay"><aside class="panel rlist" aria-label="보고서 목록"><div class="ph"><h2>${RSTG[RV.st][2]}</h2>${RV.sel ? `<button type="button" class="btn rback" data-rlist>← 목록</button>` : ''}</div><div class="rli">${rpListHtml()}</div></aside>
+      <section class="panel redit" aria-label="보고서 편집">${RV.w && EXC.mode !== 'empty' ? rpEditor() : `<div class="pb">${emptyBox('👈', '보고서를 고르세요', '왼쪽 목록에서 보고서를 고르거나 새로 작성합니다.', [])}</div>`}</section></div>
+    <details class="panel rspec"><summary class="ph"><h2>버튼별 결과와 다음 화면 · 권한 · 예외 처리</h2></summary><div class="pb">${rpSpec()}</div></details>` +
+    roleFoot('단계별 보고서', '8단계마다 정해진 보고서를 같은 편집기로 씁니다. 작성자는 프로젝트 담당(접수·리뷰는 영업지원), 결재는 단계별 결재선을 따릅니다. 입력하면 자동 저장되고, 필수값·숫자·날짜·코드 형식·같은 제목 중복을 바로 알려 줍니다. 상신·삭제·회수·저장 안 하고 나가기는 한 번 더 확인합니다.', [['담당 · 작성·상신', 'p-rv'], ['영업임원·대표이사 · 결재', 'p-qp'], ['시스템데이터관리자 · 전체 수정·삭제', 'p-sys']]);
+};
+VIEWS.rpt.after = () => { const f = RV.focus, fl = document.querySelector('.rnext'); RV.focus = null; setTimeout(() => { const el = f && document.getElementById('rf-' + f); if (el) { el.focus({preventScroll: true}); el.scrollIntoView({block: 'center'}); } else if (fl && innerWidth < 900) fl.scrollIntoView({block: 'start'}); }, 20); };
+function rpSpec() {
+  return `<h3 style="font-size:13px;margin:0 0 6px">버튼별 결과와 다음 화면</h3>${tbl(['버튼', '누가', '성공하면', '실패하면'], [
+    ['+ 새 보고서', '작성자·관리자', '빈 양식이 열리고 제목이 자동으로 붙음 (같은 제목이면 차수 번호)', '권한 없으면 버튼이 보이지 않음'],
+    ['입력 (자동 저장)', '작성자·관리자', '1.2초 뒤 “저장 중…” → “✓ 저장됨 HH:MM”', '“저장 실패 · 이 기기에 임시 보관” + 다시 시도 · 화면은 그대로'],
+    ['임시저장', '작성자·관리자', '같은 화면 · 저장 시각 표시', '저장 실패 표시 · 다시 시도'],
+    ['상신 / 확정', '작성자·관리자', '확인 → 상태 “상신 · 영업임원” → 안내 카드에서 승인함·프로젝트 진행으로 이동', '필수값·형식·중복 오류를 항목 아래 빨간 글씨와 위쪽 목록으로 표시 · 첫 오류로 이동 / 네트워크 오류면 차단'],
+    ['회수 후 수정', '작성자 (다음 결재자 처리 전)', '확인 → “작성 중”으로 돌아가 편집 가능', '이미 다음 결재자가 처리했으면 버튼이 없음'],
+    ['승인 / 반려', '결재 차례인 사람', '다음 결재자에게 넘어가거나 최종 승인 · 반려는 작성자에게 돌아감', '의견 누락 시 의견란 아래 오류 (임원 필수 · 반려 필수)'],
+    ['삭제', '작성자 (작성 중만) · 관리자 (전부)', '확인 → 목록에서 사라지고 다른 보고서 또는 빈 상태', '취소하면 그대로'],
+    ['← 목록 · 다른 메뉴 · 뒤로 가기', '모두', '바로 이동', '저장 안 한 변경이 있으면 “저장 후 이동 / 저장 안 하고 이동 / 취소” 확인'],
+  ].map(r => tr(r)))}
+  <h3 style="font-size:13px;margin:14px 0 6px">권한</h3>${tbl(['', '작성자 (담당)', '결재자 (영업임원·대표이사)', '시스템데이터관리자', '그 밖의 역할'], [
+    ['보기', '✓', '✓', '✓', '✓ (담당 분야만)'], ['작성·편집', '작성 중·반려일 때', '—', '승인 전까지 모두 (이력에 남음)', '—'], ['상신·확정', '✓', '—', '✓ (대리)', '—'],
+    ['승인·반려', '—', '자기 차례일 때', '—', '—'], ['삭제', '작성 중일 때', '—', '✓ (상신·승인 건 포함, 추가 확인)', '—']].map(r => tr(r)))}
+  <h3 style="font-size:13px;margin:14px 0 6px">입력 검사</h3>${tbl(['종류', '규칙', '메시지 예'], [['필수', '* 표시 항목은 비울 수 없음', '개요를 입력하세요 · 의견을 고르세요'], ['숫자', '숫자·쉼표·소수점만 · 음수 불가', '숫자만 입력하세요'], ['비율', '0~100', '0~100 사이로 입력하세요'], ['날짜', 'YYYY-MM-DD · 실제 있는 날짜', '날짜는 2026-11-05 형식으로'], ['코드', 'WO-2026-0007 · C26-0007', 'WO-2026-0007 형식으로'], ['길이', '개요 30자 · 의견 10자 이상', '30자 이상 적어 주세요 (지금 12자)'], ['중복', '같은 프로젝트·단계에 같은 제목', '같은 단계에 같은 제목의 보고서가 있습니다'], ['업무 규칙', '협상 금액 ≤ 요청 금액 · 실주면 원인 필수 · 리스크율 권장 미만은 경고', '협상 금액이 요청 금액보다 큽니다']].map(r => tr(r)))}
+  <p class="muted" style="font-size:12px;margin-top:10px">화면 왼쪽 아래 ‘상태 미리보기’로 데이터 없음 · 저장 실패 · 네트워크 오류 상황을 바꿔 볼 수 있습니다.</p>`;
+}
+/* ---------- 동작 ---------- */
+let RP_T = 0;
+const rpSaveUI = () => { const s = document.getElementById('rsave'); if (s) s.innerHTML = rpSaveTxt(); };
+function rpDoSave(manual) {
+  return new Promise(res => {
+    if (!RV.w) return res(false);
+    RV.save = 'saving'; rpSaveUI();
+    setTimeout(() => {
+      if (excOffline() || EXC.mode === 'savefail') { RV.save = 'fail'; rpSaveUI(); if (manual) toast(excOffline() ? '네트워크 오류로 저장하지 못했습니다 · 이 기기에 임시 보관했습니다' : '저장하지 못했습니다 · 잠시 후 다시 시도하세요'); return res(false); }
+      const i = RPTS.findIndex(r => r.id === RV.w.id), copy = JSON.parse(JSON.stringify(RV.w));
+      if (i < 0) RPTS.push(copy); else RPTS[i] = copy;
+      rpPersist(); RV.dirty = false; RV.save = 'saved'; RV.savedAt = nowHM(); rpSaveUI();
+      const li = document.querySelector('.rli'); if (li) li.innerHTML = rpListHtml();
+      if (manual) toast(`임시저장했습니다 · ${RV.savedAt}`);
+      res(true);
+    }, manual ? 450 : 650);
+  });
+}
+const rpRevalidate = () => { const {E, W} = rpValidate(RV.w); RV.errs = E; RV.warns = W; };
+function rpFieldMsg(k) { // 입력 중 해당 항목 메시지만 갱신 (다시 그리지 않음)
+  const box = document.querySelector(`[data-fk="${k}"]`) || (k === 'title' ? document.getElementById('rf-title').closest('.rfld') : null); if (!box) return;
+  const show = RV.touched[k] || RV.tried, e = show && RV.errs[k], w = !e && RV.warns[k], m = box.querySelector('.fm'), x = (RPT_F[RV.w.st] || []).find(f => f.k === k);
+  box.classList.toggle('err', !!e); box.classList.toggle('wrn', !!w);
+  const inp = box.querySelector('[data-f]'); if (inp) inp.setAttribute('aria-invalid', String(!!e));
+  const v = String(RV.w.f[k] == null ? '' : RV.w.f[k]).trim();
+  m.innerHTML = (e ? `<span class="em">⚠ ${e}</span>` : w ? `<span class="wm">${w}</span>` : '') + (x && x.t === 'area' && x.min ? `<span class="cnt">${v.length}/${x.min}자 이상</span>` : x && x.t === 'list' ? '<span class="cnt">한 줄에 하나씩</span>' : '');
+}
+document.addEventListener('input', e => {
+  const t = e.target.closest('#rform [data-f], #rf-title'); if (!t || !RV.w) return;
+  const k = t.dataset.f; if (k === 'title') RV.w.title = t.value; else RV.w.f[k] = t.value;
+  RV.dirty = true; RV.save = 'idle'; rpRevalidate(); rpFieldMsg(k); rpSaveUI();
+  clearTimeout(RP_T); RP_T = setTimeout(() => { if (RV.dirty) rpDoSave(false); }, 1200);
+});
+document.addEventListener('change', e => { if (e.target.closest('#rform select[data-f]')) { RV.touched[e.target.dataset.f] = true; rpFieldMsg(e.target.dataset.f); } });
+document.addEventListener('focusout', e => {
+  const t = e.target.closest && e.target.closest('#rform [data-f], #rf-title'); if (!t || !RV.w) return;
+  const k = t.dataset.f; RV.touched[k] = true; rpRevalidate();
+  const x = (RPT_F[RV.w.st] || []).find(f => f.k === k); if (x && x.t === 'num' && !RV.errs[k]) t.value = rpFmt(x, t.value);
+  rpFieldMsg(k);
+});
+document.addEventListener('input', e => { if (e.target.id === 'rcmt') { RV.cmt = e.target.value; if (RV.cErr && RV.cmt.trim()) { RV.cErr = ''; const m = document.getElementById('rcmt-m'); m.innerHTML = ''; e.target.closest('.rfld').classList.remove('err'); } } });
+async function rpLeave() { // 저장 안 한 변경 확인
+  if (!RV.dirty && RV.save !== 'fail') return true;
+  const v = await qModal({title: '저장하지 않은 변경이 있습니다', body: `「${esc(RV.w.title)}」의 마지막 변경이 아직 저장되지 않았습니다.${RV.save === 'fail' ? ' 저장에 실패해 이 기기에만 임시 보관되어 있습니다.' : ''}`, buttons: [{l: '취소', v: null}, {l: '저장 안 하고 이동', v: 'drop'}, {l: '저장 후 이동', v: 'save', cls: 'pri'}]});
+  if (!v) return false;
+  if (v === 'save') { const ok = await rpDoSave(true); if (!ok) return false; }
+  RV.dirty = false; RV.save = 'idle'; return true;
+}
+const rpOpenSel = id => { RV.sel = id; RV.w = null; rpEnsure(); render(); };
+document.addEventListener('click', async e => {
+  const fo = e.target.closest('[data-rfocus]'); if (fo) { e.preventDefault(); const el = document.getElementById('rf-' + fo.dataset.rfocus); if (el) { el.focus(); el.scrollIntoView({block: 'center', behavior: 'smooth'}); } return; }
+  const st = e.target.closest('[data-rst]'); if (st) { if (!(await rpLeave())) return; RV.noAuto = false; RV.st = st.dataset.rst; RV.sel = null; RV.w = null; render(); return; }
+  const se = e.target.closest('[data-rsel]'); if (se) { if (se.dataset.rsel === RV.sel) return; if (!(await rpLeave())) return; RV.noAuto = false; rpOpenSel(se.dataset.rsel); if (innerWidth < 900) setTimeout(() => { const r = document.querySelector('.redit'); r && r.scrollIntoView({behavior: 'smooth'}); }, 60); return; }
+  if (e.target.closest('[data-rlist]')) { if (!(await rpLeave())) return; RV.sel = null; RV.w = null; RV.noAuto = true; render(); return; }
+  if (e.target.closest('[data-rpreview]') && RV.w) { const r = RV.w; openPanel(r.title, `${RSTG[r.st][2]} · 미리보기`, `<div class="doc" style="font-size:13.5px;line-height:1.75">${RPT_F[r.st].map(x => `<h3 style="font-size:13.5px;margin:12px 0 4px">${x.l}</h3>${x.t === 'list' ? `<ul style="margin:0;padding-left:18px">${String(r.f[x.k] || '').split('\n').filter(Boolean).map(s => `<li>${esc(s)}</li>`).join('') || '<li class="muted">—</li>'}</ul>` : `<p style="margin:0">${esc(rpFmt(x, r.f[x.k])) || '<span class="muted">—</span>'}${x.unit && r.f[x.k] ? ' ' + x.unit : ''}</p>`}`).join('')}</div>`); return; }
+  const b = e.target.closest('[data-rdo]'); if (!b) return; e.preventDefault();
+  const a = b.dataset.rdo;
+  if (a === 'new') {
+    if (!rpCanCreate(RV.pid, RV.st)) { toast('이 단계 보고서를 작성할 권한이 없습니다'); return; }
+    if (!(await rpLeave())) return;
+    const st0 = RSTG[RV.st], n = rpList(RV.pid, RV.st).length, base = `${pjName(RV.pid).split(' ').slice(0, 2).join(' ')} ${st0[2]}`;
+    const title = n ? `${base} #${n + 1}` : base;
+    RV.w = {id: 'R' + Date.now(), pid: RV.pid, st: RV.st, title, status: 'draft', f: {}, by: ROLE, at: pjNow(), hist: [[pjNow(), ROLE, '작성 시작', '']], turn: null};
+    RV.sel = RV.w.id; RV.dirty = true; RV.errs = {}; RV.touched = {}; RV.tried = false; RV.save = 'idle';
+    rpRevalidate(); RV.flash = {ok: true, msg: '새 보고서를 열었습니다', next: '필수(*) 항목을 채우면 상신할 수 있습니다 · 입력하면 자동 저장'};
+    render(); rpDoSave(false); return;
+  }
+  const r = RV.w; if (!r) return; const P = rpPerm(r), stg = RSTG[r.st], line = stg[4];
+  if (a === 'save') { if (!P.edit && RV.save !== 'fail') return; await rpDoSave(true); return; }
+  if (a === 'del') {
+    const S = rpStatus(r);
+    const v = await qModal({title: '보고서를 삭제할까요?', body: `「${esc(r.title)}」을(를) 삭제합니다. 삭제하면 되돌릴 수 없습니다.${S.s !== 'draft' ? `<div class="rnote bad" style="margin-top:8px">이 보고서는 ‘${RPT_ST[S.s][0]}’ 상태입니다. 관리자 권한으로 삭제하면 결재 기록에는 남고 보고서 본문만 지워집니다.</div>` : ''}`, buttons: [{l: '취소', v: 0}, {l: '삭제', v: 1, cls: 'dng'}]});
+    if (!v) return;
+    if (excOffline()) { toast('네트워크 오류로 삭제하지 못했습니다 · 다시 시도하세요'); return; }
+    RPTS = RPTS.filter(x => x.id !== r.id); rpPersist(); RV.sel = null; RV.w = null; RV.dirty = false;
+    toast('보고서를 삭제했습니다'); rpEnsure(); RV.flash = RV.w ? {ok: true, msg: '삭제했습니다', next: '같은 단계의 다른 보고서를 열었습니다'} : null; render(); return;
+  }
+  if (a === 'reopen') {
+    const v = await qModal({title: rpStatus(r).s === 'fix' ? '확정한 보고서를 수정할까요?' : '결재를 회수하고 수정할까요?', body: rpStatus(r).s === 'fix' ? '‘작성 중’으로 돌아가며 다시 확정해야 합니다.' : `진행 중인 결재(${PJ_RN(rpStatus(r).turn)} 차례)가 회수되고 ‘작성 중’으로 돌아갑니다. 수정 후 다시 상신해야 합니다.`, buttons: [{l: '취소', v: 0}, {l: '회수하고 수정', v: 1, cls: 'pri'}]});
+    if (!v) return;
+    if (excOffline()) { toast('네트워크 오류로 회수하지 못했습니다'); return; }
+    if (r.eng && PJS[r.pid].wait && PJS[r.pid].wait.kind === r.eng.kind) { pjAct(r.pid, 'recall', ROLE, '보고서 수정', true); pjSync(); saveSoon(); }
+    r.status = 'draft'; r.turn = null; r.eng = null; r.hist.push([pjNow(), ROLE, '회수', '']); await rpDoSave(false);
+    RV.flash = {ok: true, msg: '회수했습니다 · 이제 수정할 수 있습니다', next: '고친 뒤 다시 상신'}; render(); return;
+  }
+  if (a === 'submit') {
+    RV.tried = true; rpRevalidate();
+    if (Object.keys(RV.errs).length) { const first = Object.keys(RV.errs)[0]; RV.focus = first === 'title' ? 'title' : first; render(); toast(`입력을 확인하세요 · ${Object.keys(RV.errs).length}개 항목`); return; }
+    const warn = Object.values(RV.warns);
+    const v = await qModal({title: line.length ? `${PJ_RN(line[0])}에게 상신할까요?` : '보고서를 확정할까요?', body: `「${esc(r.title)}」${line.length ? `을(를) 상신합니다. 결재선: 담당 → ${line.map(PJ_RN).join(' → ')}. 상신 후에는 회수해야 고칠 수 있습니다.` : '을(를) 확정합니다. 확정 후에도 작성자가 다시 열어 고칠 수 있습니다.'}${warn.length ? `<div class="rnote" style="margin-top:8px">⚠ ${warn.join(' · ')}</div>` : ''}`, buttons: [{l: '취소', v: 0}, {l: line.length ? '상신' : '확정', v: 1, cls: 'pri'}]});
+    if (!v) return;
+    if (excOffline()) { RV.flash = {ok: false, msg: '네트워크 오류로 상신하지 못했습니다', next: '연결 후 다시 상신하세요 · 작성 내용은 이 기기에 보관 중'}; render(); return; }
+    if (EXC.mode === 'savefail') { RV.save = 'fail'; RV.flash = {ok: false, msg: '서버에 저장하지 못해 상신하지 못했습니다', next: '잠시 후 다시 시도하세요'}; render(); return; }
+    const op = String(r.f.op || r.f.nx || '').trim();
+    const nx = pjNext(r.pid), eng = stg[5] && nx && nx.acts && nx.acts.some(x => x[0] === 'req') && pjStage(r.pid) === stg[1] ? stg[5] : null;
+    if (eng) { const n0 = PJS[r.pid].done.filter(d => d.kind === eng).length; pjAct(r.pid, 'req', ROLE, op || r.title, true); pjSync(); saveSoon(); r.eng = {kind: eng, n: n0}; }
+    r.status = line.length ? 'sub' : 'fix'; r.turn = line[0] || null; r.hist.push([pjNow(), ROLE, line.length ? '상신' : '확정', op]);
+    await rpDoSave(false);
+    const nextStg = RPT_STG[stg[1] + 1];
+    RV.flash = line.length ? {ok: true, msg: `상신했습니다 → ${PJ_RN(line[0])} 검토`, next: eng ? '승인함에 결재가 올라갔습니다' : `${PJ_RN(line[0])}가 이 화면에서 승인·반려합니다`, links: [[eng ? '승인함 보기' : '프로젝트 진행 보기', eng ? '#appr' : '#pipe', 1], ['목록으로', '#rpt-list']]}
+      : {ok: true, msg: '확정했습니다', next: nextStg ? `${String(nextStg[1] + 1).padStart(2, '0')} ${nextStg[2]}` : '마지막 단계입니다', links: nextStg ? [[`${nextStg[2]} 작성 →`, '#rpt', 1]] : []};
+    if (!line.length && nextStg) RV.nextSt = nextStg[0];
+    toast(RV.flash.msg); render(); return;
+  }
+  if (a === 'ok' || a === 'rej') {
+    const need = a === 'rej' || ROLE !== 'ceo';
+    if (need && !RV.cmt.trim()) { RV.cErr = a === 'rej' ? '반려 사유를 입력하세요' : '결재 의견을 입력하세요 (대표이사가 아닌 결재는 필수)'; render(); setTimeout(() => { const t = document.getElementById('rcmt'); t && t.focus(); }, 30); return; }
+    const v = await qModal({title: a === 'ok' ? '승인할까요?' : '반려할까요?', body: a === 'ok' ? `「${esc(r.title)}」을(를) 승인합니다.` : `「${esc(r.title)}」을(를) 반려합니다. 작성자에게 돌아가 보완 후 다시 상신합니다.`, buttons: [{l: '취소', v: 0}, {l: a === 'ok' ? '승인' : '반려', v: 1, cls: a === 'ok' ? 'pri' : 'dng'}]});
+    if (!v) return;
+    if (excOffline()) { toast('네트워크 오류로 처리하지 못했습니다'); return; }
+    const i = line.indexOf(r.turn);
+    if (a === 'rej') { r.status = 'rej'; r.turn = null; }
+    else if (i < line.length - 1) r.turn = line[i + 1]; else { r.status = 'ok'; r.turn = null; }
+    r.hist.push([pjNow(), ROLE, a === 'ok' ? '승인' : '반려', RV.cmt.trim()]); RV.cmt = ''; RV.cErr = '';
+    const ix = RPTS.findIndex(x => x.id === r.id); RPTS[ix] = JSON.parse(JSON.stringify(r)); rpPersist();
+    RV.flash = a === 'rej' ? {ok: true, msg: '반려했습니다', next: `${PJ_RN(r.by)}에게 돌아갑니다`, links: [['승인함으로', '#appr']]} : r.status === 'ok' ? {ok: true, msg: '최종 승인했습니다', next: '보고서가 확정되었습니다', links: [['승인함으로', '#appr']]} : {ok: true, msg: `승인했습니다 → ${PJ_RN(r.turn)}`, next: `${PJ_RN(r.turn)} 차례`, links: [['승인함으로', '#appr']]};
+    toast(RV.flash.msg); render(); return;
+  }
+});
+document.addEventListener('click', e => { const a = e.target.closest('.rnext a[href="#rpt"], .rnext a[href="#rpt-list"]'); if (!a) return; e.preventDefault(); if (a.getAttribute('href') === '#rpt' && RV.nextSt) { RV.st = RV.nextSt; RV.nextSt = null; RV.noAuto = false; } else RV.noAuto = true; RV.sel = null; RV.w = null; render(); });
+document.addEventListener('change', async e => {
+  if (e.target.id !== 'rpid') return; const v = e.target.value;
+  if (!(await rpLeave())) { e.target.value = RV.pid; return; }
+  RV.pid = v; RV.noAuto = false; RV.st = null; RV.sel = null; RV.w = null; render();
+});
+/* 다른 메뉴로 나가기 · 뒤로 가기 · 창 닫기 확인 */
+document.addEventListener('click', async e => {
+  if (CUR !== 'rpt' || (!RV.dirty && RV.save !== 'fail')) return;
+  const a = e.target.closest('a[href^="#"]'); if (!a || a.closest('.rnext') || a.getAttribute('href') === '#' || a.getAttribute('href') === '#rpt') return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  if (await rpLeave()) location.hash = a.getAttribute('href');
+}, true);
+let RP_BACK = false;
+addEventListener('hashchange', async ev => {
+  if (RP_BACK) { RP_BACK = false; return; }
+  const from = (ev.oldURL.split('#')[1] || ''), to = location.hash;
+  if (from.split('?')[0] !== 'rpt' || to === '#rpt' || (!RV.dirty && RV.save !== 'fail')) return;
+  RP_BACK = true; location.hash = '#rpt';
+  if (await rpLeave()) location.hash = to;
+});
+addEventListener('beforeunload', e => { if (CUR === 'rpt' && (RV.dirty || RV.save === 'fail')) { e.preventDefault(); e.returnValue = ''; } });
+/* 진입: 메뉴 · 프로젝트 진행 패널 · 승인함 */
+(() => { const g = MENU[0]; if (!MENU_INDEX.rpt) { const it = {id: 'rpt', l: '단계별 보고서', r: '*'}; g.items.splice(Math.min(2, g.items.length), 0, it); MENU_INDEX.rpt = it; MENU_ROLE.rpt = '*'; } })();
+V2C.rpt = 'SAL-ANL-01';
+document.addEventListener('click', e => { const b = e.target.closest('[data-rptgo]'); if (!b) return; e.preventDefault(); const [pid, st] = b.dataset.rptgo.split(':'); RV.pid = pid; RV.st = st; RV.sel = null; RV.w = null; if (typeof closeDrawer === 'function') try { closeDrawer(true); } catch (x) {} if (location.hash === '#rpt') render(); else location.hash = '#rpt'; });
+const _pjOpenRpt = pjOpen;
+pjOpen = id => { _pjOpenRpt(id); const b = document.querySelector('.dw .dw-b'); if (!b || b.querySelector('[data-rptgo]')) return; const st = RPT_STG[Math.min(7, pjStage(id))]; const bar = b.querySelector('.pjbar'); (bar || b.firstElementChild).insertAdjacentHTML('afterend', `<div style="margin-top:10px"><button type="button" class="btn rbtn" data-rptgo="${id}:${st[0]}" style="min-height:28px;font-size:12.5px">📝 ${st[2]} 작성·보기 →</button></div>`); };
+const _apdRpt = apDetail;
+apDetail = k => { const h = _apdRpt(k), a = APPR.find(x => x.k === k); if (!a || !a.wait) return h; const st = RPT_STG.find(s => s[5] === a.wait.kind); if (!st) return h; return h.replace(/(<span class="muted" style="font-size:12px;font-weight:700;margin-right:2px">관련 문서<\/span>)/, `$1<button type="button" class="btn rbtn" data-rptgo="${a.pid}:${st[0]}" style="min-height:28px;font-size:12.5px;padding:0 10px">${st[2]} (편집기)</button>`); };
+
+document.head.insertAdjacentHTML('beforeend', `<style>
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.rpid{font:inherit;font-size:13.5px;min-height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--surface);color:var(--fg);max-width:100%}
+.rstg{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin;margin:0 0 12px;padding-bottom:2px}
+.rstg button{flex:1 0 118px;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:7px 9px;font:inherit;font-size:12.5px;color:var(--fg2);cursor:pointer;text-align:left}
+.rstg button .n{font-weight:800;font-size:11.5px;color:var(--muted)}.rstg button .l{flex:1;line-height:1.3}.rstg button .c{min-width:18px;height:18px;border-radius:9px;background:var(--chip);font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 5px}
+.rstg button.pd{background:var(--accent-soft)}.rstg button.pc{border-color:var(--accent)}
+.rstg button.on{background:var(--accent);border-color:var(--accent);color:#fff}.rstg button.on .n{color:#fff}.rstg button.on .c{background:rgba(255,255,255,.25)}
+.rlay{display:grid;grid-template-columns:minmax(240px,300px) minmax(0,1fr);gap:14px;align-items:start}
+.rlist .rli{display:flex;flex-direction:column}
+.rrow{display:flex;flex-direction:column;gap:4px;align-items:flex-start;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 14px;font:inherit;color:inherit;cursor:pointer}
+.rrow b{font-size:13px;font-weight:600}.rrow .muted{font-size:11.5px}.rrow:hover{background:var(--chip)}.rrow.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.rnew{margin:10px 14px 14px;align-self:flex-start}.rback{display:none;min-height:28px;font-size:12.5px}
+.redit{padding:16px 18px}
+.rhead{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.rtitle{font-size:17px;font-weight:700;margin:0;width:100%}input.rtitle{border:1px solid transparent;border-radius:8px;padding:4px 6px;margin-left:-7px;background:transparent;color:var(--fg);font:inherit;font-size:17px;font-weight:700}
+input.rtitle:hover,input.rtitle:focus{border-color:var(--line);background:var(--surface)}
+.rstat{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.sv{font-size:12px;color:var(--muted);display:inline-flex;gap:6px;align-items:center}.sv.ok{color:var(--ok,#1a7f37)}.sv.bad{color:var(--bad)}
+.sv .lnk{all:unset;cursor:pointer;color:var(--accent);text-decoration:underline;font-weight:600}
+.spin{width:11px;height:11px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;display:inline-block;animation:spn .7s linear infinite}@keyframes spn{to{transform:rotate(360deg)}}
+.rperm{margin:10px 0 0;padding:8px 10px;border-radius:8px;background:var(--chip);font-size:12.5px;color:var(--fg2)}.rperm.adm{background:#EEF4FF}
+.rnote{margin:10px 0 0;padding:8px 10px;border-radius:8px;background:var(--warn-soft,#FFF4E5);font-size:12.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.rnote.bad{background:#FDECEA;color:#8A1C11}
+.rline{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:12px 0 0;font-size:12px}.rline span{padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--muted)}.rline span.d{background:var(--accent-soft);color:var(--accent)}.rline span.c{background:var(--accent);color:#fff;font-weight:700}.rline i{font-style:normal;color:var(--muted)}
+.rsum{margin:12px 0 0;padding:10px 12px;border:1px solid var(--bad);border-radius:10px;background:#FDF3F1;font-size:13px}.rsum b{color:var(--bad)}.rsum ul{margin:6px 0 0;padding-left:18px}.rsum a{color:var(--bad)}
+.rgridf{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin-top:14px}
+.rfld{display:flex;flex-direction:column;gap:5px;min-width:0}.rfld.w2{grid-column:1/-1}
+.rfld label{font-size:12.5px;font-weight:600;color:var(--fg2)}.rfld .rq{color:var(--bad)}
+.rfld input,.rfld select,.rfld textarea{font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);color:var(--fg);min-height:38px;width:100%;box-sizing:border-box}
+.rfld textarea{resize:vertical;line-height:1.55}
+.rfld input:focus,.rfld select:focus,.rfld textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+.rfld.err input,.rfld.err select,.rfld.err textarea{border-color:var(--bad);background:#FFF8F7}.rfld.wrn input{border-color:#E8A23A}
+.rfld .fm{display:flex;justify-content:space-between;gap:8px;min-height:16px;font-size:12px}.rfld .em{color:var(--bad);font-weight:600}.rfld .wm{color:#9A5B00}.rfld .cnt{color:var(--muted);margin-left:auto}
+.rv-ro{font-size:13.5px;line-height:1.6;padding:6px 0;border-bottom:1px dashed var(--line);white-space:pre-wrap}.rv-ro ul{margin:0;padding-left:18px;white-space:normal}
+.rfoot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}.rfoot .sp{flex:1}.rdel{color:var(--bad)}
+.rnext{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:#EAF6EE;border:1px solid #BFE3CB;font-size:13px}.rnext.bad{background:#FDECEA;border-color:#F3B8B0}.rnext>div{display:flex;gap:6px;margin-left:auto}.rnext .btn{min-height:30px;font-size:12.5px}
+.rhist{margin-top:12px;font-size:12.5px}.rhist summary{cursor:pointer;color:var(--muted);font-weight:600}
+.rspec{margin-top:14px}.rspec summary{cursor:pointer;list-style:none}.rspec summary::-webkit-details-marker{display:none}
+html.scr .rspec{display:none}
+@media (max-width:900px){
+  .rlay{grid-template-columns:1fr}
+  .rback{display:inline-flex}
+  .rgridf{grid-template-columns:1fr}
+  .rfoot{position:sticky;bottom:0;background:var(--surface,#fff);margin:12px -18px -16px;padding:10px 18px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 16px rgba(0,0,0,.06);z-index:5}
+  .rfoot .btn{flex:1 1 auto}.rfoot .sp{display:none}
+  .rstg button{flex:0 0 auto}
+  .redit{padding:14px}
+  body:has(.rfoot) .toast{bottom:96px}
+  .rstat{align-items:flex-start;flex-direction:row;flex-wrap:wrap}
+}
+</style>`);
 
 render();
 })();
